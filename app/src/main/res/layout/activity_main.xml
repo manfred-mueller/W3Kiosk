@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainRelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/settingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:alpha="1.0"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/settingsButton"
+        android:src="@mipmap/ic_launcher_round"
+        app:rippleColor="@android:color/transparent"
+        app:backgroundTint="@android:color/transparent"
+        app:pressedTranslationZ="0dp"
+        app:borderWidth="0dp"
+        app:elevation="0dp" />
+
+    <WebView
+        android:id="@+id/kioskView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        tools:context=".MainActivity" />
+
+</RelativeLayout>
