@@ -3,6 +3,4 @@ A kiosk-like android web browser with password-protected settings, autostart fun
 
 Needs android.permission.SYSTEM_ALERT_WINDOW.
 
-adb shell pm grant \
-  com.nass.ek.w3kiosk\
-  android.permission.SYSTEM_ALERT_WINDOW
+adb shell pm grant com.nass.ek.w3kiosk android.permission.SYSTEM_ALERT_WINDOW
