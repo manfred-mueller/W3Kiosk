@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     android:orientation="vertical"
-    android:onClick="hideKeyboard">
+    android:onClick="hideKeyboard"
+    tools:ignore="UsingOnClickInXml">
 
     <TextView
         android:layout_width="wrap_content"
@@ -31,7 +32,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="5dp">
+
+                <Switch
+                    android:id="@+id/mobileToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:background="?android:attr/colorBackground"
+                    tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -39,20 +50,10 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentBottom="true"
-                    android:text="@string/mobile_mode"
-                    android:textSize="15sp"
+                    android:layout_toStartOf="@id/mobileToggle"
                     android:focusable="auto"
-                    android:layout_toStartOf="@id/mobileToggle" />
-
-                <Switch
-                    android:id="@+id/mobileToggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="?android:attr/colorBackground"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+                    android:text="@string/mobile_mode"
+                    android:textSize="15sp" />
 
             </RelativeLayout>
 
@@ -60,7 +61,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="5dp">
+
+                <Switch
+                    android:id="@+id/autofillToggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:background="?android:attr/colorBackground"
+                    tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -68,20 +79,10 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentBottom="true"
-                    android:text="@string/check_autofill"
-                    android:textSize="15sp"
+                    android:layout_toStartOf="@id/autofillToggle"
                     android:focusable="auto"
-                    android:layout_toStartOf="@id/autofillToggle" />
-
-                <Switch
-                    android:id="@+id/autofillToggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="?android:attr/colorBackground"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+                    android:text="@string/check_autofill"
+                    android:textSize="15sp" />
 
             </RelativeLayout>
 
@@ -96,11 +97,12 @@
                 android:paddingRight="10dp">
 
                 <TextView
+                    android:id="@+id/clientText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:focusable="auto"
-                    android:text="@string/website"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <EditText
@@ -115,11 +117,163 @@
                     android:nextFocusLeft="@id/clientEditText"
                     android:nextFocusUp="@id/clientEditText"
                     android:singleLine="true"
-                    android:text="@string/default_url"
+                    android:text=""
                     android:textCursorDrawable="@color/colorPrimary"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/permissionLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="invisible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
+                        <TextView
+                            android:id="@+id/permissions"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentBottom="false"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_horizontal"
+                            android:text="@string/permissions"
+                            android:textSize="15sp"
+                            tools:ignore="UsingOnClickInXml,TouchTargetSizeCheck" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/phoneAccess"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:clickable="false"
+                            android:onClick="checkPhonePermission"
+                            android:text="@string/phone_access" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/micAccess"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:onClick="checkMicPermission"
+                            android:text="@string/mic_access" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/camAccess"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:clickable="false"
+                            android:onClick="checkCameraPermission"
+                            android:text="@string/camera_access" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/overlayPerm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:onClick="checkOverlayPermission"
+                            android:text="@string/overlay_permission" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/powerMenu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:clickable="false"
+                            android:onClick="checkAccessibilityPermission"
+                            android:text="@string/powermenu" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/writeSystem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:onClick="checkWritePermission"
+                            android:text="@string/write_system_settings" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+
         </LinearLayout>
     </ScrollView>
 
@@ -138,7 +292,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
-            android:onClick="autofillSettings"
+            android:onClick="sdClick"
             android:text="@string/copyright"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="12sp" />
@@ -149,30 +303,47 @@
             android:layout_weight="1" />
 
         <ImageButton
+            android:id="@+id/scannerButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:contentDescription="@string/scanner_button"
+            android:onClick="configureScanner"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/barcode"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
+
+        <ImageButton
             android:id="@+id/setLauncherButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="end"
             android:contentDescription="@string/set_launcher_button"
             android:onClick="setLauncher"
-            app:srcCompat="@android:drawable/ic_dialog_dialer" />
+            android:visibility="visible"
+            app:srcCompat="@android:drawable/ic_dialog_dialer"
+            tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
         <ImageButton
             android:id="@+id/systemSettingsButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="end"
             android:contentDescription="@string/system_settings_button"
             android:onClick="startSystemSettings"
-            app:srcCompat="@android:drawable/ic_menu_manage" />
+            app:srcCompat="@android:drawable/ic_menu_manage"
+            tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
         <ImageButton
             android:id="@+id/settingsSaveButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="end"
             android:contentDescription="@string/settings_save_button"
-            app:srcCompat="@android:drawable/ic_menu_save" />
+            app:srcCompat="@android:drawable/ic_menu_save"
+            tools:ignore="RedundantDescriptionCheck,ImageContrastCheck" />
 
     </LinearLayout>
 </LinearLayout>

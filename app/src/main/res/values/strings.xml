@@ -7,8 +7,8 @@
     <string name="settingsButton" translatable="false">SettingsButton</string>
     <string name="check_autofill">Check AutoFill</string>
     <string name="mobile_mode">Mobile Mode</string>
-    <string name="website">Client url (https://w3coach.de/ will be preset)</string>
-    <string name="copyright" translatable="false">© 2021, NASS e.K.</string>
+    <string name="website">Client url (%s will be preset)</string>
+    <string name="copyright" translatable="false">© 2022, NASS e.K.</string>
     <string name="set_home_button" translatable="false">Set home button</string>
     <string name="set_launcher_button" translatable="false">Set launcher button</string>
     <string name="settings_save_button" translatable="false">Settings save button</string>
@@ -20,7 +20,7 @@
     <string name="anydeskbutton" translatable="false">anydeskButton</string>
     <string name="closebutton" translatable="false">closeButton</string>
     <string name="logo" translatable="false">logo</string>
-    <string name="helpText">If installed, you will see buttons for TeamviewerⓇ or AnydeskⓇ above. Please start these apps on request of the support only.\n\nIf no button(s) can be seen, head over to the GoogleⓇ Playstore™ and install either TeamviewerⓇ Quicksupport™ or AnydeskⓇ.</string>
+    <string name="helpText">If installed, you will see buttons for TeamviewerⓇ or AnydeskⓇ above. Please start these apps on request of the support only.\n\nIf no button(s) can be seen, head over to the GoogleⓇ Playstore™ and install either TeamviewerⓇ Quicksupport™ or AnydeskⓇ.\n\nTo reload the configured url please key in \'r\' and click \'ok\'.</string>
     <string name="invalid_url">Invalid or unreachable url:\u0020</string>
     <string name="additional_perms">Additional permissions are needed!</string>
     <string name="cam_permission">Camera access denied, recording impossible!</string>
@@ -30,4 +30,18 @@
     <string name="running_on">Running on:\u0020</string>
     <string name="disable_autofill">Disable AutoFill</string>
     <string name="autofill_text">AutoFill in a kiosk app is insecure. Please disable AutoFill.</string>
+    <string name="camera_access">Camera access</string>
+    <string name="mic_access">Microphone access</string>
+    <string name="phone_access">Phone access</string>
+    <string name="overlay_permission">Overlay permission</string>
+    <string name="powermenu">Power menu</string>
+    <string name="login_name">Login name:</string>
+    <string name="autologin">Autologin</string>
+    <string name="login_password">Login password:</string>
+    <string name="write_system_settings">System settings</string>
+    <string name="permissions">Permissions</string>
+    <string name="modelTxt">Model:\u0020</string>
+    <string name="serialTxt">serial:\u0020</string>
+    <string name="scanner_button" translatable="false">scannerButton</string>
+    <string name="service_description">Service to call the powermenu</string>
 </resources>

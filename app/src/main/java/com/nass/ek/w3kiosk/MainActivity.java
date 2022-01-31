@@ -1,8 +1,8 @@
 package com.nass.ek.w3kiosk;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,13 +10,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,25 +29,27 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
+import java.lang.reflect.Method;
+
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final int RequestPermissionCode = 1;
     public String PASSWORD = "0000";
     public WebView kioskWeb;
     private int currentApiVersion;
     Context context = this;
     public String urlPreset;
     public boolean checkAutofill;
-    public boolean mobileMode;
+    public boolean checkcamAccess;
+    public boolean checksystemSettings;
+    public boolean checkwriteOverlay;
+    public boolean checkpowerDown;
+    public boolean checkmobileMode;
     public String clientUrl;
 
     String tvUri = "com.teamviewer.quicksupport.market";
@@ -62,7 +64,54 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public boolean isScanner() {
-        return android.os.Build.MODEL.startsWith("C4050") || android.os.Build.MODEL.startsWith("C72") || android.os.Build.MODEL.startsWith("C61");
+        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
+    }
+
+    public static String getSerialNumber() {
+        String serialNumber;
+
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class);
+
+            // (?) Lenovo Tab (https://stackoverflow.com/a/34819027/1276306)
+            serialNumber = (String) get.invoke(c, "gsm.sn1");
+
+            if (serialNumber.equals(""))
+                // Samsung Galaxy S5 (SM-G900F) : 6.0.1
+                // Samsung Galaxy S6 (SM-G920F) : 7.0
+                // Samsung Galaxy Tab 4 (SM-T530) : 5.0.2
+                // (?) Samsung Galaxy Tab 2 (https://gist.github.com/jgold6/f46b1c049a1ee94fdb52)
+                serialNumber = (String) get.invoke(c, "ril.serialnumber");
+
+            if (serialNumber.equals(""))
+                // Archos 133 Oxygen : 6.0.1
+                // Google Nexus 5 : 6.0.1
+                // Hannspree HANNSPAD 13.3" TITAN 2 (HSG1351) : 5.1.1
+                // Honor 5C (NEM-L51) : 7.0
+                // Honor 5X (KIW-L21) : 6.0.1
+                // Huawei M2 (M2-801w) : 5.1.1
+                // (?) HTC Nexus One : 2.3.4 (https://gist.github.com/tetsu-koba/992373)
+                serialNumber = (String) get.invoke(c, "ro.serialno");
+
+            if (serialNumber.equals(""))
+                // (?) Samsung Galaxy Tab 3 (https://stackoverflow.com/a/27274950/1276306)
+                serialNumber = (String) get.invoke(c, "sys.serialnumber");
+
+            if (serialNumber.equals(""))
+                // Chainway scanner
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    serialNumber = Build.getSerial();
+                }
+            // If none of the methods above worked
+            if (serialNumber.equals(Build.UNKNOWN))
+                serialNumber = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialNumber = null;
+        }
+
+        return serialNumber;
     }
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
@@ -78,19 +127,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 if (isConnected) {
                     commitURL(urlPreset + clientUrl);
                 } else {
-                    kioskWeb.loadUrl("about:blank");
+                    kioskWeb.loadUrl("file:///android_asset/nonet.svg");
                 }
             }
         }
     };
 
+    @SuppressLint("ApplySharedPref")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mobileMode = sharedPreferences.getBoolean("mobileMode", false);
+        checkcamAccess = sharedPreferences.getBoolean("camera", false);
+        checksystemSettings = sharedPreferences.getBoolean("system", false);
+        checkwriteOverlay = sharedPreferences.getBoolean("overlay", false);
+        checkpowerDown = sharedPreferences.getBoolean("powerdown", false);
+        checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
-        clientUrl = sharedPreferences.getString("clientUrl", "w3c");
+        clientUrl = sharedPreferences.getString("clientUrl", "");
         urlPreset = getString(R.string.url_preset);
         setContentView(R.layout.activity_main);
         kioskWeb = findViewById(R.id.kioskView);
@@ -109,17 +163,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
-            Toast.makeText(this, getString(R.string.additional_perms), Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-        startActivityForResult(intent, 4712);
-        }
-
         currentApiVersion = Build.VERSION.SDK_INT;
-        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         if (currentApiVersion >= Build.VERSION_CODES.KITKAT) {
             getWindow().getDecorView().setSystemUiVisibility(flags);
             final View decorView = getWindow().getDecorView();
@@ -149,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         checkPasswordDialog.setTitle(title);
         checkPasswordDialog.setCancelable(false)
-                .setPositiveButton("OK", (dialog, id) -> {
+                .setPositiveButton("Ok", (dialog, id) -> {
                     String PwInput = password.getText().toString();
                     if (PwInput.equals("exit")) {
                         finish();
@@ -157,6 +207,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     else if (PwInput.equals("h")) {
                         Intent startSupportActivityIntent = new Intent(getApplicationContext(), SupportActivity.class);
                         startActivity(startSupportActivityIntent);
+                    }
+                    else if (PwInput.equals("r")) {
+                        commitURL(urlPreset + clientUrl);
                     }
                     else if (PwInput.equals(PASSWORD)) {
                         Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
@@ -183,25 +236,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         }
                     }
                     else if (PwInput.equals("i")) {
-                        Toast.makeText(MainActivity.this, getString(R.string.running_on) + Build.PRODUCT, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.running_on) + Build.MODEL, Toast.LENGTH_LONG).show();
                     }
-                     else {
-                        checkPassword(getString(R.string.code_or_help));
+                    else {
+                        dialog.cancel();
                     }
                 });
 
         checkPasswordDialog.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
-        checkPasswordDialog.show();
+        AlertDialog dialog = checkPasswordDialog.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setAllCaps(false);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private void setupSettings() {
-        EnableRuntimePermission();
-        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.M) {
-            CheckWritePermission();
-        }
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnLongClickListener(v -> {
+            recreate();
+            return true;
+        });
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
 
         kioskWeb.setWebChromeClient(new WebChromeClient() {
@@ -219,15 +275,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 webView.stopLoading();
             } catch (Exception ignored) {
             }
-            webView.loadUrl("about:blank");
+                webView.loadUrl("file:///android_asset/nonet.svg");
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
             alertDialog.setTitle(getString(R.string.error));
             alertDialog.setMessage(getString(R.string.check_internet));
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    commitURL(urlPreset + clientUrl);
-                }
-            });
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl));
 
             alertDialog.show();
             super.onReceivedError(webView, errorCode, description, failingUrl);
@@ -240,11 +292,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         kioskWeb.getSettings().setMediaPlaybackRequiresUserGesture(false);
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        setMobileMode(mobileMode);
-        kioskWeb.setOnLongClickListener(view -> {
-            commitURL(urlPreset + clientUrl);
-            return true;
-        });
+        kioskWeb.getSettings().setDomStorageEnabled(true);
+        setMobileMode(checkmobileMode);
 
     }
 
@@ -267,15 +316,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void commitURL(String url) {
         if (url.equals(urlPreset))
         {
-            url += getString(R.string.default_url);
+            Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(startSettingsActivityIntent);
         }
-        if (isNetworkAvailable())
-        {
+        if (isNetworkAvailable()) {
             kioskWeb.loadUrl(url);
         }
         else
         {
-            kioskWeb.loadUrl("about:blank");
+            kioskWeb.loadUrl("file:///android_asset/nonet.svg");
         }
         hideKeyboard(this);
         findViewById(R.id.settingsButton).bringToFront();
@@ -300,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        recreate();
     }
 
     @Override
@@ -315,32 +365,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                     View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-    }
-
-    public void EnableRuntimePermission(){
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{
-                    Manifest.permission.CAMERA}, RequestPermissionCode);
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void CheckWritePermission(){
-        if (! Settings.System.canWrite(this)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            intent.setData(Uri.parse("package:" + this.getPackageName()));
-            startActivity(intent);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] result) {
-        if (requestCode == RequestPermissionCode) {
-            if (result.length > 0 && result[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(MainActivity.this, getString(R.string.cam_permission), Toast.LENGTH_LONG).show();
-            }
         }
     }
 

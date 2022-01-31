@@ -3,11 +3,11 @@
     <string name="settings">Einstellungen</string>
     <string name="check_autofill">AutoFill prüfen</string>
     <string name="mobile_mode">Mobiler Modus</string>
-    <string name="website">Kunden-Url (https://w3coach.de/ wird vorangestellt)</string>
+    <string name="website">Kunden-Url (%s wird vorangestellt)</string>
     <string name="code_or_help">Code oder \'h\' für Hilfe</string>
     <string name="cancel">Abbrechen</string>
     <string name="an_error_occurred">Ein Fehler ist aufgetreten:\u0020</string>
-    <string name="helpText" translatable="false">Falls installiert, sehen Sie oben Schaltflächen für TeamviewerⓇ oder AnydeskⓇ. Bitte starten Sie diese Programme nur auf Aufforderung und nennen dem Supportmitarbeiter die Ihnen angezeigte ID.\n\nFalls oben keine Schaltflächen zu sehen sind, installieren Sie TeamviewerⓇ Quicksupport™ oder AnydeskⓇ aus dem GoogleⓇ Playstore™.</string>
+    <string name="helpText" translatable="false">Falls installiert, sehen Sie oben Schaltflächen für TeamviewerⓇ oder AnydeskⓇ. Bitte starten Sie diese Programme nur auf Aufforderung und nennen dem Supportmitarbeiter die Ihnen angezeigte ID.\n\nFalls oben keine Schaltflächen zu sehen sind, installieren Sie TeamviewerⓇ Quicksupport™ oder AnydeskⓇ aus dem GoogleⓇ Playstore™.\n\nZum erneuten Laden der eingestellten URL geben Sie \'r\' ein und klicken auf \'ok\'.</string>
     <string name="invalid_url">Ungültige oder nicht erreichbare Url:\u0020</string>
     <string name="additional_perms">Weitere Berechtingungen erforderlich!</string>
     <string name="cam_permission">Kamera-Zugriff abgelehnt, keine Aufnahmen möglich!</string>
@@ -17,4 +17,17 @@
     <string name="running_on">Aktiv auf:\u0020</string>
     <string name="disable_autofill">AutoFill deaktivieren</string>
     <string name="autofill_text">AutoFill in einer Kiosk-Anwendung ist unsicher. Bitte deaktivieren Sie AutoFill.</string>
+    <string name="camera_access">Kamerazugriff</string>
+    <string name="mic_access">Microfonzugriff</string>
+    <string name="phone_access">Telefonzugriff</string>
+    <string name="overlay_permission">Überlagerung</string>
+    <string name="powermenu">Powermenü</string>
+    <string name="login_name">Login name:</string>
+    <string name="autologin">Autologin</string>
+    <string name="login_password">Login Passwort:</string>
+    <string name="write_system_settings">Systemeinstellungen</string>
+    <string name="permissions">Berechtigungen</string>
+    <string name="modelTxt">Modell:\u0020</string>
+    <string name="serialTxt">Seriennummer:\u0020</string>
+    <string name="service_description">Dienst zum Starten des Powermenüs</string>
 </resources>
