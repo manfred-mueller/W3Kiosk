@@ -304,32 +304,32 @@
 
         <ImageButton
             android:id="@+id/scannerButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_gravity="end"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/scanner_button"
             android:onClick="configureScanner"
-            android:visibility="invisible"
-            app:srcCompat="@drawable/barcode"
-            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:srcCompat="@drawable/scanner"
             tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
         <ImageButton
             android:id="@+id/setLauncherButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_gravity="end"
             android:contentDescription="@string/set_launcher_button"
             android:onClick="setLauncher"
-            android:visibility="visible"
+            android:visibility="gone"
             app:srcCompat="@android:drawable/ic_dialog_dialer"
             tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
         <ImageButton
             android:id="@+id/systemSettingsButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_gravity="end"
             android:contentDescription="@string/system_settings_button"
             android:onClick="startSystemSettings"
@@ -338,8 +338,8 @@
 
         <ImageButton
             android:id="@+id/settingsSaveButton"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_gravity="end"
             android:contentDescription="@string/settings_save_button"
             app:srcCompat="@android:drawable/ic_menu_save"

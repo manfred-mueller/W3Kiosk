@@ -2,22 +2,16 @@ package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 
 public class SupportActivity extends AppCompatActivity {

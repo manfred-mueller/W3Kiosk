@@ -13,7 +13,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 30
         versionCode 1
-        versionName "1.4"
+        versionName "1.5"
         setProperty("archivesBaseName", "w3kiosk-$versionName.$versionCode")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
