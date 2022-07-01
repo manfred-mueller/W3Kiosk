@@ -3,11 +3,12 @@
     <string name="settings">Einstellungen</string>
     <string name="check_autofill">AutoFill prüfen</string>
     <string name="mobile_mode">Mobiler Modus</string>
-    <string name="website">Kunden-Url (%s wird vorangestellt)</string>
+    <string name="website1">Erste Kunden-Url (%s wird vorangestellt)</string>
     <string name="code_or_help">Code oder \'h\' für Hilfe</string>
     <string name="cancel">Abbrechen</string>
     <string name="an_error_occurred">Ein Fehler ist aufgetreten:\u0020</string>
-    <string name="helpText" translatable="false">Falls installiert, sehen Sie oben Schaltflächen für TeamviewerⓇ oder AnydeskⓇ. Bitte starten Sie diese Programme nur auf Aufforderung und nennen dem Supportmitarbeiter die Ihnen angezeigte ID.\n\nFalls oben keine Schaltflächen zu sehen sind, installieren Sie TeamviewerⓇ Quicksupport™ oder AnydeskⓇ aus dem GoogleⓇ Playstore™.\n\nZum erneuten Laden der eingestellten URL geben Sie \'r\' ein und klicken auf \'ok\'.</string>
+    <string name="helpText" translatable="false">Falls installiert, sehen Sie oben Schaltflächen für TeamviewerⓇ oder AnydeskⓇ. Bitte starten Sie diese Programme nur auf Aufforderung und nennen dem Supportmitarbeiter die Ihnen angezeigte ID.\n\nFalls oben keine Schaltflächen zu sehen sind, installieren Sie TeamviewerⓇ Quicksupport™ oder AnydeskⓇ aus dem GoogleⓇ Playstore™.\n\nZum erneuten Laden der eingestellten URL halten Sie den W3Coach-Button unten rechts gedrückt.</string>
+    <string name="helpTextTv">Sind 2 URLs konfiguriert, können Sie mit der \'Zurück-Taste\' zwischen diesen URLs umschalten.\n\nZum Aufrufen des Menüs drücken Sie die \'Menü-Taste\'.\n\nZum erneuten Laden der Anwendung drücken Sie bitte die \'Home Taste\'.\n\n</string>
     <string name="invalid_url">Ungültige oder nicht erreichbare Url:\u0020</string>
     <string name="additional_perms">Weitere Berechtingungen erforderlich!</string>
     <string name="cam_permission">Kamera-Zugriff abgelehnt, keine Aufnahmen möglich!</string>
@@ -22,12 +23,18 @@
     <string name="phone_access">Telefonzugriff</string>
     <string name="overlay_permission">Überlagerung</string>
     <string name="powermenu">Powermenü</string>
-    <string name="login_name">Login name:</string>
+    <string name="login_name">Login-Name:</string>
     <string name="autologin">Autologin</string>
-    <string name="login_password">Login Passwort:</string>
+    <string name="login_password">Login-Passwort:</string>
     <string name="write_system_settings">Systemeinstellungen</string>
     <string name="permissions">Berechtigungen</string>
     <string name="modelTxt">Modell:\u0020</string>
     <string name="serialTxt">Seriennummer:\u0020</string>
     <string name="service_description">Dienst zum Starten des Powermenüs</string>
+    <string name="noNetwork">Suche Netzwerk…</string>
+    <string name="website2">Zweite Kunden-Url (%s wird vorangestellt)</string>
+    <string name="chooseAction">Bitte auswählen</string>
+    <string name="toggleUrl">URL umschalten</string>
+    <string name="deactivateMenubutton">Menübutton (de-)aktivieren</string>
+    <string name="showHelp">Hilfe anzeigen</string>
 </resources>

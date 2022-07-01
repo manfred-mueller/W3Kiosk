@@ -2,21 +2,27 @@ package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.Settings;
+import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
@@ -34,25 +40,27 @@ import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public String PASSWORD = "0000";
     public WebView kioskWeb;
-    private int currentApiVersion;
+    public String JavaString = "";
     Context context = this;
     public String urlPreset;
+    public String autoName;
+    public String autoPassWord;
     public boolean checkAutofill;
-    public boolean checkcamAccess;
-    public boolean checksystemSettings;
-    public boolean checkwriteOverlay;
-    public boolean checkpowerDown;
     public boolean checkmobileMode;
-    public String clientUrl;
+    public boolean checkAutoLogin;
+    public String clientUrl1;
+    public String clientUrl2;
+    public int toggleKey;
+    public String nextUrl;
 
     String tvUri = "com.teamviewer.quicksupport.market";
     String adUri = "com.anydesk.anydeskandroid";
-    String keUri = "com.rscja.scanner";
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -61,47 +69,40 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    public boolean isScanner() {
+    public static boolean isScanner() {
         return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
+    }
+
+    public static boolean isTablet() {
+        return android.os.Build.MODEL.toUpperCase().startsWith("RK");
     }
 
     public static String getSerialNumber() {
         String serialNumber;
 
         try {
-            Class<?> c = Class.forName("android.os.SystemProperties");
+            @SuppressLint("PrivateApi") Class<?> c = Class.forName("android.os.SystemProperties");
             Method get = c.getMethod("get", String.class);
 
-            // (?) Lenovo Tab (https://stackoverflow.com/a/34819027/1276306)
             serialNumber = (String) get.invoke(c, "gsm.sn1");
 
+            assert serialNumber != null;
             if (serialNumber.equals(""))
-                // Samsung Galaxy S5 (SM-G900F) : 6.0.1
-                // Samsung Galaxy S6 (SM-G920F) : 7.0
-                // Samsung Galaxy Tab 4 (SM-T530) : 5.0.2
-                // (?) Samsung Galaxy Tab 2 (https://gist.github.com/jgold6/f46b1c049a1ee94fdb52)
                 serialNumber = (String) get.invoke(c, "ril.serialnumber");
 
+            assert serialNumber != null;
             if (serialNumber.equals(""))
-                // Archos 133 Oxygen : 6.0.1
-                // Google Nexus 5 : 6.0.1
-                // Hannspree HANNSPAD 13.3" TITAN 2 (HSG1351) : 5.1.1
-                // Honor 5C (NEM-L51) : 7.0
-                // Honor 5X (KIW-L21) : 6.0.1
-                // Huawei M2 (M2-801w) : 5.1.1
-                // (?) HTC Nexus One : 2.3.4 (https://gist.github.com/tetsu-koba/992373)
                 serialNumber = (String) get.invoke(c, "ro.serialno");
 
+            assert serialNumber != null;
             if (serialNumber.equals(""))
-                // (?) Samsung Galaxy Tab 3 (https://stackoverflow.com/a/27274950/1276306)
                 serialNumber = (String) get.invoke(c, "sys.serialnumber");
 
+            assert serialNumber != null;
             if (serialNumber.equals(""))
-                // Chainway scanner
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     serialNumber = Build.getSerial();
                 }
-            // If none of the methods above worked
             if (serialNumber.equals(Build.UNKNOWN))
                 serialNumber = null;
         } catch (Exception e) {
@@ -118,36 +119,50 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             if (intent != null && intent.getAction().equals(ConnectivityManager
                     .CONNECTIVITY_ACTION)) {
 
-                boolean isConnected = ConnectivityManagerCompat.getNetworkInfoFromBroadcast
+                boolean isConnected = Objects.requireNonNull(ConnectivityManagerCompat.getNetworkInfoFromBroadcast
                         ((ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE),
-                                intent).isConnected();
+                                intent)).isConnected();
 
                 if (isConnected) {
-                    commitURL(urlPreset + clientUrl);
+                    commitURL(urlPreset + clientUrl1);
                 } else {
-                    kioskWeb.loadUrl("file:///android_asset/nonet.svg");
+                    String noNet = context.getString(R.string.noNetwork);
+                    String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+                    kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
                 }
             }
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint("ApplySharedPref")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        checkcamAccess = sharedPreferences.getBoolean("camera", false);
-        checksystemSettings = sharedPreferences.getBoolean("system", false);
-        checkwriteOverlay = sharedPreferences.getBoolean("overlay", false);
-        checkpowerDown = sharedPreferences.getBoolean("powerdown", false);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
+        checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
-        clientUrl = sharedPreferences.getString("clientUrl", "");
+        clientUrl1 = sharedPreferences.getString("clientUrl1", "");
+        clientUrl2 = sharedPreferences.getString("clientUrl2", "");
+        autoName = sharedPreferences.getString("loginName", "");
+        toggleKey = sharedPreferences.getInt("toggleKey", 82);
+        autoPassWord = sharedPreferences.getString("loginPassword", "");
         urlPreset = getString(R.string.url_preset);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         kioskWeb = findViewById(R.id.kioskView);
+        if (isTv()) {
+            new CountDownTimer(60000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
+                public void onFinish() {
+                    findViewById(R.id.settingsButton).setVisibility(View.GONE);
+                }
+            }.start();
+        }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26 && checkAutofill) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && checkAutofill && !isTv()) {
             Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
             dialogIntent.setData(Uri.parse("package:none"));
             if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
@@ -161,14 +176,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         }
 
-        currentApiVersion = Build.VERSION.SDK_INT;
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        if (currentApiVersion >= Build.VERSION_CODES.KITKAT) {
             getWindow().getDecorView().setSystemUiVisibility(flags);
             final View decorView = getWindow().getDecorView();
             decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
@@ -176,11 +189,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     decorView.setSystemUiVisibility(flags);
                 }
             });
-        }
 
         setupSettings();
-        commitURL(urlPreset + clientUrl);
-
+        commitURL(urlPreset + clientUrl1);
+        nextUrl = clientUrl2;
         Intent mIntent = getIntent();
         String action = mIntent.getAction();
         if (action != null && action.equals(Intent.ACTION_VIEW)) {
@@ -207,55 +219,62 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         startActivity(startSupportActivityIntent);
                     }
                     else if (PwInput.equals("r")) {
-                        commitURL(urlPreset + clientUrl);
+                        startService(new Intent(this, ShutdownService.class));
                     }
                     else if (PwInput.equals(PASSWORD)) {
-                        Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                        @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                         startActivity(startSettingsActivityIntent);
                     }
-                    else if (PwInput.equals("teamviewer")) {
+                    else if (PwInput.equals("t")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
                         startActivity(intent);
                     }
-                    else if (PwInput.equals("anydesk")) {
+                    else if (PwInput.equals("a")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
                         startActivity(intent);
                     }
-                    else if (PwInput.equals("ke")) {
-                        Intent keyboardEmulator;
-                        PackageManager manager = getPackageManager();
-                        try {
-                            keyboardEmulator = manager.getLaunchIntentForPackage(keUri);
-                            if (keyboardEmulator == null)
-                                throw new PackageManager.NameNotFoundException();
-                            keyboardEmulator.addCategory(Intent.CATEGORY_LAUNCHER);
-                            startActivity(keyboardEmulator);
-                        } catch (PackageManager.NameNotFoundException ignored) {
-                        }
+                    else if (PwInput.equals("w")) {
+                        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                        startActivity(intent);
                     }
                     else if (PwInput.equals("i")) {
-                        Toast.makeText(MainActivity.this, getString(R.string.running_on) + Build.MODEL, Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.running_on) + Build.MODEL + "\n" + getString(R.string.serialTxt) + MainActivity.getSerialNumber(), Toast.LENGTH_LONG).show();
                     }
                     else {
                         dialog.cancel();
                     }
                 });
-
         checkPasswordDialog.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
+        if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty())
+        {
+            checkPasswordDialog.setNeutralButton(getString(R.string.autologin), (dialog, id) -> commitURL(urlPreset + clientUrl1));
+        } else
+        {
+            checkPasswordDialog.setNeutralButton("Reboot", (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
+        }
         AlertDialog dialog = checkPasswordDialog.create();
         dialog.show();
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setAllCaps(false);
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAllCaps(false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint("SetJavaScriptEnabled")
     private void setupSettings() {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setOnLongClickListener(v -> {
-            recreate();
-            return true;
-        });
+        if (isTv()) {
+            settingsButton.setOnLongClickListener(v -> {
+                toggleUrl();
+                return true;
+            });
+        } else {
+            settingsButton.setOnLongClickListener(v -> {
+                recreate();
+                return true;
+            });
+        }
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
 
         kioskWeb.setWebChromeClient(new WebChromeClient() {
@@ -273,11 +292,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 webView.stopLoading();
             } catch (Exception ignored) {
             }
-                webView.loadUrl("file:///android_asset/nonet.svg");
+                String noNet = context.getString(R.string.noNetwork);
+                String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+                kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
             alertDialog.setTitle(getString(R.string.error));
             alertDialog.setMessage(getString(R.string.check_internet));
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl));
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl1));
 
             alertDialog.show();
             super.onReceivedError(webView, errorCode, description, failingUrl);
@@ -292,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
+        registerForContextMenu(kioskWeb);
 
     }
 
@@ -314,19 +336,47 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void commitURL(String url) {
         if (url.equals(urlPreset))
         {
-            Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+            @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(startSettingsActivityIntent);
         }
         if (isNetworkAvailable()) {
+            if (!autoName.isEmpty() && !autoPassWord.isEmpty())
+            {
+                JavaString = "javascript:window.frames[\"Mainpage\"].document.getElementsByName('login')[0].value='" +
+                        autoName + "';" +
+                        "javascript:window.frames[\"Mainpage\"].document.getElementsByName('pwd')[0].value='" +
+                        autoPassWord + "';";
+                if (checkAutoLogin) {
+                    JavaString += "javascript:window.frames[\"Mainpage\"].document.getElementById('logon').click()";
+                }
+                kioskWeb.setWebViewClient(new WebViewClient() {
+                    public void onPageFinished(WebView view, String url) {
+                            view.evaluateJavascript(JavaString, s -> {
+                            });
+                    }
+                });
+            }
             kioskWeb.loadUrl(url);
         }
         else
         {
-            kioskWeb.loadUrl("file:///android_asset/nonet.svg");
+            String noNet = context.getString(R.string.noNetwork);
+            String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+            kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
         }
         hideKeyboard(this);
         findViewById(R.id.settingsButton).bringToFront();
+    }
 
+    private void toggleUrl(){
+        if (nextUrl.equals(clientUrl2)){
+            commitURL(urlPreset + clientUrl2);
+            nextUrl = clientUrl1;
+        }
+        else if (nextUrl.equals(clientUrl1)){
+            commitURL(urlPreset + clientUrl1);
+            nextUrl = clientUrl2;
+        }
     }
 
     private void hideKeyboard(Activity activity) {
@@ -350,15 +400,25 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         recreate();
     }
 
+    public boolean isTv() {
+        UiModeManager uiModeManager =
+                (UiModeManager) this.getApplicationContext().getSystemService(UI_MODE_SERVICE);
+        return uiModeManager != null
+                && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
     @Override
     public void onBackPressed() {
+        if (isTv()) {
+            toggleUrl();
+        } else
         kioskWeb.goBack();
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (currentApiVersion >= Build.VERSION_CODES.KITKAT && hasFocus) {
+        if (hasFocus) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
@@ -382,5 +442,56 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (isTv()) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_HOME) {
+                recreate();
+                return true;
+            }
+            else if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+                kioskWeb.showContextMenu();
+                return true;
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    public void toggleSettingsButton() {
+        View buttonView = findViewById(R.id.settingsButton);
+            if(buttonView.getVisibility()==View.GONE)
+                buttonView.setVisibility(View.VISIBLE);
+            else if(buttonView.getVisibility()==View.VISIBLE)
+                buttonView.setVisibility(View.GONE);
+    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        // you can set menu header with title icon etc
+        menu.setHeaderTitle(R.string.chooseAction);
+        // add menu items
+        menu.add(0, 1, 0, R.string.toggleUrl);
+        menu.add(0, 2, 0, R.string.deactivateMenubutton);
+        menu.add(0, 3, 0, R.string.settings);
+        menu.add(0, 4, 0, R.string.showHelp);
+    }
+
+    // menu item select listener
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() == 2) {
+            toggleSettingsButton();
+        } else if (item.getItemId() == 3) {
+            checkPassword(getString(R.string.code_or_help));
+        } else if (item.getItemId() == 4) {
+            Intent startSupportActivityIntent = new Intent(getApplicationContext(), SupportActivity.class);
+            startActivity(startSupportActivityIntent);
+        }
+        else {
+            toggleUrl();
+        }
+        return true;
     }
 }

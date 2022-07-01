@@ -7,6 +7,7 @@
     android:padding="10dp"
     android:orientation="vertical"
     android:onClick="hideKeyboard"
+    android:keepScreenOn="true"
     tools:ignore="UsingOnClickInXml">
 
     <TextView
@@ -97,7 +98,7 @@
                 android:paddingRight="10dp">
 
                 <TextView
-                    android:id="@+id/clientText"
+                    android:id="@+id/client1Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
@@ -106,7 +107,7 @@
                     android:textSize="15sp" />
 
                 <EditText
-                    android:id="@+id/clientEditText"
+                    android:id="@+id/client1EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="no"
@@ -114,14 +115,147 @@
                     android:gravity="start"
                     android:hint="@string/default_url"
                     android:inputType="textUri|text"
-                    android:nextFocusLeft="@id/clientEditText"
-                    android:nextFocusUp="@id/clientEditText"
+                    android:nextFocusLeft="@id/client1EditText"
+                    android:nextFocusUp="@id/client1EditText"
                     android:singleLine="true"
                     android:text=""
                     android:textCursorDrawable="@color/colorPrimary"
                     android:textSize="15sp"
                     tools:ignore="TouchTargetSizeCheck" />
 
+                <TextView
+                    android:id="@+id/client2Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:focusable="auto"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:visibility="visible" />
+
+                <EditText
+                    android:id="@+id/client2EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="no"
+                    android:cursorVisible="true"
+                    android:gravity="start"
+                    android:hint="@string/default_url"
+                    android:inputType="textUri|text"
+                    android:nextFocusLeft="@id/client2EditText"
+                    android:nextFocusUp="@id/client2EditText"
+                    android:singleLine="true"
+                    android:text=""
+                    android:textCursorDrawable="@color/colorPrimary"
+                    android:textSize="15sp"
+                    android:visibility="visible"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/autologinLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <Switch
+                        android:id="@+id/autoLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:background="?android:attr/colorBackground"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toStartOf="@id/autoLogin"
+                        android:focusable="auto"
+                        android:text="@string/autologin"
+                        android:textSize="15sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <EditText
+                        android:id="@+id/loginEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/loginName"
+                        android:autofillHints="no"
+                        android:cursorVisible="true"
+                        android:gravity="start"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:id="@+id/loginName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="false"
+                        android:layout_centerVertical="true"
+                        android:focusable="auto"
+                        android:text="@string/login_name"
+                        android:textSize="15sp"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <EditText
+                        android:id="@+id/pwEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/loginPw"
+                        android:autofillHints="no"
+                        android:cursorVisible="true"
+                        android:gravity="start"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/loginPw"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="false"
+                        android:layout_centerVertical="true"
+                        android:focusable="auto"
+                        android:text="@string/login_password"
+                        android:textSize="15sp" />
+
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout

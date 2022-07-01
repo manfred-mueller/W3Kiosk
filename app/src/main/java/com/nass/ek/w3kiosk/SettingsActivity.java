@@ -38,25 +38,38 @@ public class SettingsActivity extends AppCompatActivity {
     Switch s;
     EditText e;
     CheckBox c;
+
     @SuppressLint("ApplySharedPref")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        TextView clientText = findViewById(R.id.clientText);
-        clientText.setText(String.format(getString(R.string.website), getString(R.string.url_preset)));
+        toggleLogin(findViewById(R.id.autologinLayout));
+        TextView client1Text = findViewById(R.id.client1Text);
+        TextView client2Text = findViewById(R.id.client2Text);
+        client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
+        client2Text.setText(String.format(getString(R.string.website2), getString(R.string.url_preset)));
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
-        if (!isTv()){
+        if (MainActivity.isTablet() || MainActivity.isScanner()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                findViewById(R.id.permissionLayout).setVisibility(View.VISIBLE);
-            }
-            if (checkApp("com.rscja.scanner")){
-                findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
+                findViewById(R.id.autologinLayout).setVisibility(View.VISIBLE);
             }
         }
+
+        if (!isTv()){
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                    findViewById(R.id.permissionLayout).setVisibility(View.VISIBLE);
+                }
+                if (checkApp("com.rscja.scanner")){
+                findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
+            }
+            findViewById(R.id.client2Text).setVisibility(View.GONE);
+            findViewById(R.id.client2EditText).setVisibility(View.GONE);
+        }
+
         ImageButton b = findViewById(R.id.settingsSaveButton);
         b.setOnClickListener(view -> {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
             s = findViewById(R.id.autofillToggle);
@@ -65,14 +78,24 @@ public class SettingsActivity extends AppCompatActivity {
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
 
-            e = findViewById(R.id.clientEditText);
-                editor.putString("clientUrl", e.getText().toString());
+            s = findViewById(R.id.autoLogin);
+            editor.putBoolean("autoLogin", s.isChecked());
+
+            e = findViewById(R.id.loginEditText);
+                editor.putString("loginName", e.getText().toString());
+
+            e = findViewById(R.id.pwEditText);
+                editor.putString("loginPassword", e.getText().toString());
+
+            e = findViewById(R.id.client1EditText);
+            editor.putString("clientUrl1", e.getText().toString());
+
+            e = findViewById(R.id.client2EditText);
+            editor.putString("clientUrl2", e.getText().toString());
 
             editor.commit();
             finish();
         });
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         s = findViewById(R.id.autofillToggle);
         s.setChecked(sharedPreferences.getBoolean("checkAutofill", true));
@@ -80,10 +103,28 @@ public class SettingsActivity extends AppCompatActivity {
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
 
-        e = findViewById(R.id.clientEditText);
-        e.setText(sharedPreferences.getString("clientUrl", ""));
+        s = findViewById(R.id.autoLogin);
+        s.setChecked(sharedPreferences.getBoolean("autoLogin", false));
+        s.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                findViewById(R.id.loginEditText).setVisibility(View.VISIBLE);
+                findViewById(R.id.loginName).setVisibility(View.VISIBLE);
+                findViewById(R.id.pwEditText).setVisibility(View.VISIBLE);
+                findViewById(R.id.loginPw).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.loginEditText).setVisibility(View.GONE);
+                findViewById(R.id.loginName).setVisibility(View.GONE);
+                findViewById(R.id.pwEditText).setVisibility(View.GONE);
+                findViewById(R.id.loginPw).setVisibility(View.GONE);
+            }
+        });
+        e = findViewById(R.id.client1EditText);
+        e.setText(sharedPreferences.getString("clientUrl1", ""));
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+        e = findViewById(R.id.client2EditText);
+        e.setText(sharedPreferences.getString("clientUrl2", ""));
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             c = findViewById(R.id.phoneAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
 
@@ -101,6 +142,22 @@ public class SettingsActivity extends AppCompatActivity {
 
             c = findViewById(R.id.writeSystem);
             c.setChecked(Settings.System.canWrite(this));
+        }
+    }
+
+    public void toggleLogin(View v) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
+        if (checkAutoLogin) {
+            findViewById(R.id.loginEditText).setVisibility(View.VISIBLE);
+            findViewById(R.id.loginName).setVisibility(View.VISIBLE);
+            findViewById(R.id.pwEditText).setVisibility(View.VISIBLE);
+            findViewById(R.id.loginPw).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.loginEditText).setVisibility(View.GONE);
+            findViewById(R.id.loginName).setVisibility(View.GONE);
+            findViewById(R.id.pwEditText).setVisibility(View.GONE);
+            findViewById(R.id.loginPw).setVisibility(View.GONE);
         }
     }
 
@@ -132,7 +189,7 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(new Intent(Settings.ACTION_SETTINGS));
     }
 
-    public void sdClick(View view) {
+    public void sdClick(View v) {
         startService(new Intent(this, ShutdownService.class));
     }
 
@@ -207,7 +264,6 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(keyboardEmulator);
         } catch (PackageManager.NameNotFoundException ignored) {
         }
-
     }
 
     public boolean isAccessibilitySettingsOn() {
