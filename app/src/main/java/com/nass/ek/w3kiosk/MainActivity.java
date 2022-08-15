@@ -31,7 +31,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -39,12 +38,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public String PASSWORD = "0000";
+    public static String PASSWORD = "0000";
     public WebView kioskWeb;
     public String JavaString = "";
     Context context = this;
@@ -56,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean checkAutoLogin;
     public String clientUrl1;
     public String clientUrl2;
+    public int appsCount;
     public int toggleKey;
     public String nextUrl;
 
@@ -75,42 +74,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public static boolean isTablet() {
         return android.os.Build.MODEL.toUpperCase().startsWith("RK");
-    }
-
-    public static String getSerialNumber() {
-        String serialNumber;
-
-        try {
-            @SuppressLint("PrivateApi") Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class);
-
-            serialNumber = (String) get.invoke(c, "gsm.sn1");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "ril.serialnumber");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "ro.serialno");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "sys.serialnumber");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    serialNumber = Build.getSerial();
-                }
-            if (serialNumber.equals(Build.UNKNOWN))
-                serialNumber = null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            serialNumber = null;
-        }
-
-        return serialNumber;
     }
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
@@ -135,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     };
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    @SuppressLint("ApplySharedPref")
+    @SuppressLint({"ApplySharedPref", "HardwareIds"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
+        appsCount = sharedPreferences.getInt("appsCount", 0);
         clientUrl1 = sharedPreferences.getString("clientUrl1", "");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         autoName = sharedPreferences.getString("loginName", "");
@@ -218,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         Intent startSupportActivityIntent = new Intent(getApplicationContext(), SupportActivity.class);
                         startActivity(startSupportActivityIntent);
                     }
+                    else if (PwInput.equals("a")) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
+                        startActivity(intent);
+                    }
                     else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
@@ -229,16 +197,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
                         startActivity(intent);
                     }
-                    else if (PwInput.equals("a")) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
-                        startActivity(intent);
-                    }
                     else if (PwInput.equals("w")) {
                         Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
                         startActivity(intent);
-                    }
-                    else if (PwInput.equals("i")) {
-                        Toast.makeText(MainActivity.this, getString(R.string.running_on) + Build.MODEL + "\n" + getString(R.string.serialTxt) + MainActivity.getSerialNumber(), Toast.LENGTH_LONG).show();
                     }
                     else {
                         dialog.cancel();
@@ -248,9 +209,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty())
         {
             checkPasswordDialog.setNeutralButton(getString(R.string.autologin), (dialog, id) -> commitURL(urlPreset + clientUrl1));
+        } else if (appsCount > 0)
+        {
+            checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
         } else
         {
-            checkPasswordDialog.setNeutralButton("Reboot", (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
+            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
         }
         AlertDialog dialog = checkPasswordDialog.create();
         dialog.show();
@@ -469,16 +433,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        // you can set menu header with title icon etc
         menu.setHeaderTitle(R.string.chooseAction);
-        // add menu items
         menu.add(0, 1, 0, R.string.toggleUrl);
         menu.add(0, 2, 0, R.string.deactivateMenubutton);
         menu.add(0, 3, 0, R.string.settings);
         menu.add(0, 4, 0, R.string.showHelp);
     }
 
-    // menu item select listener
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getItemId() == 2) {

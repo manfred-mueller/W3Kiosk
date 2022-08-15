@@ -3,10 +3,13 @@ package com.nass.ek.w3kiosk;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.UiModeManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -45,7 +49,7 @@ public class SupportActivity extends AppCompatActivity {
         }
 
         TextView txtSerial = findViewById(R.id.txtSerial);
-        txtSerial.setText(getString(R.string.modelTxt) + Build.MODEL.toUpperCase() + "\n" + "IP: " + getIpAddress() + "\n" + getString(R.string.serialTxt) + MainActivity.getSerialNumber());
+        txtSerial.setText(String.format(getString(R.string.devInfo) ,Build.MANUFACTURER ,Build.MODEL.toUpperCase(), getIpAddress(), getSerialNumber(), getGsfAndroidId(this), Build.DISPLAY));
 
         if (tvCheck) {
             {
@@ -137,5 +141,57 @@ public class SupportActivity extends AppCompatActivity {
             ip = "0.0.0.0";
         }
         return ip;
+    }
+
+    public static String getSerialNumber() {
+        String serialNumber;
+
+        try {
+            @SuppressLint("PrivateApi") Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class);
+
+            serialNumber = (String) get.invoke(c, "gsm.sn1");
+
+            assert serialNumber != null;
+            if (serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "ril.serialnumber");
+
+            assert serialNumber != null;
+            if (serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "ro.serialno");
+
+            assert serialNumber != null;
+            if (serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "sys.serialnumber");
+
+            assert serialNumber != null;
+            if (serialNumber.equals(""))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    serialNumber = Build.getSerial();
+                }
+            if (serialNumber.equals(Build.UNKNOWN))
+                serialNumber = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialNumber = null;
+        }
+
+        return serialNumber;
+    }
+
+    private static String getGsfAndroidId(Context context)
+    {
+        Uri URI = Uri.parse("content://com.google.android.gsf.gservices");
+        String ID_KEY = "android_id";
+        String[] params = {ID_KEY};
+        try (Cursor c = context.getContentResolver().query(URI, null, null, params, null)) {
+            if (!c.moveToFirst() || c.getColumnCount() < 2)
+                return null;
+            try {
+                return Long.toHexString(Long.parseLong(c.getString(1)));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
     }
 }

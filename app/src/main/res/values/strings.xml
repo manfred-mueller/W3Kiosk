@@ -41,8 +41,6 @@
     <string name="login_password">Login password:</string>
     <string name="write_system_settings">System settings</string>
     <string name="permissions">Permissions</string>
-    <string name="modelTxt">Model:\u0020</string>
-    <string name="serialTxt">serial:\u0020</string>
     <string name="scanner_button" translatable="false">scannerButton</string>
     <string name="service_description">Service to call the powermenu</string>
     <string name="noNetwork">Searching network…</string>
@@ -51,4 +49,16 @@
     <string name="toggleUrl">Toggle URL</string>
     <string name="deactivateMenubutton">(de-)activate) Menubutton</string>
     <string name="showHelp">Show help</string>
+    <string name="devInfo">Model: %1$s %2$s\nIP address: %3$s\nSerial: %4$s\nGSF-ID: %5$s\nFirmware: %6$s</string>
+    <string name="app1">App1</string>
+    <string name="app2">App2</string>
+    <string name="app3">App3</string>
+    <string name="app4">App4</string>
+    <string name="app5">App5</string>
+    <string name="appPw">"application password"</string>
+    <string name="choose_app">Choose an app</string>
+    <string name="enable_apps">allowed apps count</string>
+    <string name="apps">Apps</string>
+    <string name="reboot">Reboot</string>
+    <string name="enterPassword">Please enter password:</string>
 </resources>

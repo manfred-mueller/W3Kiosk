@@ -12,8 +12,8 @@ android {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 6
-        versionName "1.8"
+        versionCode 1
+        versionName "1.9"
         setProperty("archivesBaseName", "w3kiosk-$versionName.$versionCode")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

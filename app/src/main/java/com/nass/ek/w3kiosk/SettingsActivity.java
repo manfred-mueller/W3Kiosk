@@ -18,9 +18,11 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -38,7 +40,9 @@ public class SettingsActivity extends AppCompatActivity {
     Switch s;
     EditText e;
     CheckBox c;
+    String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ApplySharedPref")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,11 @@ public class SettingsActivity extends AppCompatActivity {
         TextView client2Text = findViewById(R.id.client2Text);
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(String.format(getString(R.string.website2), getString(R.string.url_preset)));
+        Spinner dropdown = findViewById(R.id.appsSpinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allowedApps);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dropdown.setAdapter(adapter);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
         if (MainActivity.isTablet() || MainActivity.isScanner()){
@@ -68,7 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.client2EditText).setVisibility(View.GONE);
         }
 
-        ImageButton b = findViewById(R.id.settingsSaveButton);
+        ImageButton b = findViewById(R.id.updateCloseButton);
         b.setOnClickListener(view -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
@@ -77,6 +86,8 @@ public class SettingsActivity extends AppCompatActivity {
 
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
+
+            editor.putInt("appsCount", Integer.parseInt(dropdown.getSelectedItem().toString()));
 
             s = findViewById(R.id.autoLogin);
             editor.putBoolean("autoLogin", s.isChecked());
@@ -98,10 +109,12 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         s = findViewById(R.id.autofillToggle);
-        s.setChecked(sharedPreferences.getBoolean("checkAutofill", true));
+        s.setChecked(sharedPreferences.getBoolean("checkAutofill", false));
 
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
+
+        dropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
 
         s = findViewById(R.id.autoLogin);
         s.setChecked(sharedPreferences.getBoolean("autoLogin", false));
@@ -311,6 +324,22 @@ public class SettingsActivity extends AppCompatActivity {
 
             c = findViewById(R.id.writeSystem);
             c.setChecked(Settings.System.canWrite(this));
+        }
+    }
+
+    public void checkAutofill(View V) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv()) {
+            Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
+            dialogIntent.setData(Uri.parse("package:none"));
+            if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                builder.setTitle(getString(R.string.disable_autofill))
+                        .setMessage(R.string.autofill_text)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", (dialog, which) -> startActivity(dialogIntent));
+                android.app.AlertDialog dialog = builder.create();
+                dialog.show();
+            }
         }
     }
 }
