@@ -5,4 +5,4 @@ Needs android.permission.SYSTEM_ALERT_WINDOW.
 
 adb shell pm grant com.nass.ek.w3kiosk android.permission.SYSTEM_ALERT_WINDOW
 
-![Screenshot](screenshot.png) ![Screenshot2](screenshot2.png) ![Screenshot3](screenshot3.png)
+![Screenshot](app/src/main/res/drawable-nodpi/screenshot.png) ![Screenshot2](app/src/main/res/drawable-nodpi/screenshot2.png) ![Screenshot3](app/src/main/res/drawable-nodpi/screenshot3.png)
