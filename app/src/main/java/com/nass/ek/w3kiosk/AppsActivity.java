@@ -69,6 +69,8 @@ public class AppsActivity extends AppCompatActivity {
         app4Button = findViewById(R.id.app4_Button);
         app5Button = findViewById(R.id.app5_Button);
 
+//        findViewById(R.id.copyright_text).setOnClickListener(arg0 -> MainActivity.AboutBox.Show(AppsActivity.this));
+
         if (appsCount > 0) {
             if (!app1.isEmpty()) {
             Drawable icon = null;

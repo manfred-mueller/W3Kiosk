@@ -57,6 +57,11 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allowedApps);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dropdown.setAdapter(adapter);
+        dropdown.setOnLongClickListener(v -> {
+            startActivity(new Intent(this, AppsActivity.class));
+            return true;
+        });
+
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);

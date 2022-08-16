@@ -47,4 +47,5 @@
     <string name="apps">Anwendungen</string>
     <string name="reboot">Neustart</string>
     <string name="enterPassword">Bitte Passwort eingeben:</string>
+    <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
 </resources>

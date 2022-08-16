@@ -455,4 +455,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         return true;
     }
+
+    public static void showAbout() {
+
+    }
 }
