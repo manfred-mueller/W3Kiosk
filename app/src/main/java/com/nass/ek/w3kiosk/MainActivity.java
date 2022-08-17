@@ -189,13 +189,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
-                    else if (PwInput.equals(PASSWORD)) {
-                        @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-                        startActivity(startSettingsActivityIntent);
-                    }
                     else if (PwInput.equals("t")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
                         startActivity(intent);
+                    }
+                    else if (PwInput.equals(PASSWORD)) {
+                        @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                        startActivity(startSettingsActivityIntent);
                     }
                     else if (PwInput.equals("w")) {
                         Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);

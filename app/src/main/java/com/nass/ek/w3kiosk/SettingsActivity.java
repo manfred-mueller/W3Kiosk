@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -41,6 +42,9 @@ public class SettingsActivity extends AppCompatActivity {
     EditText e;
     CheckBox c;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
+    private Spinner dropdown;
+    private boolean dropdownInitialized;
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ApplySharedPref")
@@ -48,12 +52,13 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         toggleLogin(findViewById(R.id.autologinLayout));
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(String.format(getString(R.string.website2), getString(R.string.url_preset)));
-        Spinner dropdown = findViewById(R.id.appsSpinner);
+        dropdown = findViewById(R.id.appsSpinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allowedApps);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dropdown.setAdapter(adapter);
@@ -62,8 +67,23 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         });
 
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (!dropdownInitialized) {
+                    dropdownInitialized = true;
+                    return;
+                }
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("appsCount", Integer.parseInt(dropdown.getSelectedItem().toString()));
+                editor.commit();
+                finish();
+                startActivity(getIntent());
+            }
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
         if (MainActivity.isTablet() || MainActivity.isScanner()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
