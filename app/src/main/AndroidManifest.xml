@@ -5,6 +5,7 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.camera2.full" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
@@ -83,6 +84,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".AboutActivity">
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"/>
+        </activity>
         <activity
             android:name=".AppsActivity"
             android:windowSoftInputMode="stateHidden"

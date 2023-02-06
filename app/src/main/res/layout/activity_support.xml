@@ -85,7 +85,7 @@
 
 
     <ImageButton
-        android:id="@+id/close_Button"
+        android:id="@+id/close_Button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|center_vertical"

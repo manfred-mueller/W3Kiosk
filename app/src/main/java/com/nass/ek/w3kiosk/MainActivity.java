@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public String nextUrl;
 
     String tvUri = "com.teamviewer.quicksupport.market";
-    String adUri = "com.anydesk.anydeskandroid";
+//    String adUri = "com.anydesk.anydeskandroid";
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -183,10 +184,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         startActivity(startSupportActivityIntent);
                     }
                     else if (PwInput.equals("a")) {
+                        showAbout();
+                    }
+/*                    else if (PwInput.equals("a")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
                         startActivity(intent);
                     }
-                    else if (PwInput.equals("r")) {
+*/                    else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
                     else if (PwInput.equals("t")) {
@@ -242,7 +246,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
 
         kioskWeb.setWebChromeClient(new WebChromeClient() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onPermissionRequest(PermissionRequest request) {
                 request.grant(request.getResources());
@@ -274,18 +277,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setJavaScriptEnabled(true);
         kioskWeb.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         kioskWeb.getSettings().setMediaPlaybackRequiresUserGesture(false);
-        kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
         registerForContextMenu(kioskWeb);
-
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     public void setMobileMode(final boolean enabled) {
         final WebSettings webSettings = this.kioskWeb.getSettings();
         final String newUserAgent;
         if ((enabled) || isScanner()) {
             newUserAgent = webSettings.getUserAgentString().replace("Safari", "Mobile Safari");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         else {
             newUserAgent = webSettings.getUserAgentString().replace("Mobile Safari", "Safari");
@@ -442,7 +446,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getItemId() == 2) {
+        if (item.getItemId() == 1) {
+            toggleUrl();
+        } else if (item.getItemId() == 2) {
             toggleSettingsButton();
         } else if (item.getItemId() == 3) {
             checkPassword(getString(R.string.code_or_help));
@@ -450,13 +456,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Intent startSupportActivityIntent = new Intent(getApplicationContext(), SupportActivity.class);
             startActivity(startSupportActivityIntent);
         }
-        else {
-            toggleUrl();
-        }
         return true;
     }
 
-    public static void showAbout() {
-
+    public void showAbout() {
+        Intent startSupportActivityIntent = new Intent(getApplicationContext(), AboutActivity.class);
+        startActivity(startSupportActivityIntent);
     }
 }
