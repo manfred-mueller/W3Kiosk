@@ -45,7 +45,7 @@ jobs:
        run: echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
      - id: read-docker-image-identifiers
        name: Read Docker Image Identifiers
-       run: echo ::set-env name=IMAGE_REPOSITORY::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+       run: echo "name=IMAGE_REPOSITORY::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
