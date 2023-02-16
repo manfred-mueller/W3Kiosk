@@ -17,6 +17,9 @@ android {
         setProperty("archivesBaseName", "w3kiosk-$versionName.$versionCode")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        task printVersionInformation {
+        println "v" + defaultConfig.versionName + " (" + defaultConfig.versionCode + ")"
+        }
     }
 
     buildTypes {
@@ -29,10 +32,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-}
-
-task printVersionInformation {
-    println "v" + defaultConfig.versionName + " (" + defaultConfig.versionCode + ")"
 }
 
 dependencies {
