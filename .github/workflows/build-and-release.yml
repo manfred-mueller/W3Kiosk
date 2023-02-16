@@ -38,22 +38,32 @@ jobs:
        uses: actions/download-artifact@v1
        with:
          name: apk
-     - name: Retrieve Version
-       run: echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
-       id: android_version
-     - name: Get version
-       run: echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
-     - id: read-docker-image-identifiers
-       name: Read Docker Image Identifiers
-       run: echo "name=IMAGE_REPOSITORY::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+     - name: Get Application Name
+       run: |
+            appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2` | cut -d'.' -f4`
+            export APP_NAME=$appName
+            echo "::set-env name=APP_NAME::$APP_NAME"
+       id: android_app_name
+     - name: Get Version Name
+       run: |
+            versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
+            export VERSION_NAME=$versionName
+            echo "::set-env name=VERSION_NAME::$VERSION_NAME"
+       id: android_version_name
+     - name: Get Version Code
+       run: |
+            versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
+            export VERSION_CODE=$versionCode
+            echo "::set-env name=VERSION_CODE::$VERSION_CODE"
+       id: android_version_code
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
        with:
-         tag_name: ${{ github.run_number }}
-         release_name: ${{ github.event.repository.name }} v${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}
+         tag_name: ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+         release_name: ${{ github.event.repository.name }} v${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
      - name: Upload Release APK
        id: upload_release_asset
        uses: actions/upload-release-asset@v1.0.1
@@ -62,5 +72,5 @@ jobs:
        with:
          upload_url: ${{ steps.create_release.outputs.upload_url }}
          asset_path: apk/app-debug.apk
-         asset_name: ${{ env.IMAGE_REPOSITORY }}-${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}-release.apk
+         asset_name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release.apk
          asset_content_type: application/zip
