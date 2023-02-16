@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int toggleKey;
     public String nextUrl;
 
-    String tvUri = "com.teamviewer.quicksupport.market";
-//    String adUri = "com.anydesk.anydeskandroid";
+    public static String tvUri = "com.teamviewer.quicksupport.market";
+    public static String adUri = "com.anydesk.anydeskandroid";
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -183,14 +183,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         Intent startSupportActivityIntent = new Intent(getApplicationContext(), SupportActivity.class);
                         startActivity(startSupportActivityIntent);
                     }
-                    else if (PwInput.equals("a")) {
-                        showAbout();
+                    else if (PwInput.equals("i")) {
+                        Intent startAboutActivityIntent = new Intent(getApplicationContext(), AboutActivity.class);
+                        startActivity(startAboutActivityIntent);
                     }
-/*                    else if (PwInput.equals("a")) {
+                    else if (PwInput.equals("a")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
                         startActivity(intent);
                     }
-*/                    else if (PwInput.equals("r")) {
+                    else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
                     else if (PwInput.equals("t")) {
@@ -248,7 +249,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(PermissionRequest request) {
-                request.grant(request.getResources());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    request.grant(request.getResources());
+                }
             }
         });
 
@@ -324,7 +327,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                 });
             }
-            kioskWeb.loadUrl(url);
+            if (isScanner()) {
+                Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
+                startActivity(startScannerActivityIntent);
+            } else {
+                kioskWeb.loadUrl(url);
+            }
         }
         else
         {
@@ -457,10 +465,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             startActivity(startSupportActivityIntent);
         }
         return true;
-    }
-
-    public void showAbout() {
-        Intent startSupportActivityIntent = new Intent(getApplicationContext(), AboutActivity.class);
-        startActivity(startSupportActivityIntent);
     }
 }

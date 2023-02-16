@@ -9,6 +9,7 @@
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/aboutbox.xml" value="0.18802083333333333" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_apps.xml" value="0.2609375" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_main.xml" value="0.19739583333333333" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_scanner.xml" value="0.18541666666666667" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_settings.xml" value="0.18854166666666666" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_support.xml" value="0.19739583333333333" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_update.xml" value="0.20364583333333333" />
@@ -19,6 +20,7 @@
       </map>
     </option>
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="org.jetbrains.annotations.Nullable" />
     <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />
