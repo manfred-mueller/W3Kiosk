@@ -39,16 +39,13 @@ jobs:
        with:
          name: apk
      - name: Retrieve Version
-       run: |
-          echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
-          id: android_version
+       run: echo "::set-output name=VERSION_NAME::$(${{github.workspace}}/gradlew -q printVersionName)"
+       id: android_version
      - name: Get version
-       run: |
-          echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
+       run: echo "version_name=${{steps.android_version.outputs.VERSION_NAME}}" >> $GITHUB_ENV
      - id: read-docker-image-identifiers
        name: Read Docker Image Identifiers
-       run: |
-          echo ::set-env name=IMAGE_REPOSITORY::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+       run: echo ::set-env name=IMAGE_REPOSITORY::$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
