@@ -28,11 +28,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    task printVersionInformation {
-         println "v" + defaultConfig.versionName + " (" + defaultConfig.versionCode + ")"
-    }
 }
+
+task printVersionInformation {
+     println "v" + defaultConfig.versionName + " (" + defaultConfig.versionCode + ")"
+}
+
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
