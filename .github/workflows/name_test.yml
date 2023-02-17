@@ -25,7 +25,7 @@ jobs:
        run: bash ./gradlew assembleRelease --stacktrace
      - name: Get Application Name
        run: |
-            appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2` | cut -d'.' -f4`
+            appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
             export APP_NAME=$appName
             echo "APP_NAME=$appName" >> $GITHUB_ENV
        id: android_app_name
