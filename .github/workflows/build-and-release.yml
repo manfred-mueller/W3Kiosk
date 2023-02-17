@@ -23,15 +23,6 @@ jobs:
        run: chmod +x gradlew
      - name: Build APK
        run: bash ./gradlew assembleRelease --stacktrace
-     - name: Sign APK
-       id: sign_apk
-       uses: r0adkll/sign-android-release@v1
-       with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTOREPASSWORD }}
-          keyPassword: ${{ secrets.KEYPASSWORD }}
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
@@ -56,6 +47,15 @@ jobs:
             export APK_PATH=$apkPath
             echo "APK_PATH=$apkPath" >> $GITHUB_ENV
        id: find_apk_path
+     - name: Sign APK
+       id: sign_apk
+       uses: r0adkll/sign-android-release@v1
+       with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTOREPASSWORD }}
+          keyPassword: ${{ secrets.KEYPASSWORD }}
      - name: Upload APK
        uses: actions/upload-artifact@v1
        with:
