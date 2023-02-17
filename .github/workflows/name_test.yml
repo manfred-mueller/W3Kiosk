@@ -92,8 +92,8 @@ jobs:
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
        with:
-         tag_name: ${{ v1.9.1 }}
-         release_name: ${{ Release }}
+         tag_name: ${{ env.VERSION_NAME }}
+         release_name: ${{ env.APP_NAME }}
      - name: Upload Release APK
        id: upload_release_asset
        uses: actions/upload-release-asset@v1.0.1
