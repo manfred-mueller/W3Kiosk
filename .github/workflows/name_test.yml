@@ -41,6 +41,10 @@ jobs:
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
        id: android_version_code
+     - name: Find APK
+       run: |
+            find . -name "*.pro" -type f
+       id: find_apk_path
      - name: Upload APK
        uses: actions/upload-artifact@v1
        with:
