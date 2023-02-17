@@ -27,19 +27,19 @@ jobs:
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
             export APP_NAME=$appName
-            echo "::set-env name=APP_NAME::$APP_NAME" >> $GITHUB_ENV
+            echo "name=APP_NAME::$APP_NAME" >> $GITHUB_ENV
        id: android_app_name
      - name: Get Version Name
        run: |
             versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
             export VERSION_NAME=$versionName
-            echo "::set-env name=VERSION_NAME::$VERSION_NAME" >> $GITHUB_ENV
+            echo "name=VERSION_NAME::$VERSION_NAME" >> $GITHUB_ENV
        id: android_version_name
      - name: Get Version Code
        run: |
             versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
             export VERSION_CODE=$versionCode
-            echo "::set-env name=VERSION_CODE::$VERSION_CODE" >> $GITHUB_ENV
+            echo "name=VERSION_CODE::$VERSION_CODE" >> $GITHUB_ENV
        id: android_version_code
      - name: Upload APK
        uses: actions/upload-artifact@v1
@@ -56,24 +56,6 @@ jobs:
        uses: actions/download-artifact@v1
        with:
          name: apk
-     - name: Get Application Name
-       run: |
-            appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
-            export APP_NAME=$appName
-            echo "::set-env name=APP_NAME::$APP_NAME" >> $GITHUB_ENV
-       id: android_app_name
-     - name: Get Version Name
-       run: |
-            versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
-            export VERSION_NAME=$versionName
-            echo "::set-env name=VERSION_NAME::$VERSION_NAME" >> $GITHUB_ENV
-       id: android_version_name
-     - name: Get Version Code
-       run: |
-            versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
-            export VERSION_CODE=$versionCode
-            echo "::set-env name=VERSION_CODE::$VERSION_CODE" >> $GITHUB_ENV
-       id: android_version_code
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
