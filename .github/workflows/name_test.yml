@@ -40,5 +40,37 @@ jobs:
             versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
-            echo ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
        id: android_version_code
+     - name: Upload APK
+       uses: actions/upload-artifact@v1
+       with:
+         name: apk
+         path: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release-unsigned.apk
+
+ release:
+   name: Release APK
+   needs: apk
+   runs-on: ubuntu-latest
+   steps:
+     - name: Download APK from build
+       uses: actions/download-artifact@v1
+       with:
+         name: apk
+     - name: Create Release
+       id: create_release
+       uses: actions/create-release@v1
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       with:
+         tag_name: ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+         release_name: ${{ github.event.repository.name }} v${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+     - name: Upload Release APK
+       id: upload_release_asset
+       uses: actions/upload-release-asset@v1.0.1
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       with:
+         upload_url: ${{ steps.create_release.outputs.upload_url }}
+         asset_path: apk/release/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release-unsigned.apk
+         asset_name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release-unsigned.apk
+         asset_content_type: application/zip
