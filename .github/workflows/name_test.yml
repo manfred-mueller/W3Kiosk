@@ -58,6 +58,8 @@ jobs:
    needs: apk
    runs-on: ubuntu-latest
    steps:
+     - name: Checkout
+       uses: actions/checkout@v3
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
