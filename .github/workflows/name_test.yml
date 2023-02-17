@@ -45,7 +45,7 @@ jobs:
        uses: actions/upload-artifact@v1
        with:
          name: apk
-         path: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release-unsigned.apk
+         path: apk/release/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release-unsigned.apk
 
  release:
    name: Release APK
