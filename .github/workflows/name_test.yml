@@ -43,7 +43,7 @@ jobs:
        id: android_version_code
      - name: Find APK
        run: |
-            find . -name "*.pro" -type f
+            find . -name "*.apk" -type f
        id: find_apk_path
      - name: Upload APK
        uses: actions/upload-artifact@v1
