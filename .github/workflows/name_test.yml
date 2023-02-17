@@ -1,0 +1,44 @@
+name: Build and Release
+
+on:
+ push:
+   branches:
+     - master
+   tags:
+     - "v*"
+
+jobs:
+ apk:
+   name: Generate APK
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v3
+     - name: Setup JDK
+       uses: actions/setup-java@v3
+       with:
+         distribution: temurin
+         java-version: "11"
+     - name: Set execution flag for gradlew
+       run: chmod +x gradlew
+     - name: Build APK
+       run: bash ./gradlew assembleRelease --stacktrace
+     - name: Get Application Name
+       run: |
+            appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2` | cut -d'.' -f4`
+            export APP_NAME=$appName
+            echo "APP_NAME=$appName" >> $GITHUB_ENV
+       id: android_app_name
+     - name: Get Version Name
+       run: |
+            versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
+            export VERSION_NAME=$versionName
+            echo "VERSION_NAME=$versionName" >> $GITHUB_ENV
+       id: android_version_name
+     - name: Get Version Code
+       run: |
+            versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
+            export VERSION_CODE=$versionCode
+            echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
+            echo ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+       id: android_version_code
