@@ -35,7 +35,7 @@
     <string name="toggleUrl">URL umschalten</string>
     <string name="deactivateMenubutton">Menübutton (de-)aktivieren</string>
     <string name="showHelp">Hilfe anzeigen</string>
-    <string name="devInfo">Modell: %1$s %2$s\nIP-Adresse: %3$s\nSeriennummer: %4$s\nGSF-ID: %5$s\nFirmware: %6$s</string>
+    <string name="devInfo">Modell: %1$s %2$s\nIP-Adresse: %3$s\nSeriennummer: %4$s\nFirmware: %5$s</string>
     <string name="app1">Anwendung 1</string>
     <string name="app2">Anwendung 2</string>
     <string name="app3">Anwendung 3</string>

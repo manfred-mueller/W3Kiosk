@@ -49,7 +49,7 @@
     <string name="toggleUrl">Toggle URL</string>
     <string name="deactivateMenubutton">(de-)activate) Menubutton</string>
     <string name="showHelp">Show help</string>
-    <string name="devInfo">Model: %1$s %2$s\nIP address: %3$s\nSerial: %4$s\nGSF-ID: %5$s\nFirmware: %6$s</string>
+    <string name="devInfo">Model: %1$s %2$s\nIP address: %3$s\nSerial: %4$s\nFirmware: %5$s</string>
     <string name="app1">App1</string>
     <string name="app2">App2</string>
     <string name="app3">App3</string>

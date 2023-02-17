@@ -49,7 +49,7 @@ public class SupportActivity extends AppCompatActivity {
         }
 
         TextView txtSerial = findViewById(R.id.txtSerial);
-        txtSerial.setText(String.format(getString(R.string.devInfo) ,Build.MANUFACTURER ,Build.MODEL.toUpperCase(), getIpAddress(), getSerialNumber(), getGsfAndroidId(this), Build.DISPLAY));
+        txtSerial.setText(String.format(getString(R.string.devInfo) ,Build.MANUFACTURER ,Build.MODEL.toUpperCase(), getIpAddress(), getSerialNumber(), Build.DISPLAY));
 
         if (tvCheck) {
             {
@@ -177,21 +177,5 @@ public class SupportActivity extends AppCompatActivity {
         }
 
         return serialNumber;
-    }
-
-    private static String getGsfAndroidId(Context context)
-    {
-        Uri URI = Uri.parse("content://com.google.android.gsf.gservices");
-        String ID_KEY = "android_id";
-        String[] params = {ID_KEY};
-        try (Cursor c = context.getContentResolver().query(URI, null, null, params, null)) {
-            if (!c.moveToFirst() || c.getColumnCount() < 2)
-                return null;
-            try {
-                return Long.toHexString(Long.parseLong(c.getString(1)));
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
     }
 }
