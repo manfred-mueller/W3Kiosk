@@ -3,13 +3,10 @@ package com.nass.ek.w3kiosk;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.UiModeManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -19,17 +16,24 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.lang.reflect.Method;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.Enumeration;
 
 
 public class SupportActivity extends AppCompatActivity {
 
+    private static final String TAG = "W3kiosk";
     String tvUri = "com.teamviewer.quicksupport.market";
     String adUri = "com.anydesk.anydeskandroid";
+    public String versionString;
+    public boolean updateAvailable = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -49,7 +53,7 @@ public class SupportActivity extends AppCompatActivity {
         }
 
         TextView txtSerial = findViewById(R.id.txtSerial);
-        txtSerial.setText(String.format(getString(R.string.devInfo) ,Build.MANUFACTURER ,Build.MODEL.toUpperCase(), getIpAddress(), getSerialNumber(), Build.DISPLAY));
+        txtSerial.setText(String.format(getString(R.string.devInfo) ,Build.MANUFACTURER ,Build.MODEL.toUpperCase(), getIpAddress(), Build.DISPLAY));
 
         if (tvCheck) {
             {
@@ -60,6 +64,11 @@ public class SupportActivity extends AppCompatActivity {
             {
                 findViewById(R.id.ad_Button).setVisibility(View.VISIBLE);
             }
+        }
+        try {
+            checkUpdate();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -116,6 +125,7 @@ public class SupportActivity extends AppCompatActivity {
         return uiModeManager != null
                 && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
+
     private String getIpAddress() {
         String ip = "";
         try {
@@ -143,39 +153,65 @@ public class SupportActivity extends AppCompatActivity {
         return ip;
     }
 
-    public static String getSerialNumber() {
-        String serialNumber;
-
-        try {
-            @SuppressLint("PrivateApi") Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class);
-
-            serialNumber = (String) get.invoke(c, "gsm.sn1");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "ril.serialnumber");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "ro.serialno");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                serialNumber = (String) get.invoke(c, "sys.serialnumber");
-
-            assert serialNumber != null;
-            if (serialNumber.equals(""))
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    serialNumber = Build.getSerial();
+    public void checkUpdate() throws IOException {
+        Thread thread = new Thread(() -> {
+            try  {
+                URL url = null;
+                try {
+                    url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 }
-            if (serialNumber.equals(Build.UNKNOWN))
-                serialNumber = null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            serialNumber = null;
-        }
+                BufferedReader reader = null;
+                try {
+                    reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    versionString = line;
+                    reader.close();
+                    TextView updateText = findViewById(R.id.txtUpdate);
+                    if (isUpdateAvailable(versionString))
+                    {
+                        updateText.setText(String.format(getString(R.string.updateAvailable) ,versionString));
+                    } else {
+                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+    }
 
-        return serialNumber;
+    public boolean isUpdateAvailable(String onlineVersion) {
+
+        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
+        String[] localVersion_splits = localVersion.split("\\.");
+        String[] onlineVersion_splits = onlineVersion.split("\\.");
+        int length = Math.max(localVersion_splits.length, onlineVersion_splits.length);
+        int i=0;
+        for(;i<length;i++){
+            int local_int = getValue(localVersion_splits,i);
+            int online_int = getValue(onlineVersion_splits,i);
+            if(local_int < online_int){
+                updateAvailable = true;
+            }
+        }
+        return updateAvailable;
+    }
+
+    private static int getValue(String[] version_splits, int i) {
+        int temp;
+        try{
+            temp = Integer.parseInt(version_splits[i]);
+        }
+        catch(IndexOutOfBoundsException e){
+            temp=0;
+        }
+        return temp;
     }
 }

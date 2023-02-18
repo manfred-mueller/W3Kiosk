@@ -35,7 +35,7 @@
     <string name="toggleUrl">URL umschalten</string>
     <string name="deactivateMenubutton">Menübutton (de-)aktivieren</string>
     <string name="showHelp">Hilfe anzeigen</string>
-    <string name="devInfo">Modell: %1$s %2$s\nIP-Adresse: %3$s\nSeriennummer: %4$s\nFirmware: %5$s</string>
+    <string name="devInfo">Hersteller und Modell:\n%1$s %2$s\n\nAktuelle IP-Adresse:\n%3$s\n\nInstallierte Firmware:\n%4$s</string>
     <string name="app1">Anwendung 1</string>
     <string name="app2">Anwendung 2</string>
     <string name="app3">Anwendung 3</string>
@@ -48,4 +48,6 @@
     <string name="reboot">Neustart</string>
     <string name="enterPassword">Bitte Passwort eingeben:</string>
     <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
+    <string name="updateAvailable">Update-Version %1$s gefunden!</string>
+    <string name="versionUptodate">Ihre Version %1$s ist aktuell!</string>
 </resources>
