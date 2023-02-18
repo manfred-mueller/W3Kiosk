@@ -27,7 +27,7 @@ jobs:
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
      - name: Build APK
-       run: bash ./gradlew assemble --stacktrace
+       run: bash ./gradlew assembleRelease --stacktrace
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
