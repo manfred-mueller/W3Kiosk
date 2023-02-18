@@ -14,6 +14,11 @@ jobs:
    steps:
      - name: Checkout
        uses: actions/checkout@v3
+     - name: Bump version
+       uses: chkfung/android-version-actions@v1.2.1
+       with:
+         gradlePath: app/build.gradle 
+         versionCode: ${{github.run_number}}
      - name: Setup JDK
        uses: actions/setup-java@v3
        with:
@@ -69,6 +74,11 @@ jobs:
    steps:
      - name: Checkout
        uses: actions/checkout@v3
+     - name: Bump version
+       uses: chkfung/android-version-actions@v1.2.1
+       with:
+         gradlePath: app/build.gradle # or app/build.gradle.kts 
+         versionCode: ${{github.run_number}}
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
@@ -103,7 +113,7 @@ jobs:
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
        with:
-         tag_name: ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+         tag_name: v${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
          release_name: ${{ env.APP_NAME }} ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
      - name: Upload Release APK
        id: upload_release_asset
@@ -118,11 +128,17 @@ jobs:
      - name: "Fetching Repository Contents"
        id: fetching_repo_content
        uses: actions/checkout@main
-     - name: Update latest.version
+     - name: Bump version
+       uses: chkfung/android-version-actions@v1.2.1
+       with:
+         gradlePath: app/build.gradle # or app/build.gradle.kts 
+         versionCode: ${{github.run_number}}
+     - name: Update versions
+       id: update_versions
        run: |
           echo ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }} > latest.version
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git add latest.version
-          git commit -am "Latest version updated"
+          git commit -am "Latest version and versionCode updated"
           git push
