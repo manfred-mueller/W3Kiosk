@@ -74,6 +74,11 @@ jobs:
    steps:
      - name: Checkout
        uses: actions/checkout@v3
+     - name: Bump version
+       uses: chkfung/android-version-actions@v1.2.1
+       with:
+         gradlePath: app/build.gradle # or app/build.gradle.kts 
+         versionCode: ${{github.run_number}}
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
