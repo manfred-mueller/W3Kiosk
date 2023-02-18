@@ -142,21 +142,3 @@ jobs:
           git add latest.version
           git commit -am "Latest version and versionCode updated"
           git push
-     - name: Create Changelog body
-       run: |
-            changelogBody=`![screenshot](https://user-images.githubusercontent.com/65389254/184656446-277635ca-45e2-45fc-bd12-0e29dce90e20.png)\![screenshot2](https://user-images.githubusercontent.com/65389254/184656451-2aced69a-d175-4e99-a435-34256d6837e9.png)\![screenshot3](https://user-images.githubusercontent.com/65389254/184656456-f571d00f-cc8a-45e2-8917-df67f81dc7ce.png)`
-            export CHANGELOG_BODY=$changelogBody
-            echo "CHANGELOG_BODY=$changelogBody" >> $GITHUB_ENV
-
-     - name: Update Changelog
-       uses: stefanzweifel/changelog-updater-action@v1
-       with:
-         release-notes: ${{ env.CHANGELOG_BODY }}
-         latest-version: ${{ github.event.release.name }}
-
-     - name: Commit updated CHANGELOG
-       uses: stefanzweifel/git-auto-commit-action@v4
-       with:
-         branch: main
-         commit_message: Update CHANGELOG
-         file_pattern: CHANGELOG.md
