@@ -12,11 +12,18 @@ android {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 6
-        versionName "1.9"
+        versionCode rootProject.ext.verCode
+        versionName rootProject.ext.verName
+
         setProperty("archivesBaseName", "w3kiosk-$versionName.$versionCode")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    afterEvaluate {
+        assembleRelease.doLast {
+            new File(rootProject.ext.releaseDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
+        }
     }
 
     buildTypes {

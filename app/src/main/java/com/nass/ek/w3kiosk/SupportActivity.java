@@ -161,7 +161,7 @@ public class SupportActivity extends AppCompatActivity {
             try  {
                 URL url = null;
                 try {
-                    url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
+                    url = new URL("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/latest.version");
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
@@ -179,9 +179,16 @@ public class SupportActivity extends AppCompatActivity {
                     if (isUpdateAvailable(versionString))
                     {
                         updateText.setText(String.format(getString(R.string.updateAvailable) ,versionString));
-                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/tree/master/app/release/w3kiosk-%1s-release.apk", versionString);
+                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString);
                     } else {
-                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
+//                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
+                        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
+                        int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
+                        int online_int = Integer.parseInt(versionString.replaceAll("[\\D]", ""));
+                        URL myURL = new URL(String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString));
+                        String myString = "Local: " + Integer.toString(local_int) + " Remote: " + Integer.toString(online_int);
+                        updateText.setText(getFileNameFromURL(myURL));
+                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString);
                     }
                 }
             } catch (Exception e) {
@@ -199,6 +206,17 @@ public class SupportActivity extends AppCompatActivity {
     public boolean isUpdateAvailable(String onlineVersion) {
 
         String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
+            int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
+            int online_int = Integer.parseInt(onlineVersion.replaceAll("[\\D]", ""));
+            if(local_int < online_int){
+                return updateAvailable = true;
+            }
+        return false;
+    }
+/*
+    public boolean isUpdateAvailable(String onlineVersion) {
+
+        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
         String[] localVersion_splits = localVersion.split("\\.");
         String[] onlineVersion_splits = onlineVersion.split("\\.");
         int length = Math.max(localVersion_splits.length, onlineVersion_splits.length);
@@ -206,13 +224,13 @@ public class SupportActivity extends AppCompatActivity {
         for(;i<length;i++){
             int local_int = getValue(localVersion_splits,i);
             int online_int = getValue(onlineVersion_splits,i);
-            if(local_int < online_int){
+            if(local_int != online_int){
                 updateAvailable = true;
             }
         }
         return updateAvailable;
     }
-
+*/
     private static int getValue(String[] version_splits, int i) {
         int temp;
         try{
