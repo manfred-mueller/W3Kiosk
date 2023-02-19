@@ -180,6 +180,7 @@ public class SupportActivity extends AppCompatActivity {
                     {
                         updateText.setText(String.format(getString(R.string.updateAvailable) ,versionString));
                         updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString);
+                        updateText.setOnClickListener(v -> getUpdate(updateUrl));
                     } else {
 //                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
                         String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
@@ -242,9 +243,10 @@ public class SupportActivity extends AppCompatActivity {
         return temp;
     }
 
-    public void getUpdate(View v) {
+    public void getUpdate(String uUrl) {
         try {
-            Uri uri = Uri.parse("googlechrome://navigate?url=" + updateUrl);
+            uUrl = updateUrl;
+            Uri uri = Uri.parse("googlechrome://navigate?url=" + uUrl);
             Intent i = new Intent(Intent.ACTION_VIEW, uri);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
