@@ -8,7 +8,7 @@
     <string name="check_autofill">Check AutoFill</string>
     <string name="mobile_mode">Mobile Mode</string>
     <string name="website1">First client url (%s will be preset)</string>
-    <string name="copyright" translatable="false">© 2022, NASS e.K.</string>
+    <string name="copyright" translatable="false">© 2023, NASS e.K.</string>
     <string name="set_home_button" translatable="false">Set home button</string>
     <string name="set_launcher_button" translatable="false">Set launcher button</string>
     <string name="settings_save_button" translatable="false">Settings save button</string>

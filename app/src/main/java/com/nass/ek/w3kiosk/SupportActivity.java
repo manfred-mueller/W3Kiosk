@@ -3,10 +3,12 @@ package com.nass.ek.w3kiosk;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.UiModeManager;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -187,6 +189,11 @@ public class SupportActivity extends AppCompatActivity {
         thread.start();
     }
 
+    public static String getFileNameFromURL(URL url) {
+        String fileName = url.getFile();
+        return fileName.substring(fileName.lastIndexOf('/') + 1);
+    }
+
     public boolean isUpdateAvailable(String onlineVersion) {
 
         String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
@@ -214,4 +221,17 @@ public class SupportActivity extends AppCompatActivity {
         }
         return temp;
     }
+
+    public void getUpdate(View v) {
+    String url = "https://github.com/manfred-mueller/W3Kiosk/releases/tag/v1.9.7";
+        try {
+            Uri uri = Uri.parse("googlechrome://navigate?url=" + url);
+            Intent i = new Intent(Intent.ACTION_VIEW, uri);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            // Chrome is probably not installed
+        }
+    }
+
 }

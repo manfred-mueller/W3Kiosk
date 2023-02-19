@@ -64,15 +64,19 @@ public class ScannerActivity extends AppCompatActivity {
         });
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        clientUrl = sharedPreferences.getString("clientUrl1", "");
+        clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
         urlPreset = getString(R.string.url_preset);
         webView = findViewById(R.id.scannerView);
         initWebView(urlPreset + clientUrl);
         findViewById(R.id.settingsButton).bringToFront();
+        if (getIntent().getBooleanExtra("EXIT", false))
+        {
+            finish();
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void initWebView(String verification_url) {
+    private void initWebView(String web_url) {
 
         webView.setVisibility(View.VISIBLE);
 
@@ -81,7 +85,7 @@ public class ScannerActivity extends AppCompatActivity {
         webView.setWebViewClient(new myWebClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
-        webView.loadUrl(verification_url);
+        webView.loadUrl(web_url);
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
 
@@ -220,8 +224,10 @@ public class ScannerActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", (dialog, id) -> {
                     String PwInput = password.getText().toString();
                     if (PwInput.equals("exit")) {
-                        finish();
-                    }
+                        Intent intent = new Intent(ScannerActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("EXIT", true);
+                        startActivity(intent);                    }
                     else if (PwInput.equals("h")) {
                         Intent startSupportActivityIntent = new Intent(getApplicationContext(), SupportActivity.class);
                         startActivity(startSupportActivityIntent);
