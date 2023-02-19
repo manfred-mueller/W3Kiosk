@@ -34,6 +34,7 @@ public class SupportActivity extends AppCompatActivity {
     private static final String TAG = "W3kiosk";
     String tvUri = "com.teamviewer.quicksupport.market";
     String adUri = "com.anydesk.anydeskandroid";
+    public String updateUrl;
     public String versionString;
     public boolean updateAvailable = false;
 
@@ -178,6 +179,7 @@ public class SupportActivity extends AppCompatActivity {
                     if (isUpdateAvailable(versionString))
                     {
                         updateText.setText(String.format(getString(R.string.updateAvailable) ,versionString));
+                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/tree/master/app/release/w3kiosk-%1s-release.apk", versionString);
                     } else {
                         updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
                     }
@@ -223,9 +225,8 @@ public class SupportActivity extends AppCompatActivity {
     }
 
     public void getUpdate(View v) {
-    String url = "https://github.com/manfred-mueller/W3Kiosk/releases/tag/v1.9.7";
         try {
-            Uri uri = Uri.parse("googlechrome://navigate?url=" + url);
+            Uri uri = Uri.parse("googlechrome://navigate?url=" + updateUrl);
             Intent i = new Intent(Intent.ACTION_VIEW, uri);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
