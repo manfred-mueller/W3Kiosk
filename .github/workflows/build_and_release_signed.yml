@@ -65,7 +65,7 @@ jobs:
          aabFile: app/build/outputs/bundle/release/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release.aab
          base64Keystore: ${{ secrets.KEYSTORE_B64 }}
          keystorePassword: ${{ secrets.KEY_PASSWORD }}
-         keystoreAlias: release
+         keystoreAlias: ${{ secrets.KEY_ALIAS }}
          keyPassword: ${{ secrets.ALIAS_PASSWORD }}
          bundletoolVersion: '1.9.0'
 
