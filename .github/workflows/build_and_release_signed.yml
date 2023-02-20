@@ -62,7 +62,7 @@ jobs:
        id: convert_aab
        uses: mukeshsolanki/bundletool-action@v1.0.0
        with:
-         aabFile: ${{ secrets.AAB_PATH }}
+         aabFile: ${{ env.AAB_PATH }}
          base64Keystore: ${{ secrets.KEYSTORE_B64 }}
          keystorePassword: ${{ secrets.KEY_PASSWORD }}
          keystoreAlias: ${{ secrets.KEY_ALIAS }}
