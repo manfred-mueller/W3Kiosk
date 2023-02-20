@@ -75,7 +75,7 @@ jobs:
          path: ${{ steps.convert_aab.outputs.apkPath }}
      - name: Find APK
        run: |
-            find app/build/outputs/bundle/release/ -name "*.apk" -type f
+            find . -name "*.apk" -type f
        id: find_apk
 
  release:
