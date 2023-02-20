@@ -26,6 +26,15 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../key.jks")
+            storePassword = "$System.env.KEY_PASSWORD"
+            keyAlias = "release"
+            keyPassword = "$System.env.ALIAS_PASSWORD"
+        }
+    }
+
     buildTypes {
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_11
@@ -33,6 +42,7 @@ android {
         }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
