@@ -32,7 +32,7 @@ jobs:
             echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
             echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > key.jks
      - name: Build APK
-       run: bash ./gradlew assembleRelease --stacktrace
+       run: bash ./gradlew bundle --stacktrace
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
@@ -52,17 +52,27 @@ jobs:
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
             find app/build -name "*.apk" -type f
        id: android_version_code
-     - name: Find APK
+     - name: Find AAB
        run: |
-            apkPath=`find app/build/ -name "*.apk" -type f`
-            export APK_PATH=$apkPath
-            echo "APK_PATH=$apkPath" >> $GITHUB_ENV
-       id: find_apk_path
-     - name: Upload APK
-       uses: actions/upload-artifact@v1
+            aabPath=`find app/build/ -name "*.aab" -type f`
+            export AAB_PATH=$aabPath
+            echo "AAB_PATH=$aabPath" >> $GITHUB_ENV
+       id: find_aab_path
+     - name: Convert aab to apk
+       id: convert_aab
+       uses: mukeshsolanki/bundletool-action@v1.0.0
        with:
-         name: apk
-         path: ${{ env.APK_PATH }}
+         aabFile: ${{ env.AAB_PATH }}
+         base64Keystore: ${{ secrets.KEYSTORE_B64 }}
+         keystorePassword: ${{ secrets.KEY_PASSWORD }}
+         keystoreAlias: release
+         keyPassword: ${{ secrets.ALIAS_PASSWORD }}
+         bundletoolVersion: '1.9.0'
+
+     - uses: actions/upload-artifact@v3
+       with:
+         name: release-apk
+         path: ${{ steps.convert_aab.outputs.apkPath }}
 
  release:
    name: Release APK
@@ -100,7 +110,7 @@ jobs:
          name: apk
      - name: Find APK
        run: |
-            apkPath=`find . -name "*.apk" -type f`
+            apkPath=`find app/build/ -name "*.apk" -type f`
             export APK_PATH=$apkPath
             echo "APK_PATH=$apkPath" >> $GITHUB_ENV
        id: find_apk_path
