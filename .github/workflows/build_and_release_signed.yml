@@ -17,7 +17,7 @@ jobs:
      - name: Bump version
        uses: chkfung/android-version-actions@v1.2.1
        with:
-         gradlePath: app/build.gradle 
+         gradlePath: build.gradle 
          versionCode: ${{github.run_number}}
      - name: Setup JDK
        uses: actions/setup-java@v3
@@ -32,7 +32,7 @@ jobs:
             echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
             echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > key.jks
      - name: Build APK
-       run: bash ./gradlew bundle --stacktrace
+       run: bash ./gradlew bundleRelease --stacktrace
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
