@@ -8,7 +8,13 @@ android {
         abortOnError false
     }
 
-    defaultConfig {
+     signingConfigs {
+        dev {
+            v2SigningEnabled true
+        }
+     }
+     
+     defaultConfig {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 33
