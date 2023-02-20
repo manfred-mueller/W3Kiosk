@@ -62,12 +62,11 @@ jobs:
        id: convert_aab
        uses: mukeshsolanki/bundletool-action@v1.0.0
        with:
-         aabFile: app/build/outputs/bundle/release/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release.aab
+         aabFile: ${{ secrets.AAB_PATH }}
          base64Keystore: ${{ secrets.KEYSTORE_B64 }}
          keystorePassword: ${{ secrets.KEY_PASSWORD }}
          keystoreAlias: ${{ secrets.KEY_ALIAS }}
          keyPassword: ${{ secrets.ALIAS_PASSWORD }}
-         bundletoolVersion: '1.9.0'
 
      - uses: actions/upload-artifact@v3
        with:
