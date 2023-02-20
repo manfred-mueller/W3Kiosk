@@ -123,6 +123,12 @@ jobs:
        with:
          tag_name: v${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
          release_name: ${{ env.APP_NAME }} ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+     - name: Find APK_PATH
+       run: |
+            apkPath=$(find apk/ -name "*.apk" -type f)
+            export APK_PATH=$apkPath
+            echo "APK_PATH=$apkPath" >> $GITHUB_ENV
+       id: find_apk_path
      - name: Upload Release APK
        id: upload_release_asset
        uses: actions/upload-release-asset@v1.0.1
@@ -130,7 +136,7 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
        with:
          upload_url: ${{ steps.create_release.outputs.upload_url }}
-         asset_path: apk/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release.apk
+         asset_path: ${{ env.APK_PATH }}
          asset_name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-release.apk
          asset_content_type: application/zip
      - name: "Fetching Repository Contents"
