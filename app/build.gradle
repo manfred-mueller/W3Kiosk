@@ -8,11 +8,17 @@ android {
         abortOnError false
     }
 
-    defaultConfig {
+     signingConfigs {
+        dev {
+            v2SigningEnabled true
+        }
+     }
+     
+     defaultConfig {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode rootProject.ext.verCode
+        versionCode 38
         versionName rootProject.ext.verName
 
         setProperty("archivesBaseName", "w3kiosk-$versionName.$versionCode")

@@ -17,7 +17,7 @@ jobs:
      - name: Bump version
        uses: chkfung/android-version-actions@v1.2.1
        with:
-         gradlePath: app/build.gradle 
+         gradlePath: build.gradle 
          versionCode: ${{github.run_number}}
      - name: Setup JDK
        uses: actions/setup-java@v3
@@ -26,8 +26,13 @@ jobs:
          java-version: "11"
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
+     - name: Decode Keystore
+       run: |
+            echo "ALIAS_PASSWORD=${{ secrets.ALIAS_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+            echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > key.jks
      - name: Build APK
-       run: bash ./gradlew assembleRelease --stacktrace
+       run: bash ./gradlew bundleRelease --stacktrace
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
@@ -36,36 +41,41 @@ jobs:
        id: android_app_name
      - name: Get Version Name
        run: |
-            versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
+            versionName=`grep " verName" build.gradle | cut -d'"' -f2`
             export VERSION_NAME=$versionName
             echo "VERSION_NAME=$versionName" >> $GITHUB_ENV
        id: android_version_name
      - name: Get Version Code
        run: |
-            versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
+            versionCode=`grep " verCode" build.gradle | awk '{ print $3; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
+            find app/build/outputs/bundle/release -name "*.aab" -type f
        id: android_version_code
-     - name: Find APK
+     - name: Find AAB
        run: |
-            apkPath=`find . -name "*.apk" -type f`
-            export APK_PATH=$apkPath
-            echo "APK_PATH=$apkPath" >> $GITHUB_ENV
-       id: find_apk_path
-     - name: Sign APK
-       id: sign_apk
-       uses: r0adkll/sign-android-release@v1
+            aabPath=$(find app/build/outputs/bundle/release/ -name "*.aab" -type f)
+            export AAB_PATH=$aabPath
+            echo "AAB_PATH=$aabPath" >> $GITHUB_ENV
+       id: find_aab_path
+     - name: Convert aab to apk
+       id: convert_aab
+       uses: mukeshsolanki/bundletool-action@v1.0.0
        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEYSTOREPASSWORD }}
-          keyPassword: ${{ secrets.KEYPASSWORD }}
-     - name: Upload APK
-       uses: actions/upload-artifact@v1
+         aabFile: ${{ env.AAB_PATH }}
+         base64Keystore: ${{ secrets.KEYSTORE_B64 }}
+         keystorePassword: ${{ secrets.KEY_PASSWORD }}
+         keystoreAlias: ${{ secrets.KEY_ALIAS }}
+         keyPassword: ${{ secrets.ALIAS_PASSWORD }}
+
+     - uses: actions/upload-artifact@v3
        with:
          name: apk
-         path: ${{ env.APK_PATH }}
+         path: ${{ steps.convert_aab.outputs.apkPath }}
+     - name: Find APK
+       run: |
+            find . -name "*.apk" -type f
+       id: find_apk
 
  release:
    name: Release APK
@@ -77,7 +87,7 @@ jobs:
      - name: Bump version
        uses: chkfung/android-version-actions@v1.2.1
        with:
-         gradlePath: app/build.gradle # or app/build.gradle.kts 
+         gradlePath: app/build.gradle 
          versionCode: ${{github.run_number}}
      - name: Get Application Name
        run: |
@@ -87,13 +97,13 @@ jobs:
        id: android_app_name
      - name: Get Version Name
        run: |
-            versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
+            versionName=`grep " verName" build.gradle | cut -d'"' -f2`
             export VERSION_NAME=$versionName
             echo "VERSION_NAME=$versionName" >> $GITHUB_ENV
        id: android_version_name
      - name: Get Version Code
        run: |
-            versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
+            versionCode=`grep " verCode" build.gradle | awk '{ print $3; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
        id: android_version_code
@@ -103,10 +113,8 @@ jobs:
          name: apk
      - name: Find APK
        run: |
-            apkPath=`find . -name "*.apk" -type f`
-            export APK_PATH=$apkPath
-            echo "APK_PATH=$apkPath" >> $GITHUB_ENV
-       id: find_apk_path
+            find . -name "*.apk" -type f
+       id: find_apk
      - name: Create Release
        id: create_release
        uses: actions/create-release@v1
@@ -115,6 +123,12 @@ jobs:
        with:
          tag_name: v${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
          release_name: ${{ env.APP_NAME }} ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
+     - name: Find APK_PATH
+       run: |
+            apkPath=$(find apk/ -name "*.apk" -type f)
+            export APK_PATH=$apkPath
+            echo "APK_PATH=$apkPath" >> $GITHUB_ENV
+       id: find_apk_path
      - name: Upload Release APK
        id: upload_release_asset
        uses: actions/upload-release-asset@v1.0.1
