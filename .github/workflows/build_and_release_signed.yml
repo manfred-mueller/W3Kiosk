@@ -50,13 +50,19 @@ jobs:
             versionCode=`grep " verCode" build.gradle | awk '{ print $3; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
-            find . -name "*.apk" -type f
+            find app/build -name "*.apk" -type f
        id: android_version_code
+     - name: Find APK
+       run: |
+            apkPath=`find app/build/ -name "*.apk" -type f`
+            export APK_PATH=$apkPath
+            echo "APK_PATH=$apkPath" >> $GITHUB_ENV
+       id: find_apk_path
      - name: Upload APK
        uses: actions/upload-artifact@v1
        with:
          name: apk
-         path: app/build/outputs/apk/release/${{ env.APP_NAME }}-${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}-*.apk
+         path: ${{ env.APK_PATH }}
 
  release:
    name: Release APK
