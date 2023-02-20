@@ -94,13 +94,13 @@ jobs:
        id: android_app_name
      - name: Get Version Name
        run: |
-            versionName=`grep " versionName" app/build.gradle | cut -d'"' -f2`
+            versionName=`grep " versionName" build.gradle | cut -d'"' -f2`
             export VERSION_NAME=$versionName
             echo "VERSION_NAME=$versionName" >> $GITHUB_ENV
        id: android_version_name
      - name: Get Version Code
        run: |
-            versionCode=`grep " versionCode" app/build.gradle | awk '{ print $2; }'`
+            versionCode=`grep " versionCode" build.gradle | awk '{ print $3; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
        id: android_version_code
