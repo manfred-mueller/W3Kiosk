@@ -31,7 +31,7 @@ jobs:
             echo "ENCODED_STRING=${{ secrets.KEYSTORE_B64 }}" >> $GITHUB_ENV
             echo "ALIAS_PASSWORD=${{ secrets.ALIAS_PASSWORD }}" >> $GITHUB_ENV
             echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-            echo $ENCODED_STRING | base64 -di > "key.jks
+            echo "$ENCODED_STRING | base64 -di" > key.jks
      - name: Build APK
        run: bash ./gradlew assembleRelease --stacktrace
      - name: Get Application Name
