@@ -53,12 +53,18 @@ jobs:
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
             find app/build/outputs/bundle/release -name "*.aab" -type f
        id: android_version_code
-     - name: Find APK
+     - name: Find APK_PATH
        run: |
             apk_path=`find app/build/outputs/apk/release -name "*.apk" -type f`
             export APK_PATH=$apk_path
             echo "APK_PATH=$apk_path" >> $GITHUB_ENV
-       id: find_apk
+       id: find_apk_path
+     - name: Upload APK
+       uses: actions/upload-artifact@v1
+       with:
+         name: apk
+         path: ${{ env.APK_PATH }}
+
 
  release:
    name: Release APK
