@@ -28,6 +28,7 @@ jobs:
        run: chmod +x gradlew
      - name: Decode Keystore
        run: |
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
             echo "ALIAS_PASSWORD=${{ secrets.ALIAS_PASSWORD }}" >> $GITHUB_ENV
             echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
             echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > keystore.jks
