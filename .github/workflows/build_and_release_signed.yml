@@ -55,7 +55,9 @@ jobs:
        id: android_version_code
      - name: Find APK
        run: |
-            find . -name "*.apk" -type f
+            apk_path=`find app/build/outputs/apk/release -name "*.apk" -type f`
+            export APK_PATH=$apk_path
+            echo "APK_PATH=$apk_path" >> $GITHUB_ENV
        id: find_apk
 
  release:
