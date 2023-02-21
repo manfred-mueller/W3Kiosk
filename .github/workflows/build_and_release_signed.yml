@@ -30,7 +30,7 @@ jobs:
        run: |
             echo "ALIAS_PASSWORD=${{ secrets.ALIAS_PASSWORD }}" >> $GITHUB_ENV
             echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-            echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > local
+            echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > release
      - name: Build APK
        run: bash ./gradlew bundleRelease --stacktrace
      - name: Get Application Name
