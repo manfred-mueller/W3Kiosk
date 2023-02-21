@@ -51,7 +51,7 @@ jobs:
             versionCode=`grep " verCode" build.gradle | awk '{ print $3; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
-            find app/build/outputs/bundle/release -name "*.aab" -type f
+            find app/build/outputs/apk/release -name "*.apk" -type f
        id: android_version_code
      - name: Find APK_PATH
        run: |
