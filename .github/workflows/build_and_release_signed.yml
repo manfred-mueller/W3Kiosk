@@ -14,6 +14,12 @@ jobs:
    steps:
      - name: Checkout
        uses: actions/checkout@v3
+     - name: Checkout submodules
+       uses: actions/checkout@v3
+       with:
+         repository: manfred-mueller/signing
+         token: ${{ secrets.SIGNING_TOKEN }}
+         path: keystore
      - name: Bump version
        uses: chkfung/android-version-actions@v1.2.1
        with:
@@ -26,11 +32,6 @@ jobs:
          java-version: "11"
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
-     - name: Decode Keystore
-       run: |
-            echo "ALIAS_PASSWORD=${{ secrets.ALIAS_PASSWORD }}" >> $GITHUB_ENV
-            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-            echo "${{ secrets.KEYSTORE_B64 }} | base64 -di" > keystore.jks
      - name: Build APK
        run: bash ./gradlew bundleRelease --stacktrace
      - name: Get Application Name
@@ -52,26 +53,6 @@ jobs:
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
             find app/build/outputs/bundle/release -name "*.aab" -type f
        id: android_version_code
-     - name: Find AAB
-       run: |
-            aabPath=$(find app/build/outputs/bundle/release/ -name "*.aab" -type f)
-            export AAB_PATH=$aabPath
-            echo "AAB_PATH=$aabPath" >> $GITHUB_ENV
-       id: find_aab_path
-     - name: Convert aab to apk
-       id: convert_aab
-       uses: mukeshsolanki/bundletool-action@v1.0.0
-       with:
-         aabFile: ${{ env.AAB_PATH }}
-         base64Keystore: ${{ secrets.KEYSTORE_B64 }}
-         keystorePassword: ${{ secrets.KEY_PASSWORD }}
-         keystoreAlias: ${{ secrets.KEY_ALIAS }}
-         keyPassword: ${{ secrets.ALIAS_PASSWORD }}
-
-     - uses: actions/upload-artifact@v3
-       with:
-         name: apk
-         path: ${{ steps.convert_aab.outputs.apkPath }}
      - name: Find APK
        run: |
             find . -name "*.apk" -type f
