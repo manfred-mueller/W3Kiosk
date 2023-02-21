@@ -3,6 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 33
     buildToolsVersion '32.0.0'
+    def keyProps = new Properties()
+    def keyPropsFile = rootProject.file('keystore/credentials')
+    if (keyPropsFile.exists()) {
+        keyProps.load(new FileInputStream(keyPropsFile))
+    }
     lintOptions {
         warningsAsErrors false
         abortOnError false
@@ -34,10 +39,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../keystore.jks")
-            storePassword = "$System.env.KEY_PASSWORD"
-            keyAlias = "$System.env.KEY_ALIAS"
-            keyPassword = "$System.env.ALIAS_PASSWORD"
+            keyAlias keyProps['keyAlias']
+            keyPassword keyProps['keyPassword']
+            storeFile keyProps['storeFile'] ? file(keyProps['storeFile']) : null
+            storePassword keyProps['storePassword']
         }
     }
 
