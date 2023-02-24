@@ -4,10 +4,14 @@ package com.nass.ek.w3kiosk;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +36,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import org.json.JSONArray;
@@ -42,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ScannerActivity extends AppCompatActivity {
 
@@ -52,6 +58,27 @@ public class ScannerActivity extends AppCompatActivity {
     private String mCameraPhotoPath;
     public String urlPreset;
     public String clientUrl;
+
+    BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && intent.getAction().equals(ConnectivityManager
+                    .CONNECTIVITY_ACTION)) {
+
+                boolean isConnected = Objects.requireNonNull(ConnectivityManagerCompat.getNetworkInfoFromBroadcast
+                        ((ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE),
+                                intent)).isConnected();
+
+                if (isConnected) {
+                    initWebView(urlPreset + clientUrl);
+                } else {
+                    String noNet = context.getString(R.string.noNetwork);
+                    String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+                    webView.loadData(rawHTML, "text/HTML", "UTF-8");
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -268,5 +295,22 @@ public class ScannerActivity extends AppCompatActivity {
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAllCaps(false);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(connectionReceiver, filter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            unregisterReceiver(connectionReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
