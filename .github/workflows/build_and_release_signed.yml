@@ -18,7 +18,7 @@ jobs:
        uses: actions/checkout@v3
        with:
          repository: manfred-mueller/signing
-         token: ${{ secrets.SIGNING_TOKEN }}
+         token: ${{ secrets.ACCESS_TOKEN }}
          path: keystore
      - name: Bump version
        uses: chkfung/android-version-actions@v1.2.1
@@ -33,7 +33,7 @@ jobs:
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
      - name: Build APK
-       run: bash ./gradlew bundleRelease --stacktrace
+       run: bash ./gradlew assembleRelease --stacktrace
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
@@ -51,12 +51,21 @@ jobs:
             versionCode=`grep " verCode" build.gradle | awk '{ print $3; }'`
             export VERSION_CODE=$versionCode
             echo "VERSION_CODE=$versionCode" >> $GITHUB_ENV
-            find app/build/outputs/bundle/release -name "*.aab" -type f
+            find app/build/outputs/apk/release -name "*.apk" -type f
        id: android_version_code
-     - name: Find APK
+     - name: Find APK_PATH
        run: |
-            find . -name "*.apk" -type f
-       id: find_apk
+            apk_path=`find app/build/outputs/apk/release -name "*.apk" -type f`
+            export APK_PATH=$apk_path
+            echo "APK_PATH=$apk_path" >> $GITHUB_ENV
+            find app/build/outputs/apk/release -name "*.apk" -type f
+       id: find_apk_path
+     - name: Upload APK
+       uses: actions/upload-artifact@v1
+       with:
+         name: apk
+         path: ${{ env.APK_PATH }}
+
 
  release:
    name: Release APK
