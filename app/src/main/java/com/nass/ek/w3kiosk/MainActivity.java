@@ -156,12 +156,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
 
         setupSettings();
-        if (isScanner()) {
-            Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
-            startActivity(startScannerActivityIntent);
-        } else {
-            commitURL(urlPreset + clientUrl1);
-        }
+        commitURL(urlPreset + clientUrl1);
         nextUrl = clientUrl2;
         Intent mIntent = getIntent();
         String action = mIntent.getAction();
@@ -332,7 +327,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                 });
             }
+            if (isScanner()) {
+                Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
+                startActivity(startScannerActivityIntent);
+            } else {
                 kioskWeb.loadUrl(url);
+            }
         }
         else
         {

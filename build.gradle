@@ -13,7 +13,7 @@ buildscript {
 }
 
 ext {
-    verCode = 3
+    verCode = 2
     verName = "1.9"
     verDir = file("${projectDir}")
 }
