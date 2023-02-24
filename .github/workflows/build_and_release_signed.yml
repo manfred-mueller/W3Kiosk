@@ -58,6 +58,7 @@ jobs:
             apk_path=`find app/build/outputs/apk/release -name "*.apk" -type f`
             export APK_PATH=$apk_path
             echo "APK_PATH=$apk_path" >> $GITHUB_ENV
+            find app/build/outputs/apk/release -name "*.apk" -type f
        id: find_apk_path
      - name: Upload APK
        uses: actions/upload-artifact@v1
