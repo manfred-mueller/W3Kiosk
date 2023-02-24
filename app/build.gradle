@@ -33,7 +33,7 @@ android {
 
     afterEvaluate {
         assembleRelease.doLast {
-            new File(rootProject.ext.releaseDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
+            new File(rootProject.ext.verDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
         }
     }
 

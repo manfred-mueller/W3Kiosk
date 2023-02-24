@@ -182,14 +182,7 @@ public class SupportActivity extends AppCompatActivity {
                         updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString);
                         updateText.setOnClickListener(v -> getUpdate(updateUrl));
                     } else {
-//                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
-                        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
-                        int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
-                        int online_int = Integer.parseInt(versionString.replaceAll("[\\D]", ""));
-                        URL myURL = new URL(String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString));
-                        String myString = "Local: " + Integer.toString(local_int) + " Remote: " + Integer.toString(online_int);
-                        updateText.setText(getFileNameFromURL(myURL));
-                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString);
+                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
                     }
                 }
             } catch (Exception e) {
@@ -197,11 +190,6 @@ public class SupportActivity extends AppCompatActivity {
             }
         });
         thread.start();
-    }
-
-    public static String getFileNameFromURL(URL url) {
-        String fileName = url.getFile();
-        return fileName.substring(fileName.lastIndexOf('/') + 1);
     }
 
     public boolean isUpdateAvailable(String onlineVersion) {
@@ -213,34 +201,6 @@ public class SupportActivity extends AppCompatActivity {
                 return updateAvailable = true;
             }
         return false;
-    }
-/*
-    public boolean isUpdateAvailable(String onlineVersion) {
-
-        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
-        String[] localVersion_splits = localVersion.split("\\.");
-        String[] onlineVersion_splits = onlineVersion.split("\\.");
-        int length = Math.max(localVersion_splits.length, onlineVersion_splits.length);
-        int i=0;
-        for(;i<length;i++){
-            int local_int = getValue(localVersion_splits,i);
-            int online_int = getValue(onlineVersion_splits,i);
-            if(local_int != online_int){
-                updateAvailable = true;
-            }
-        }
-        return updateAvailable;
-    }
-*/
-    private static int getValue(String[] version_splits, int i) {
-        int temp;
-        try{
-            temp = Integer.parseInt(version_splits[i]);
-        }
-        catch(IndexOutOfBoundsException e){
-            temp=0;
-        }
-        return temp;
     }
 
     public void getUpdate(String uUrl) {

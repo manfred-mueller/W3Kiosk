@@ -15,7 +15,7 @@ buildscript {
 ext {
     verCode = 3
     verName = "1.9"
-    releaseDir = file("${projectDir}/app/release")
+    verDir = file("${projectDir}")
 }
 
 allprojects {
