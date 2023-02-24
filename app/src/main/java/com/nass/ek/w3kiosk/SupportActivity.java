@@ -161,7 +161,7 @@ public class SupportActivity extends AppCompatActivity {
             try  {
                 URL url = null;
                 try {
-                    url = new URL("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/latest.version");
+                    url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
