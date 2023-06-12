@@ -30,7 +30,7 @@
     <string name="permissions">Berechtigungen</string>
     <string name="service_description">Dienst zum Starten des Powermenüs</string>
     <string name="noNetwork">Suche Netzwerk…</string>
-    <string name="website2">Zweite Kunden-Url (%s wird vorangestellt)</string>
+    <string name="website2">Zweite Kunden-Url</string>
     <string name="chooseAction">Bitte auswählen</string>
     <string name="toggleUrl">URL umschalten</string>
     <string name="deactivateMenubutton">Menübutton (de-)aktivieren</string>
@@ -50,4 +50,5 @@
     <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
     <string name="updateAvailable">Update-Version %1$s gefunden!</string>
     <string name="versionUptodate">Ihre Version %1$s ist aktuell!</string>
+    <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden</string>
 </resources>

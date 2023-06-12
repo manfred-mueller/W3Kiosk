@@ -23,9 +23,11 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,8 +44,11 @@ public class SettingsActivity extends AppCompatActivity {
     EditText e;
     CheckBox c;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
-    private Spinner dropdown;
-    private boolean dropdownInitialized;
+    String[] urlTimeout = new String[]{"30", "60", "90", "120", "150", "180"};
+    private Spinner appsDropdown;
+    private boolean appsDropdownInitialized;
+    private Spinner timeoutDropdown;
+    private boolean timeoutDropdownInitialized;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -57,24 +62,46 @@ public class SettingsActivity extends AppCompatActivity {
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
-        client2Text.setText(String.format(getString(R.string.website2), getString(R.string.url_preset)));
-        dropdown = findViewById(R.id.appsSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allowedApps);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dropdown.setAdapter(adapter);
-        dropdown.setOnLongClickListener(v -> {
+        client2Text.setText(getString(R.string.website2));
+        appsDropdown = findViewById(R.id.appsSpinner);
+        ArrayAdapter<String> appAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allowedApps);
+        appAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        appsDropdown.setAdapter(appAdapter);
+        appsDropdown.setOnLongClickListener(v -> {
             startActivity(new Intent(this, AppsActivity.class));
             return true;
         });
 
-        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        appsDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!dropdownInitialized) {
-                    dropdownInitialized = true;
+                if (!appsDropdownInitialized) {
+                    appsDropdownInitialized = true;
                     return;
                 }
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("appsCount", Integer.parseInt(dropdown.getSelectedItem().toString()));
+                editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
+                editor.commit();
+                finish();
+                startActivity(getIntent());
+            }
+
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
+
+        timeoutDropdown = findViewById(R.id.timeoutSpinner);
+        ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, urlTimeout);
+        timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        timeoutDropdown.setAdapter(timeoutAdapter);
+
+        timeoutDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (!timeoutDropdownInitialized) {
+                    timeoutDropdownInitialized = true;
+                    return;
+                }
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("urlTimeout", timeoutDropdown.getSelectedItemPosition());
                 editor.commit();
                 finish();
                 startActivity(getIntent());
@@ -91,7 +118,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
-        if (!isTv()){
+        if (isScanner()){
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                     findViewById(R.id.permissionLayout).setVisibility(View.VISIBLE);
                 }
@@ -112,16 +139,18 @@ public class SettingsActivity extends AppCompatActivity {
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
 
-            editor.putInt("appsCount", Integer.parseInt(dropdown.getSelectedItem().toString()));
+            editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
+
+            editor.putInt("urlTimeout", timeoutDropdown.getSelectedItemPosition());
 
             s = findViewById(R.id.autoLogin);
             editor.putBoolean("autoLogin", s.isChecked());
 
             e = findViewById(R.id.loginEditText);
-                editor.putString("loginName", e.getText().toString());
+            editor.putString("loginName", e.getText().toString());
 
             e = findViewById(R.id.pwEditText);
-                editor.putString("loginPassword", e.getText().toString());
+            editor.putString("loginPassword", e.getText().toString());
 
             e = findViewById(R.id.client1EditText);
             editor.putString("clientUrl1", e.getText().toString());
@@ -139,7 +168,10 @@ public class SettingsActivity extends AppCompatActivity {
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
 
-        dropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
+        appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
+        int spinnerValue = sharedPreferences.getInt("urlTimeout",-1);
+        if(spinnerValue != -1)
+        timeoutDropdown.setSelection(spinnerValue);
 
         s = findViewById(R.id.autoLogin);
         s.setChecked(sharedPreferences.getBoolean("autoLogin", false));
@@ -161,6 +193,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         e = findViewById(R.id.client2EditText);
         e.setText(sharedPreferences.getString("clientUrl2", ""));
+
+        e = findViewById(R.id.loginEditText);
+        e.setText(sharedPreferences.getString("loginName", ""));
+
+        e = findViewById(R.id.pwEditText);
+        e.setText(sharedPreferences.getString("loginPassword", ""));
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             c = findViewById(R.id.phoneAccess);
@@ -204,6 +242,10 @@ public class SettingsActivity extends AppCompatActivity {
                 (UiModeManager) this.getApplicationContext().getSystemService(UI_MODE_SERVICE);
         return uiModeManager != null
                 && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    public static boolean isScanner() {
+        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
     }
 
     public void setLauncher(View v) {

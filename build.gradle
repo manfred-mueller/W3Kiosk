@@ -2,7 +2,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.2'
@@ -13,7 +13,7 @@ buildscript {
 }
 
 ext {
-    verCode = 11
+    verCode = 4
     verName = "1.9"
     releaseDir = file("${projectDir}/app/release")
 }
@@ -21,7 +21,7 @@ ext {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven { url 'https://jitpack.io' }
     }
 }

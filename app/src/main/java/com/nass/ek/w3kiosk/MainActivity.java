@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.provider.Settings;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -56,8 +57,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public String clientUrl1;
     public String clientUrl2;
     public int appsCount;
+    public int handlerTimeout;
     public int toggleKey;
     public String nextUrl;
+    public Handler handler;
+    public Runnable runnable;
 
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
@@ -108,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
         appsCount = sharedPreferences.getInt("appsCount", 0);
+        handlerTimeout = (sharedPreferences.getInt("urlTimeout", 0) + 1) * 30000;
         clientUrl1 = sharedPreferences.getString("clientUrl1", "");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         autoName = sharedPreferences.getString("loginName", "");
@@ -117,6 +122,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         kioskWeb = findViewById(R.id.kioskView);
+        handler = new Handler();
+        runnable = (Runnable) () -> {
+            commitURL(urlPreset + clientUrl1);
+            nextUrl = clientUrl2;
+        };
+
         if (isTv()) {
             new CountDownTimer(60000, 1000) {
                 public void onTick(long millisUntilFinished) {
@@ -249,7 +260,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             });
         }
-        settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
+        if (isTablet()) {
+            settingsButton.setOnClickListener(view -> settingsButton.showContextMenu());
+        } else {
+            settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
+        }
 
         kioskWeb.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -288,7 +303,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
-        registerForContextMenu(kioskWeb);
+//        registerForContextMenu(kioskWeb);
+        registerForContextMenu(settingsButton);
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -346,7 +362,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void toggleUrl(){
         if (nextUrl.equals(clientUrl2)){
+            if (isTablet()) {
+                commitURL(clientUrl2);
+                startHandler();
+            } else {
             commitURL(urlPreset + clientUrl2);
+            }
             nextUrl = clientUrl1;
         }
         else if (nextUrl.equals(clientUrl1)){
@@ -465,5 +486,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             startActivity(startSupportActivityIntent);
         }
         return true;
+    }
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        stopHandler();
+        startHandler();
+    }
+    public void stopHandler() {
+        handler.removeCallbacks(runnable);
+    }
+    public void startHandler() {
+        handler.postDelayed(runnable, handlerTimeout);
     }
 }

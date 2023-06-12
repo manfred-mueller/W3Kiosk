@@ -94,18 +94,6 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:padding="5dp">
-                <!--
-                <Switch
-                    android:id="@+id/appsToggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="?android:attr/colorBackground"
-                    android:onClick="checkAutofill"
-                    tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
--->
                 <Spinner
                     android:id="@+id/appsSpinner"
                     android:layout_width="wrap_content"
@@ -128,6 +116,37 @@
                     android:layout_toStartOf="@id/appsSpinner"
                     android:focusable="auto"
                     android:text="@string/enable_apps"
+                    android:textSize="15sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="5dp">
+                <Spinner
+                    android:id="@+id/timeoutSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:dropDownWidth="50dp"
+                    android:spinnerMode="dropdown"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@id/timeoutSpinner"
+                    android:focusable="auto"
+                    android:text="@string/urlTimeout"
                     android:textSize="15sp" />
 
             </RelativeLayout>
