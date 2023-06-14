@@ -3,7 +3,7 @@
     <string name="settings">Einstellungen</string>
     <string name="check_autofill">AutoFill prüfen</string>
     <string name="mobile_mode">Mobiler Modus</string>
-    <string name="website1">Erste Kunden-Url (%s wird vorangestellt)</string>
+    <string name="website1">Erste Kunden-Url (ohne %s)</string>
     <string name="code_or_help">Code oder \'h\' für Hilfe</string>
     <string name="cancel">Abbrechen</string>
     <string name="an_error_occurred">Ein Fehler ist aufgetreten:\u0020</string>
@@ -24,7 +24,7 @@
     <string name="overlay_permission">Überlagerung</string>
     <string name="powermenu">Powermenü</string>
     <string name="login_name">Login-Name:</string>
-    <string name="autologin">Autologin</string>
+    <string name="autologin">Autologin erste Kunden-Url</string>
     <string name="login_password">Login-Passwort:</string>
     <string name="write_system_settings">Systemeinstellungen</string>
     <string name="permissions">Berechtigungen</string>
@@ -36,19 +36,20 @@
     <string name="deactivateMenubutton">Menübutton (de-)aktivieren</string>
     <string name="showHelp">Hilfe anzeigen</string>
     <string name="devInfo">Hersteller und Modell:\n%1$s %2$s\n\nAktuelle IP-Adresse:\n%3$s\n\nInstallierte Firmware:\n%4$s</string>
-    <string name="app1">Anwendung 1</string>
-    <string name="app2">Anwendung 2</string>
-    <string name="app3">Anwendung 3</string>
-    <string name="app4">Anwendung 4</string>
-    <string name="app5">Anwendung 5</string>
+    <string name="app1">App 1</string>
+    <string name="app2">App 2</string>
+    <string name="app3">App 3</string>
+    <string name="app4">App 4</string>
+    <string name="app5">App 5</string>
     <string name="appPw">"Anwendungspasswort"</string>
-    <string name="choose_app">Anwendung wählen</string>
-    <string name="enable_apps">Anzahl erlaubter Anwendungen</string>
-    <string name="apps">Anwendungen</string>
+    <string name="choose_app">App wählen</string>
+    <string name="enable_apps">Erlaubte Apps</string>
+    <string name="apps">Apps</string>
     <string name="reboot">Neustart</string>
     <string name="enterPassword">Bitte Passwort eingeben:</string>
     <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
     <string name="updateAvailable">Update-Version %1$s gefunden!</string>
     <string name="versionUptodate">Ihre Version %1$s ist aktuell!</string>
     <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden</string>
+    <string name="appInfo">%1$s vom %2$s</string>
 </resources>

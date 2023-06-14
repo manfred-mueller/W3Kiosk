@@ -1,6 +1,9 @@
 package com.nass.ek.w3kiosk;
 
-import static com.nass.ek.w3kiosk.MainActivity.PASSWORD;
+import static com.nass.ek.w3kiosk.MainActivity.PW1;
+import static com.nass.ek.w3kiosk.MainActivity.PW2;
+import static com.nass.ek.w3kiosk.MainActivity.PW3;
+import static com.nass.ek.w3kiosk.MainActivity.PW4;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -191,7 +194,7 @@ public class AppsActivity extends AppCompatActivity {
         checkPasswordDialog.setCancelable(false)
                 .setPositiveButton("Ok", (dialog, id) -> {
                     String PwInput = password.getText().toString();
-                    if (PwInput.equals(PASSWORD)) {
+                    if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
 

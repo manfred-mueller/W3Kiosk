@@ -44,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
     EditText e;
     CheckBox c;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
-    String[] urlTimeout = new String[]{"30", "60", "90", "120", "150", "180"};
+    String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
     private Spinner appsDropdown;
     private boolean appsDropdownInitialized;
     private Spinner timeoutDropdown;
@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(new Intent(this, AppsActivity.class));
             return true;
         });
-
+/*
         appsDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!appsDropdownInitialized) {
@@ -88,12 +88,12 @@ public class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
-
+*/
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeoutDropdown.setAdapter(timeoutAdapter);
-
+/*
         timeoutDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!timeoutDropdownInitialized) {
@@ -110,7 +110,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
-
+*/
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
         if (MainActivity.isTablet() || MainActivity.isScanner()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -127,6 +127,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
             findViewById(R.id.client2Text).setVisibility(View.GONE);
             findViewById(R.id.client2EditText).setVisibility(View.GONE);
+            findViewById(R.id.timeoutText).setVisibility(View.GONE);
+            findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
         }
 
         ImageButton b = findViewById(R.id.updateCloseButton);
@@ -203,9 +205,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             c = findViewById(R.id.phoneAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
-
-            c = findViewById(R.id.micAccess);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -309,14 +308,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public void checkMicPermission(View v){
-        if (ContextCompat.checkSelfPermission(SettingsActivity.this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(SettingsActivity.this,new String[]{
-                    Manifest.permission.RECORD_AUDIO}, 4715);
-        }
-    }
-
     public void checkPhonePermission(View v){
         if (ContextCompat.checkSelfPermission(SettingsActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
         {
@@ -376,9 +367,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             c = findViewById(R.id.phoneAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
-
-            c = findViewById(R.id.micAccess);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);

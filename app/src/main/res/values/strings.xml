@@ -7,7 +7,7 @@
     <string name="settingsButton" translatable="false">SettingsButton</string>
     <string name="check_autofill">Check AutoFill</string>
     <string name="mobile_mode">Mobile Mode</string>
-    <string name="website1">First client url (%s will be preset)</string>
+    <string name="website1">First client url (without %s)</string>
     <string name="copyright" translatable="false">© 2023, NASS e.K.</string>
     <string name="set_home_button" translatable="false">Set home button</string>
     <string name="set_launcher_button" translatable="false">Set launcher button</string>
@@ -37,7 +37,7 @@
     <string name="overlay_permission">Overlay permission</string>
     <string name="powermenu">Power menu</string>
     <string name="login_name">Login name:</string>
-    <string name="autologin">Autologin</string>
+    <string name="autologin">Autologin first client url</string>
     <string name="login_password">Login password:</string>
     <string name="write_system_settings">System settings</string>
     <string name="permissions">Permissions</string>
@@ -57,7 +57,7 @@
     <string name="app5">App5</string>
     <string name="appPw">"application password"</string>
     <string name="choose_app">Choose an app</string>
-    <string name="enable_apps">allowed apps count</string>
+    <string name="enable_apps">Allowed apps</string>
     <string name="apps">Apps</string>
     <string name="reboot">Reboot</string>
     <string name="enterPassword">Please enter password:</string>
@@ -65,4 +65,5 @@
     <string name="updateAvailable">Update version %1$s found!</string>
     <string name="versionUptodate">Your version %1$s is up to date!</string>
     <string name="urlTimeout">Timeout  second client url in sconds</string>
+    <string name="appInfo">%1$s from %2$s</string>
 </resources>

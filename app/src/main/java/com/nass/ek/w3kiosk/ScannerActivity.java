@@ -1,6 +1,11 @@
 package com.nass.ek.w3kiosk;
 
 
+import static com.nass.ek.w3kiosk.MainActivity.PW1;
+import static com.nass.ek.w3kiosk.MainActivity.PW2;
+import static com.nass.ek.w3kiosk.MainActivity.PW3;
+import static com.nass.ek.w3kiosk.MainActivity.PW4;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -58,6 +63,7 @@ public class ScannerActivity extends AppCompatActivity {
     private String mCameraPhotoPath;
     public String urlPreset;
     public String clientUrl;
+    public int appsCount;
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
@@ -91,6 +97,7 @@ public class ScannerActivity extends AppCompatActivity {
         });
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        appsCount = sharedPreferences.getInt("appsCount", 0);
         clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
         urlPreset = getString(R.string.url_preset);
         webView = findViewById(R.id.scannerView);
@@ -274,7 +281,7 @@ public class ScannerActivity extends AppCompatActivity {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + MainActivity.tvUri));
                         startActivity(intent);
                     }
-                    else if (PwInput.equals(MainActivity.PASSWORD)) {
+                    else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
                         @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                         startActivity(startSettingsActivityIntent);
                     }
@@ -287,7 +294,13 @@ public class ScannerActivity extends AppCompatActivity {
                     }
                 });
         checkPasswordDialog.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
-        checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
+        if (appsCount > 0)
+        {
+            checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
+        } else
+        {
+            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
+        }
         AlertDialog dialog = checkPasswordDialog.create();
         dialog.show();
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);

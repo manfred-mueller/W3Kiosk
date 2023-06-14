@@ -17,6 +17,14 @@ android {
         dev {
             v2SigningEnabled true
         }
+        buildTypes {
+            debug {
+                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
+            }
+            release {
+                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
+            }
+        }
      }
      
      defaultConfig {

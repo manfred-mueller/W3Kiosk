@@ -1,70 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_about"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:background="@color/colorPrimaryDark"
+    android:gravity="center"
     tools:context=".AboutActivity">
+
+    <ImageButton
+        android:id="@+id/close_Button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:contentDescription="@string/closebutton"
+        android:onClick="closeClick"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@android:drawable/ic_delete"
+        tools:ignore="UsingOnClickInXml" />
 
     <ImageView
         android:id="@+id/logo_id"
         android:layout_width="350dp"
         android:layout_height="200dp"
-        android:layout_centerHorizontal="true"
+        android:contentDescription="splash logo"
         android:src="@drawable/logo_splash"
-        android:contentDescription="splash logo"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/logo_id"
-        android:layout_marginTop="10dp"
-        android:text="W3Lager"
-        android:layout_centerHorizontal="true"
-        android:textColor="#FFFEFE"
-        android:textSize="50dp"
-        android:textStyle="bold"
-        tools:textStyle="italic" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logo_id"
-        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="W3Lager"
+        android:textColor="#FFFEFE"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo_id"
+        tools:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="90dp"
         android:text="Ihre Lagerverwaltung für die Luftfracht"
         android:textColor="#FFFEFE"
         android:textSize="15dp"
-        android:textStyle="bold|italic" />
+        android:textStyle="bold|italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo_id" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
+        android:layout_marginTop="130dp"
+        android:text=""
+        android:textColor="#FFFEFE"
+        android:textSize="15dp"
+        android:textStyle="bold|italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo_id" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="160dp"
         android:text="Copyright ©W3Coach 2018-2023"
         android:textColor="#FFFEFE"
         android:textSize="10dp"
-        android:textStyle="bold|italic" />
+        android:textStyle="bold|italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView1" />
 
-    <ImageButton
-        android:id="@+id/close_Button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
-        android:contentDescription="@string/closebutton"
-        android:onClick="closeClick"
-        android:visibility="visible"
-        app:srcCompat="@android:drawable/ic_media_play"
-        tools:ignore="UsingOnClickInXml" />
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

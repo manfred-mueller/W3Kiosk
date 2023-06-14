@@ -44,7 +44,10 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static String PASSWORD = "0000";
+    public static String PW1 = "49214";
+    public static String PW2 = "65474";
+    public static String PW3 = "45470";
+    public static String PW4 = "0000";
     public WebView kioskWeb;
     public String JavaString = "";
     Context context = this;
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public String clientUrl1;
     public String clientUrl2;
     public int appsCount;
+    public int toSetting;
     public int handlerTimeout;
     public int toggleKey;
     public String nextUrl;
@@ -112,7 +116,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
         appsCount = sharedPreferences.getInt("appsCount", 0);
-        handlerTimeout = (sharedPreferences.getInt("urlTimeout", 0) + 1) * 30000;
+        toSetting = sharedPreferences.getInt("urlTimeout", 0);
+        if (toSetting > 0) {
+            handlerTimeout = toSetting * 30000;
+        } else {
+            handlerTimeout = toSetting;
+        }
         clientUrl1 = sharedPreferences.getString("clientUrl1", "");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         autoName = sharedPreferences.getString("loginName", "");
@@ -214,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
                         startActivity(intent);
                     }
-                    else if (PwInput.equals(PASSWORD)) {
+                    else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
                         @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                         startActivity(startSettingsActivityIntent);
                     }
@@ -227,10 +236,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                 });
         checkPasswordDialog.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
-        if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty())
+        if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty() && clientUrl2.isEmpty())
         {
-            checkPasswordDialog.setNeutralButton(getString(R.string.autologin), (dialog, id) -> commitURL(urlPreset + clientUrl1));
-        } else if (appsCount > 0)
+            checkPasswordDialog.setNeutralButton("Autologin", (dialog, id) -> commitURL(urlPreset + clientUrl1));
+        }
+        else if (!clientUrl2.isEmpty()) {
+            checkPasswordDialog.setNeutralButton(R.string.toggleUrl, (dialog, id) -> toggleUrl());
+        }
+        else if (appsCount > 0 && clientUrl2.isEmpty())
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
         } else
@@ -260,11 +273,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             });
         }
-        if (isTablet()) {
-            settingsButton.setOnClickListener(view -> settingsButton.showContextMenu());
-        } else {
-            settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
-        }
+        settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
 
         kioskWeb.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -303,8 +312,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
-//        registerForContextMenu(kioskWeb);
-        registerForContextMenu(settingsButton);
+        registerForContextMenu(kioskWeb);
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -364,15 +372,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (nextUrl.equals(clientUrl2)){
             if (isTablet()) {
                 commitURL(clientUrl2);
-                startHandler();
+                if (handlerTimeout > 0) {
+                    startHandler();
+                }
             } else {
-            commitURL(urlPreset + clientUrl2);
+                commitURL(urlPreset + clientUrl2);
             }
             nextUrl = clientUrl1;
         }
         else if (nextUrl.equals(clientUrl1)){
             commitURL(urlPreset + clientUrl1);
             nextUrl = clientUrl2;
+            stopHandler();
         }
     }
 
@@ -490,8 +501,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
-        stopHandler();
-        startHandler();
+        if (nextUrl.equals(clientUrl1) && handlerTimeout > 0) {
+            stopHandler();
+            startHandler();
+        }
     }
     public void stopHandler() {
         handler.removeCallbacks(runnable);
