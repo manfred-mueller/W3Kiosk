@@ -31,7 +31,7 @@ android {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode rootProject.ext.verCode
+        versionCode 71
         versionName rootProject.ext.verName
 
         setProperty("archivesBaseName", "w3kiosk-$versionName.$versionCode")
