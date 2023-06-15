@@ -44,10 +44,22 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static String PW1 = "49214";
-    public static String PW2 = "65474";
-    public static String PW3 = "45470";
-    public static String PW4 = "0000";
+    public static String PW1;
+    public static String PW2;
+    public static String PW3;
+    public static String PW4;
+
+    static {
+        try {
+            PW1 = AESUtils.decrypt("0220972AE0731AD40F36FCA15AEEAF7B");
+            PW2 = AESUtils.decrypt("B4EEA51496774A498A2A1F7D10EF2AAE");
+            PW3 = AESUtils.decrypt("CB2BF4EF649D42ACEAC301C660C31262");
+            PW4 = AESUtils.decrypt("FF7676CF6F7845B2E429718C5C0AE9BB");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public WebView kioskWeb;
     public String JavaString = "";
     Context context = this;
@@ -512,4 +524,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void startHandler() {
         handler.postDelayed(runnable, handlerTimeout);
     }
+
 }

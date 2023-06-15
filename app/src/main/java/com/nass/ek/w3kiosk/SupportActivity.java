@@ -9,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,7 +26,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.Enumeration;
-
 
 public class SupportActivity extends AppCompatActivity {
 
@@ -54,9 +52,6 @@ public class SupportActivity extends AppCompatActivity {
             imgView.getLayoutParams().height = 400;
             imgView.requestLayout();
         }
-
-        TextView txtSerial = findViewById(R.id.txtSerial);
-        txtSerial.setText(String.format(getString(R.string.devInfo) ,Build.MANUFACTURER ,Build.MODEL.toUpperCase(), getIpAddress(), Build.DISPLAY));
 
         if (tvCheck) {
             {

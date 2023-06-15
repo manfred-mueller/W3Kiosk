@@ -40,7 +40,7 @@ android {
     }
 
     afterEvaluate {
-        assembleRelease.doLast {
+        assembleRelease.doFirst {
             new File(rootProject.ext.releaseDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
         }
     }
