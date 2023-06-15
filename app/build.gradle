@@ -41,6 +41,7 @@ android {
 
     afterEvaluate {
         assembleRelease.doFirst {
+            Files.createDirectories(rootProject.ext.releaseDir)
             new File(rootProject.ext.releaseDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
         }
     }
