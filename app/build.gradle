@@ -42,7 +42,7 @@ android {
     afterEvaluate {
         assembleRelease.doFirst {
             def versionDir = rootProject.ext.releaseDir
-            new File($versionDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
+            new File(versionDir, "latest.version").text = String.format(rootProject.ext.verName + "." + rootProject.ext.verCode)
         }
     }
 
