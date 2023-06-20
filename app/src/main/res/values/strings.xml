@@ -66,4 +66,6 @@
     <string name="versionUptodate">Your version %1$s is up to date!</string>
     <string name="urlTimeout">Timeout  second client url in sconds</string>
     <string name="appInfo">%1$s from %2$s</string>
+    <string name="apply">Apply</string>
+    <string name="ignore">ignore</string>
 </resources>

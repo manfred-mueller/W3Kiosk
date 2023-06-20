@@ -52,4 +52,6 @@
     <string name="versionUptodate">Ihre Version %1$s ist aktuell!</string>
     <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden</string>
     <string name="appInfo">%1$s vom %2$s</string>
+    <string name="apply">Installieren</string>
+    <string name="ignore">Ignorieren</string>
 </resources>

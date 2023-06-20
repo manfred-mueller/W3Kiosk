@@ -2,6 +2,7 @@ package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.UiModeManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -126,7 +127,7 @@ public class SupportActivity extends AppCompatActivity {
             try  {
                 URL url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
                 Scanner sc = new Scanner(url.openStream());
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 while (sc.hasNext()) {
                     sb.append(sc.next());
                 }
@@ -140,6 +141,7 @@ public class SupportActivity extends AppCompatActivity {
                         updateText.setText(String.format(getString(R.string.updateAvailable), versionString));
                         updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1s/w3kiosk-%2s-release.apk", versionString, versionString);
                         updateText.setOnClickListener(v -> getUpdate());
+                        updateAlertDialog();
                     } else {
                         updateText.setText(String.format(getString(R.string.versionUptodate), versionString));
                     }
@@ -170,7 +172,17 @@ public class SupportActivity extends AppCompatActivity {
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
         } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
+    private void updateAlertDialog() {
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle(getResources().getString(R.string.app_name));
+        builder.setMessage(String.format(getString(R.string.updateAvailable), versionString));
+        builder.setCancelable(false);
+        builder.setPositiveButton(R.string.apply, (dialogInterface, i) -> getUpdate());
+        builder.setNegativeButton(R.string.ignore, (dialogInterface, i) -> dialogInterface.cancel());
+        builder.show();
+    }
 }
