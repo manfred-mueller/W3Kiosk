@@ -83,7 +83,7 @@ public class SettingsActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                     findViewById(R.id.permissionLayout).setVisibility(View.VISIBLE);
                 }
-                if (checkApp("com.rscja.scanner")){
+                if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
             findViewById(R.id.client2Text).setVisibility(View.GONE);
@@ -312,10 +312,10 @@ public class SettingsActivity extends AppCompatActivity {
         return false;
     }
 
-    private boolean checkApp(String uri) {
+    private boolean checkApp() {
         PackageInfo pkgInfo;
         try {
-            pkgInfo = getPackageManager().getPackageInfo(uri, 0);
+            pkgInfo = getPackageManager().getPackageInfo("com.rscja.scanner", 0);
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }

@@ -18,11 +18,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.Scanner;
 
 public class SupportActivity extends AppCompatActivity {
@@ -125,68 +121,31 @@ public class SupportActivity extends AppCompatActivity {
                 && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 
-    private String getIpAddress() {
-        String ip = "";
-        try {
-            Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface
-                    .getNetworkInterfaces();
-            while (enumNetworkInterfaces.hasMoreElements()) {
-                NetworkInterface networkInterface = enumNetworkInterfaces
-                        .nextElement();
-                Enumeration<InetAddress> enumInetAddress = networkInterface
-                        .getInetAddresses();
-                while (enumInetAddress.hasMoreElements()) {
-                    InetAddress inetAddress = enumInetAddress.nextElement();
-
-                    if (inetAddress.isSiteLocalAddress()) {
-                        ip = inetAddress.getHostAddress();
-                    }
-
-                }
-
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-            ip = "0.0.0.0";
-        }
-        return ip;
-    }
-
     public void checkUpdate() throws IOException {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try  {
-                    //Instantiating the URL class
-                    URL url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
-                    //Retrieving the contents of the specified page
-                    Scanner sc = new Scanner(url.openStream());
-                    //Instantiating the StringBuffer class to hold the result
-                    StringBuffer sb = new StringBuffer();
-                    while (sc.hasNext()) {
-                        sb.append(sc.next());
-                        //System.out.println(sc.next());
-                    }
-                    //Retrieving the String from the String Buffer object
-                    versionString = sb.toString();
-                    System.out.println(versionString);
-                    //Removing the HTML tags
-                    versionString = versionString.replaceAll("<[^>].*>", "");
-                    System.out.println("Contents of the web page: " + versionString);
-                    TextView updateText = findViewById(R.id.txtUpdate);
-                    runOnUiThread(() -> {
-                        if (isUpdateAvailable(versionString)) {
-                            updateText.setText(String.format(getString(R.string.updateAvailable), versionString));
-                            updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1s/w3kiosk-%2s-release.apk", versionString, versionString);
-                            updateText.setOnClickListener(v -> getUpdate(updateUrl));
-                        } else {
-                            updateText.setText(String.format(getString(R.string.versionUptodate), versionString));
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
+        Thread thread = new Thread(() -> {
+            try  {
+                URL url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
+                Scanner sc = new Scanner(url.openStream());
+                StringBuffer sb = new StringBuffer();
+                while (sc.hasNext()) {
+                    sb.append(sc.next());
                 }
+                versionString = sb.toString();
+                System.out.println(versionString);
+                versionString = versionString.replaceAll("<[^>].*>", "");
+                System.out.println("Contents of the web page: " + versionString);
+                TextView updateText = findViewById(R.id.txtUpdate);
+                runOnUiThread(() -> {
+                    if (isUpdateAvailable(versionString)) {
+                        updateText.setText(String.format(getString(R.string.updateAvailable), versionString));
+                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1s/w3kiosk-%2s-release.apk", versionString, versionString);
+                        updateText.setOnClickListener(v -> getUpdate());
+                    } else {
+                        updateText.setText(String.format(getString(R.string.versionUptodate), versionString));
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         thread.start();
@@ -203,15 +162,14 @@ public class SupportActivity extends AppCompatActivity {
         return false;
     }
 
-    public void getUpdate(String uUrl) {
+    public void getUpdate() {
         try {
-            uUrl = updateUrl;
+            String uUrl = updateUrl;
             Uri uri = Uri.parse("googlechrome://navigate?url=" + uUrl);
             Intent i = new Intent(Intent.ACTION_VIEW, uri);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
         } catch (ActivityNotFoundException e) {
-            // Chrome is probably not installed
         }
     }
 
