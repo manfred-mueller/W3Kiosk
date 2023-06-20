@@ -2,7 +2,6 @@ package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -18,7 +17,6 @@ public class AboutActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
-        DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate);
         @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);

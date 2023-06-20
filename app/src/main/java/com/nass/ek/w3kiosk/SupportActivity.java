@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class SupportActivity extends AppCompatActivity {
@@ -143,7 +145,8 @@ public class SupportActivity extends AppCompatActivity {
                         updateText.setOnClickListener(v -> getUpdate());
                         updateAlertDialog();
                     } else {
-                        updateText.setText(String.format(getString(R.string.versionUptodate), versionString));
+                        Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
+                        updateText.setText(String.format(getString(R.string.versionUptodate), versionString, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
                     }
                 });
             } catch (Exception e) {

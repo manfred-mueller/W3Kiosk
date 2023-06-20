@@ -49,7 +49,7 @@
     <string name="enterPassword">Bitte Passwort eingeben:</string>
     <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
     <string name="updateAvailable">Update-Version %1$s gefunden!</string>
-    <string name="versionUptodate">Ihre Version %1$s ist aktuell!</string>
+    <string name="versionUptodate">Ihre Version %1$s vom %2$s ist aktuell!</string>
     <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden</string>
     <string name="appInfo">%1$s vom %2$s</string>
     <string name="apply">Installieren</string>
