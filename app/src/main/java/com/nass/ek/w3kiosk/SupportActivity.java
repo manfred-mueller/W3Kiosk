@@ -17,15 +17,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Scanner;
 
 public class SupportActivity extends AppCompatActivity {
 
@@ -44,7 +42,7 @@ public class SupportActivity extends AppCompatActivity {
         boolean tvCheck = checkApps(tvUri);
         boolean adCheck = checkApps(adUri);
 
-        if (isTv()){
+        if (isTv()) {
             TextView txtTv = findViewById(R.id.textView);
             txtTv.setText(getString(R.string.helpTextTv));
             ImageView imgView = findViewById(R.id.imageView);
@@ -73,12 +71,15 @@ public class SupportActivity extends AppCompatActivity {
     public void tvClick(View view) {
         appClick(tvUri);
     }
+
     public void adClick(View view) {
         appClick(adUri);
     }
+
     public void sdClick(View view) {
         startService(new Intent(this, ShutdownService.class));
     }
+
     public void closeClick(View view) {
         finish();
     }
@@ -152,36 +153,40 @@ public class SupportActivity extends AppCompatActivity {
     }
 
     public void checkUpdate() throws IOException {
-        Thread thread = new Thread(() -> {
-            try  {
-                URL url = null;
-                try {
-                    url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                BufferedReader reader = null;
-                try {
-                    reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    versionString = line;
-                    reader.close();
-                    TextView updateText = findViewById(R.id.txtUpdate);
-                    if (isUpdateAvailable(versionString))
-                    {
-                        updateText.setText(String.format(getString(R.string.updateAvailable) ,versionString));
-                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/raw/master/app/release/w3kiosk-%1s-release.apk", versionString);
-                        updateText.setOnClickListener(v -> getUpdate(updateUrl));
-                    } else {
-                        updateText.setText(String.format(getString(R.string.versionUptodate) ,versionString));
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    //Instantiating the URL class
+                    URL url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
+                    //Retrieving the contents of the specified page
+                    Scanner sc = new Scanner(url.openStream());
+                    //Instantiating the StringBuffer class to hold the result
+                    StringBuffer sb = new StringBuffer();
+                    while (sc.hasNext()) {
+                        sb.append(sc.next());
+                        //System.out.println(sc.next());
                     }
+                    //Retrieving the String from the String Buffer object
+                    versionString = sb.toString();
+                    System.out.println(versionString);
+                    //Removing the HTML tags
+                    versionString = versionString.replaceAll("<[^>].*>", "");
+                    System.out.println("Contents of the web page: " + versionString);
+                    TextView updateText = findViewById(R.id.txtUpdate);
+                    runOnUiThread(() -> {
+                        if (isUpdateAvailable(versionString)) {
+                            updateText.setText(String.format(getString(R.string.updateAvailable), versionString));
+                            updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1s/w3kiosk-%2s-release.apk", versionString, versionString);
+                            updateText.setOnClickListener(v -> getUpdate(updateUrl));
+                        } else {
+                            updateText.setText(String.format(getString(R.string.versionUptodate), versionString));
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         });
         thread.start();
