@@ -18,16 +18,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -71,46 +68,10 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(new Intent(this, AppsActivity.class));
             return true;
         });
-/*
-        appsDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!appsDropdownInitialized) {
-                    appsDropdownInitialized = true;
-                    return;
-                }
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
-                editor.commit();
-                finish();
-                startActivity(getIntent());
-            }
-
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-*/
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeoutDropdown.setAdapter(timeoutAdapter);
-/*
-        timeoutDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (!timeoutDropdownInitialized) {
-                    timeoutDropdownInitialized = true;
-                    return;
-                }
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("urlTimeout", timeoutDropdown.getSelectedItemPosition());
-                editor.commit();
-                finish();
-                startActivity(getIntent());
-            }
-
-            public void onNothingSelected(AdapterView<?> adapterView) {
-            }
-        });
-*/
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
         if (MainActivity.isTablet() || MainActivity.isScanner()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
