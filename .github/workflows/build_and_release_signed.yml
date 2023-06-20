@@ -110,15 +110,3 @@ jobs:
         tag: v${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }}
         overwrite: true
         body: "Automatic github release"
-     - name: "Fetching Repository Contents"
-       id: fetching_repo_content
-       uses: actions/checkout@main
-     - name: Update versions
-       id: update_versions
-       run: |
-          echo ${{ env.VERSION_NAME }}.${{ env.VERSION_CODE }} > latest.version
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add latest.version
-          git commit -am "Latest Version and versionCode updated"
-          git push
