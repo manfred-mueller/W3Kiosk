@@ -54,4 +54,6 @@
     <string name="appInfo">%1$s vom %2$s</string>
     <string name="apply">Installieren</string>
     <string name="ignore">Ignorieren</string>
+    <string name="check_update">Update erzwingen</string>
+    <string name="dismiss">Ausblenden</string>
 </resources>

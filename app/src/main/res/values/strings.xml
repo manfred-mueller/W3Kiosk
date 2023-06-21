@@ -68,4 +68,6 @@
     <string name="appInfo">%1$s from %2$s</string>
     <string name="apply">Apply</string>
     <string name="ignore">ignore</string>
+    <string name="check_update">Force update</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

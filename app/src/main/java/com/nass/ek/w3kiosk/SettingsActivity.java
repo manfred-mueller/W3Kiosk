@@ -102,6 +102,9 @@ public class SettingsActivity extends AppCompatActivity {
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
 
+            s = findViewById(R.id.updateToggle);
+            editor.putBoolean("forceUpdate", s.isChecked());
+
             editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
 
             editor.putInt("urlTimeout", timeoutDropdown.getSelectedItemPosition());
@@ -130,6 +133,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
+
+        s = findViewById(R.id.updateToggle);
+        s.setChecked(sharedPreferences.getBoolean("forceUpdate", false));
 
         appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
         int spinnerValue = sharedPreferences.getInt("urlTimeout",-1);

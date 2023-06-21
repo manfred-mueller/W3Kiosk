@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.UiModeManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,12 +28,12 @@ import java.util.Scanner;
 
 public class SupportActivity extends AppCompatActivity {
 
-    private static final String TAG = "W3kiosk";
     String tvUri = "com.teamviewer.quicksupport.market";
     String adUri = "com.anydesk.anydeskandroid";
     public String updateUrl;
     public String versionString;
     public boolean updateAvailable = false;
+    public boolean forceUpdate = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -40,6 +42,8 @@ public class SupportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_support);
         boolean tvCheck = checkApps(tvUri);
         boolean adCheck = checkApps(adUri);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        forceUpdate = sharedPreferences.getBoolean("forceUpdate", false);
 
         if (isTv()) {
             TextView txtTv = findViewById(R.id.textView);
@@ -139,9 +143,9 @@ public class SupportActivity extends AppCompatActivity {
                 System.out.println("Contents of the web page: " + versionString);
                 TextView updateText = findViewById(R.id.txtUpdate);
                 runOnUiThread(() -> {
-                    if (isUpdateAvailable(versionString)) {
+                    if (isUpdateAvailable(versionString) || forceUpdate) {
                         updateText.setText(String.format(getString(R.string.updateAvailable), versionString));
-                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1s/w3kiosk-%2s-release.apk", versionString, versionString);
+                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1$s/w3kiosk-%1$s-release.apk", versionString);
                         updateText.setOnClickListener(v -> getUpdate());
                         updateAlertDialog();
                     } else {
@@ -180,12 +184,12 @@ public class SupportActivity extends AppCompatActivity {
     }
 
     private void updateAlertDialog() {
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.app_name));
-        builder.setMessage(String.format(getString(R.string.updateAvailable), versionString));
-        builder.setCancelable(false);
-        builder.setPositiveButton(R.string.apply, (dialogInterface, i) -> getUpdate());
-        builder.setNegativeButton(R.string.ignore, (dialogInterface, i) -> dialogInterface.cancel());
-        builder.show();
+        AlertDialog.Builder updateDialog=new AlertDialog.Builder(this);
+        updateDialog.setTitle(getResources().getString(R.string.app_name));
+        updateDialog.setMessage(String.format(getString(R.string.updateAvailable), versionString));
+        updateDialog.setCancelable(false);
+        updateDialog.setPositiveButton(R.string.apply, (dialogInterface, i) -> getUpdate());
+        updateDialog.setNegativeButton(R.string.ignore, (dialogInterface, i) -> dialogInterface.cancel());
+        updateDialog.show();
     }
 }

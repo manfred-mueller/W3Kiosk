@@ -383,6 +383,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void toggleUrl(){
         if (nextUrl.equals(clientUrl2)){
             if (isTablet()) {
+                if (!clientUrl2.startsWith("https://") && !clientUrl2.startsWith("http://")){
+                    clientUrl2 = "https://" + clientUrl2;
+                }
                 commitURL(clientUrl2);
                 if (handlerTimeout > 0) {
                     startHandler();
