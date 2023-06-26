@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
-        autoUpdate = sharedPreferences.getBoolean("forceUpdate", false);
+        autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
         if (toSetting > 0) {

@@ -1,17 +1,12 @@
 package com.nass.ek.w3kiosk;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import com.nass.ek.appupdate.UpdateWrapper;
 
@@ -28,11 +23,13 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
-        @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
+        @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
         findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
+        checkUpdate();
     }
 
     private void checkUpdate() {
@@ -42,8 +39,7 @@ public class AboutActivity extends AppCompatActivity {
                 .setNotificationIcon(R.mipmap.ic_launcher)
                 .setUpdateTitle(getString(R.string.UpdateAvailable))
                 .setUpdateContentText(getString(R.string.UpdateDescription))
-//                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
-                .setUrl("https://www.nass-ek.de/updates/w3kiosk.json")
+                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
                 .setIsShowToast(true)
 
                 .setCallback((model, hasNewVersion) -> {
