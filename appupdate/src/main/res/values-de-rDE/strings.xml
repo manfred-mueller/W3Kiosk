@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="update_lib_network_not_available">Konnte keine Internetverbindung herstellen</string>
+    <string name="update_lib_default_toast">Die aktuellste Version ist bereits installiert</string>
+    <string name="update_lib_download_cancel">Download abgebrochen</string>
+    <string name="update_lib_download_in_background">Aktualisiert im Hintergrund</string>
+    <string name="update_lib_download_finish">Herunterladen abgeschlossen</string>
+    <string name="update_lib_download_failed">Herunterladen fehlgeschlagen</string>
+    <string name="update_lib_update_content">Hinweis&#65306;</string>
+    <string name="update_lib_update">Aktualisieren</string>
+    <string name="update_lib_cancel">Ignorieren</string>
+    <string name="update_lib_dialog_title">Aktualisierung verfügbar</string>
+    <string name="update_lib_file_download">Datei herunterladen</string>
+    <string name="update_lib_file_downloading">Herunterladen&#8230;</string>
+    <string name="update_lib_file_download_text">Herunterladen</string>
+    <string name="update_lib_stop_download">Stopp</string>
+    <string name="update_lib_background_download">Verbergen</string>
+</resources>

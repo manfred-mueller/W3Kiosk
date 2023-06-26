@@ -485,6 +485,28 @@
 
                     </RelativeLayout>
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/writeStorage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:clickable="false"
+                            android:onClick="checkStoragePermission"
+                            android:text="@string/storage_permission" />
+
+                    </RelativeLayout>
+                </LinearLayout>
             </LinearLayout>
 
 

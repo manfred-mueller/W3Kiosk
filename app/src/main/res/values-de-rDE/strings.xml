@@ -22,6 +22,7 @@
     <string name="mic_access">Microfonzugriff</string>
     <string name="phone_access">Telefonzugriff</string>
     <string name="overlay_permission">Überlagerung</string>
+    <string name="storage_permission">Speicher zugriff</string>
     <string name="powermenu">Powermenü</string>
     <string name="login_name">Login-Name:</string>
     <string name="autologin">Autologin erste Kunden-Url</string>
@@ -56,4 +57,6 @@
     <string name="ignore">Ignorieren</string>
     <string name="check_update">Update erzwingen</string>
     <string name="dismiss">Ausblenden</string>
+    <string name="UpdateAvailable">Update verfügbar</string>
+    <string name="UpdateDescription">Aktualisieren Sie, um die neuesten Funktionen zu genießen.</string>
 </resources>

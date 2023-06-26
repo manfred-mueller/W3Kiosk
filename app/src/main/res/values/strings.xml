@@ -35,6 +35,7 @@
     <string name="mic_access">Microphone access</string>
     <string name="phone_access">Phone access</string>
     <string name="overlay_permission">Overlay permission</string>
+    <string name="storage_permission">Storage permission</string>
     <string name="powermenu">Power menu</string>
     <string name="login_name">Login name:</string>
     <string name="autologin">Autologin first client url</string>
@@ -70,4 +71,6 @@
     <string name="ignore">ignore</string>
     <string name="check_update">Force update</string>
     <string name="dismiss">Dismiss</string>
+    <string name="UpdateAvailable">Update available</string>
+    <string name="UpdateDescription">Update to ensure that you are enjoying the latest features of the app.</string>
 </resources>

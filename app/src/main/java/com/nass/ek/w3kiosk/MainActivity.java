@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -39,6 +40,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
+
+import com.nass.ek.appupdate.UpdateWrapper;
 
 import java.util.Objects;
 
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean checkAutofill;
     public boolean checkmobileMode;
     public boolean checkAutoLogin;
+    public boolean autoUpdate;
     public String clientUrl1;
     public String clientUrl2;
     public int appsCount;
@@ -127,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
+        autoUpdate = sharedPreferences.getBoolean("forceUpdate", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
         if (toSetting > 0) {
@@ -144,10 +149,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         kioskWeb = findViewById(R.id.kioskView);
         handler = new Handler();
-        runnable = (Runnable) () -> {
+        runnable = () -> {
             commitURL(urlPreset + clientUrl1);
             nextUrl = clientUrl2;
         };
+
+        if (autoUpdate) {
+            checkUpdate();
+        }
 
         if (isTv()) {
             new CountDownTimer(60000, 1000) {
@@ -528,4 +537,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         handler.postDelayed(runnable, handlerTimeout);
     }
 
+    private void checkUpdate() {
+
+        UpdateWrapper updateWrapper = new UpdateWrapper.Builder(MainActivity.this)
+                .setTime(3000)
+                .setNotificationIcon(R.mipmap.ic_launcher)
+                .setUpdateTitle(getString(R.string.UpdateAvailable))
+                .setUpdateContentText(getString(R.string.UpdateDescription))
+                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
+                .setIsShowToast(true)
+
+                .setCallback((model, hasNewVersion) -> {
+                    Log.d("Latest Version", hasNewVersion + "");
+                    Log.d("Version Name", model.getVersionName());
+                    Log.d("Version Code", model.getVersionCode() + "");
+                    Log.d("Version Description", model.getContentText());
+                    Log.d("Min Support", model.getMinSupport() + "");
+                    Log.d("Download URL", model.getUrl() + "");
+                })
+                .build();
+
+        updateWrapper.start();
+
+    }
 }

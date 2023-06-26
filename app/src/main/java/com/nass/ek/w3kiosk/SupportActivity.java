@@ -30,10 +30,6 @@ public class SupportActivity extends AppCompatActivity {
 
     String tvUri = "com.teamviewer.quicksupport.market";
     String adUri = "com.anydesk.anydeskandroid";
-    public String updateUrl;
-    public String versionString;
-    public boolean updateAvailable = false;
-    public boolean forceUpdate = false;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -42,8 +38,6 @@ public class SupportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_support);
         boolean tvCheck = checkApps(tvUri);
         boolean adCheck = checkApps(adUri);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        forceUpdate = sharedPreferences.getBoolean("forceUpdate", false);
 
         if (isTv()) {
             TextView txtTv = findViewById(R.id.textView);
@@ -63,11 +57,6 @@ public class SupportActivity extends AppCompatActivity {
             {
                 findViewById(R.id.ad_Button).setVisibility(View.VISIBLE);
             }
-        }
-        try {
-            checkUpdate();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -126,70 +115,5 @@ public class SupportActivity extends AppCompatActivity {
                 (UiModeManager) this.getApplicationContext().getSystemService(UI_MODE_SERVICE);
         return uiModeManager != null
                 && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
-    }
-
-    public void checkUpdate() throws IOException {
-        Thread thread = new Thread(() -> {
-            try  {
-                URL url = new URL("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/latest.version");
-                Scanner sc = new Scanner(url.openStream());
-                StringBuilder sb = new StringBuilder();
-                while (sc.hasNext()) {
-                    sb.append(sc.next());
-                }
-                versionString = sb.toString();
-                System.out.println(versionString);
-                versionString = versionString.replaceAll("<[^>].*>", "");
-                System.out.println("Contents of the web page: " + versionString);
-                TextView updateText = findViewById(R.id.txtUpdate);
-                runOnUiThread(() -> {
-                    if (isUpdateAvailable(versionString) || forceUpdate) {
-                        updateText.setText(String.format(getString(R.string.updateAvailable), versionString));
-                        updateUrl = String.format("https://github.com/manfred-mueller/W3Kiosk/releases/download/v%1$s/w3kiosk-%1$s-release.apk", versionString);
-                        updateText.setOnClickListener(v -> getUpdate());
-                        updateAlertDialog();
-                    } else {
-                        Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
-                        updateText.setText(String.format(getString(R.string.versionUptodate), versionString, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        thread.start();
-    }
-
-    public boolean isUpdateAvailable(String onlineVersion) {
-
-        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
-            int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
-            int online_int = Integer.parseInt(onlineVersion.replaceAll("[\\D]", ""));
-            if(local_int < online_int){
-                return updateAvailable = true;
-            }
-        return false;
-    }
-
-    public void getUpdate() {
-        try {
-            String uUrl = updateUrl;
-            Uri uri = Uri.parse("googlechrome://navigate?url=" + uUrl);
-            Intent i = new Intent(Intent.ACTION_VIEW, uri);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-        } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateAlertDialog() {
-        AlertDialog.Builder updateDialog=new AlertDialog.Builder(this);
-        updateDialog.setTitle(getResources().getString(R.string.app_name));
-        updateDialog.setMessage(String.format(getString(R.string.updateAvailable), versionString));
-        updateDialog.setCancelable(false);
-        updateDialog.setPositiveButton(R.string.apply, (dialogInterface, i) -> getUpdate());
-        updateDialog.setNegativeButton(R.string.ignore, (dialogInterface, i) -> dialogInterface.cancel());
-        updateDialog.show();
     }
 }

@@ -43,9 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
     private Spinner appsDropdown;
-    private boolean appsDropdownInitialized;
     private Spinner timeoutDropdown;
-    private boolean timeoutDropdownInitialized;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -103,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putBoolean("mobileMode", s.isChecked());
 
             s = findViewById(R.id.updateToggle);
-            editor.putBoolean("forceUpdate", s.isChecked());
+            editor.putBoolean("autoUpdate", s.isChecked());
 
             editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
 
@@ -135,7 +133,7 @@ public class SettingsActivity extends AppCompatActivity {
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
 
         s = findViewById(R.id.updateToggle);
-        s.setChecked(sharedPreferences.getBoolean("forceUpdate", false));
+        s.setChecked(sharedPreferences.getBoolean("autoUpdate", false));
 
         appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
         int spinnerValue = sharedPreferences.getInt("urlTimeout",-1);
@@ -184,6 +182,9 @@ public class SettingsActivity extends AppCompatActivity {
 
             c = findViewById(R.id.writeSystem);
             c.setChecked(Settings.System.canWrite(this));
+
+            c = findViewById(R.id.writeStorage);
+            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         }
     }
 
@@ -265,7 +266,14 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void checkStoragePermission(View v){
+        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_DENIED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4710);
+        }
+    }
+
     public void checkWritePermission(View v){
         if (! Settings.System.canWrite(this))
         {
@@ -346,6 +354,9 @@ public class SettingsActivity extends AppCompatActivity {
 
             c = findViewById(R.id.writeSystem);
             c.setChecked(Settings.System.canWrite(this));
+
+            c = findViewById(R.id.writeStorage);
+            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         }
     }
 
