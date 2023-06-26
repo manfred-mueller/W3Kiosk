@@ -1,5 +1,7 @@
 package com.nass.ek.w3kiosk;
 
+import static android.os.Build.VERSION_CODES.O;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -45,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner appsDropdown;
     private Spinner timeoutDropdown;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ApplySharedPref")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(getString(R.string.website2));
         appsDropdown = findViewById(R.id.appsSpinner);
-        ArrayAdapter<String> appAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allowedApps);
+        ArrayAdapter<String> appAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, allowedApps);
         appAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         appsDropdown.setAdapter(appAdapter);
         appsDropdown.setOnLongClickListener(v -> {
@@ -66,11 +67,11 @@ public class SettingsActivity extends AppCompatActivity {
             return true;
         });
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
-        ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, urlTimeout);
+        ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeoutDropdown.setAdapter(timeoutAdapter);
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
-        if (MainActivity.isTablet() || MainActivity.isScanner()){
+        if (MainActivity.isTablet()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                 findViewById(R.id.autologinLayout).setVisibility(View.VISIBLE);
             }
@@ -168,20 +169,36 @@ public class SettingsActivity extends AppCompatActivity {
             c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (isTv()) {
+                c.setVisibility(View.GONE);
+            } else {
+                c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            }
 
             c = findViewById(R.id.overlayPerm);
-            c.setChecked(Settings.canDrawOverlays(this));
+            if (isTv()) {
+                c.setVisibility(View.GONE);
+            } else {
+                c.setChecked(Settings.canDrawOverlays(this));
+            }
 
             c = findViewById(R.id.powerMenu);
             c.setChecked(isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
-            c.setChecked(Settings.System.canWrite(this));
+            if (isTv()) {
+                c.setVisibility(View.GONE);
+            } else {
+                c.setChecked(Settings.System.canWrite(this));
+            }
 
             c = findViewById(R.id.installApps);
             PackageManager packageManager = context.getPackageManager();
-            c.setChecked(packageManager.canRequestPackageInstalls());
+            if (Build.VERSION.SDK_INT >= O) {
+                c.setChecked(packageManager.canRequestPackageInstalls());
+            } else {
+                c.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -283,7 +300,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void checkInstallPermission(View v) {
         Intent intent;
         PackageManager packageManager = context.getPackageManager();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+        if (android.os.Build.VERSION.SDK_INT >= O && !packageManager.canRequestPackageInstalls()) {
             intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
             intent.setData(Uri.parse("package:" + getPackageName()));
             startActivity(intent);
@@ -335,7 +352,7 @@ public class SettingsActivity extends AppCompatActivity {
         return pkgInfo != null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = O)
     @Override
     protected void onResume() {
         super.onResume();
@@ -344,20 +361,37 @@ public class SettingsActivity extends AppCompatActivity {
             c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            if (isTv()) {
+                c.setVisibility(View.GONE);
+            } else {
+                c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+            }
 
             c = findViewById(R.id.overlayPerm);
-            c.setChecked(Settings.canDrawOverlays(this));
+            if (isTv()) {
+                c.setVisibility(View.GONE);
+            } else {
+                c.setChecked(Settings.canDrawOverlays(this));
+            }
 
             c = findViewById(R.id.powerMenu);
             c.setChecked(isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
-            c.setChecked(Settings.System.canWrite(this));
+            if (isTv()) {
+                c.setVisibility(View.GONE);
+            } else {
+                c.setChecked(Settings.System.canWrite(this));
+            }
 
             c = findViewById(R.id.installApps);
-            PackageManager packageManager = context.getPackageManager();
+            if (android.os.Build.VERSION.SDK_INT >= O) {
+                PackageManager packageManager = context.getPackageManager();
             c.setChecked(packageManager.canRequestPackageInstalls());
+            } else {
+                c.setVisibility(View.GONE);
+            }
+
         }
     }
 
