@@ -42,7 +42,8 @@ public class AboutActivity extends AppCompatActivity {
                 .setNotificationIcon(R.mipmap.ic_launcher)
                 .setUpdateTitle(getString(R.string.UpdateAvailable))
                 .setUpdateContentText(getString(R.string.UpdateDescription))
-                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
+//                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
+                .setUrl("https://www.nass-ek.de/updates/w3kiosk.json")
                 .setIsShowToast(true)
 
                 .setCallback((model, hasNewVersion) -> {

@@ -149,11 +149,6 @@ public class UpdateWrapper {
             return this;
         }
 
-        public Builder setCustomsActivity(Class<? extends FragmentActivity> cls) {
-            wrapper.mCls = cls;
-            return this;
-        }
-
         public Builder setCallback(CheckUpdateTask.Callback callback) {
             wrapper.mCallback = callback;
             return this;
