@@ -9,7 +9,6 @@ import android.text.TextUtils;
 
 import androidx.fragment.app.FragmentActivity;
 
-import com.nass.ek.appupdate.R;
 import com.nass.ek.appupdate.dialogs.UpdateActivity;
 import com.nass.ek.appupdate.services.CheckUpdateTask;
 import com.nass.ek.appupdate.services.VersionModel;
@@ -102,7 +101,7 @@ public class UpdateWrapper {
             }
 
             if (mUpdateTitle == null || mUpdateTitle.isEmpty()) {
-                mUpdateTitle = context.getResources().getString(R.string.update_lib_dialog_title);
+                mUpdateTitle = String.format(context.getResources().getString(R.string.update_lib_dialog_title), context.getString(R.string.app_name) );
             }
 
             if (mUpdateContentText == null || mUpdateContentText.isEmpty()) {

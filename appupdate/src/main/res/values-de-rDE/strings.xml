@@ -9,10 +9,11 @@
     <string name="update_lib_update_content">Hinweis&#65306;</string>
     <string name="update_lib_update">Aktualisieren</string>
     <string name="update_lib_cancel">Ignorieren</string>
-    <string name="update_lib_dialog_title">Aktualisierung verfügbar</string>
+    <string name="update_lib_dialog_title">%1$s-Aktualisierung verfügbar</string>
     <string name="update_lib_file_download">Datei herunterladen</string>
     <string name="update_lib_file_downloading">Herunterladen&#8230;</string>
     <string name="update_lib_file_download_text">Herunterladen</string>
     <string name="update_lib_stop_download">Stopp</string>
     <string name="update_lib_background_download">Verbergen</string>
+    <string name="app_name">W3Kiosk</string>
 </resources>

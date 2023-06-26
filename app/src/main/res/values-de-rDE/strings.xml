@@ -57,7 +57,7 @@
     <string name="ignore">Ignorieren</string>
     <string name="check_update">Automatisches Update</string>
     <string name="dismiss">Ausblenden</string>
-    <string name="UpdateAvailable">Update verfügbar</string>
-    <string name="UpdateDescription">Aktualisieren Sie, um die neuesten Funktionen zu genießen.</string>
+    <string name="UpdateAvailable">%1$s-Aktualisierung verfügbar</string>
+    <string name="UpdateDescription">Aktualisieren Sie, um die neuesten Funktionen zu benutzen.</string>
     <string name="apps_permission">Apps installieren</string>
 </resources>
