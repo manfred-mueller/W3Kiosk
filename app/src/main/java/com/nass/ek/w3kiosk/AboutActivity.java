@@ -34,10 +34,11 @@ public class AboutActivity extends AppCompatActivity {
 
     private void checkUpdate() {
 
+        String updateFound=(String.format(getString(R.string.UpdateAvailable), getString(R.string.app_name)));
         UpdateWrapper updateWrapper = new UpdateWrapper.Builder(AboutActivity.this)
                 .setTime(3000)
                 .setNotificationIcon(R.mipmap.ic_launcher)
-                .setUpdateTitle(getString(R.string.UpdateAvailable))
+                .setUpdateTitle(updateFound)
                 .setUpdateContentText(getString(R.string.UpdateDescription))
                 .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
                 .setIsShowToast(true)

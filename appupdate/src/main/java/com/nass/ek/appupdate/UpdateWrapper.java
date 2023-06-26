@@ -101,7 +101,7 @@ public class UpdateWrapper {
             }
 
             if (mUpdateTitle == null || mUpdateTitle.isEmpty()) {
-                mUpdateTitle = String.format(context.getResources().getString(R.string.update_lib_dialog_title), context.getString(R.string.app_name) );
+                mUpdateTitle = context.getResources().getString(R.string.update_lib_dialog_title);
             }
 
             if (mUpdateContentText == null || mUpdateContentText.isEmpty()) {

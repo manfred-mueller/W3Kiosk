@@ -16,7 +16,7 @@
     <string name="update_lib_version_code" translatable="false">Version&#65306;</string>
     <string name="update_lib_update">Update</string>
     <string name="update_lib_cancel">Next Time</string>
-    <string name="update_lib_dialog_title">%1$s-Update Available</string>
+    <string name="update_lib_dialog_title">Update Available</string>
 
     <!--DownloadService-->
     <string name="update_lib_file_download">Download File</string>
