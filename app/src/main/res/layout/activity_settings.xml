@@ -357,7 +357,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="invisible">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -403,13 +403,13 @@
                         android:layout_weight="1">
 
                         <CheckBox
-                            android:id="@+id/phoneAccess"
+                            android:id="@+id/writeStorage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:clickable="false"
-                            android:onClick="checkPhonePermission"
-                            android:text="@string/phone_access" />
+                            android:onClick="checkStoragePermission"
+                            android:text="@string/storage_permission" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -482,9 +482,23 @@
                             android:clickable="false"
                             android:onClick="checkAccessibilityPermission"
                             android:text="@string/powermenu" />
+                    </RelativeLayout>
 
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/installApps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:onClick="checkInstallPermission"
+                            android:text="@string/apps_permission" />
                     </RelativeLayout>
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -495,15 +509,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
-
-                        <CheckBox
-                            android:id="@+id/writeStorage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:clickable="false"
-                            android:onClick="checkStoragePermission"
-                            android:text="@string/storage_permission" />
 
                     </RelativeLayout>
                 </LinearLayout>

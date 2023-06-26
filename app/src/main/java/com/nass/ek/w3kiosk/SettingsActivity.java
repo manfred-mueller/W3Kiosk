@@ -45,7 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner appsDropdown;
     private Spinner timeoutDropdown;
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ApplySharedPref")
     @Override
@@ -78,10 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if (isScanner()){
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                    findViewById(R.id.permissionLayout).setVisibility(View.VISIBLE);
-                }
-                if (checkApp()){
+            if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
             findViewById(R.id.client2Text).setVisibility(View.GONE);
@@ -168,8 +164,8 @@ public class SettingsActivity extends AppCompatActivity {
         e.setText(sharedPreferences.getString("loginPassword", ""));
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            c = findViewById(R.id.phoneAccess);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
+            c = findViewById(R.id.writeStorage);
+            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -183,8 +179,9 @@ public class SettingsActivity extends AppCompatActivity {
             c = findViewById(R.id.writeSystem);
             c.setChecked(Settings.System.canWrite(this));
 
-            c = findViewById(R.id.writeStorage);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            c = findViewById(R.id.installApps);
+            PackageManager packageManager = context.getPackageManager();
+            c.setChecked(packageManager.canRequestPackageInstalls());
         }
     }
 
@@ -283,11 +280,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public void checkPhonePermission(View v){
-        if (ContextCompat.checkSelfPermission(SettingsActivity.this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(SettingsActivity.this,new String[]{
-                    Manifest.permission.READ_PHONE_STATE}, 4716);
+    public void checkInstallPermission(View v) {
+        Intent intent;
+        PackageManager packageManager = context.getPackageManager();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+            intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
         }
     }
 
@@ -336,12 +335,13 @@ public class SettingsActivity extends AppCompatActivity {
         return pkgInfo != null;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onResume() {
         super.onResume();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-            c = findViewById(R.id.phoneAccess);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
+            c = findViewById(R.id.writeStorage);
+            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -355,8 +355,9 @@ public class SettingsActivity extends AppCompatActivity {
             c = findViewById(R.id.writeSystem);
             c.setChecked(Settings.System.canWrite(this));
 
-            c = findViewById(R.id.writeStorage);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            c = findViewById(R.id.installApps);
+            PackageManager packageManager = context.getPackageManager();
+            c.setChecked(packageManager.canRequestPackageInstalls());
         }
     }
 

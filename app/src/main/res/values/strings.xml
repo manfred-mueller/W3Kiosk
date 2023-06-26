@@ -73,4 +73,5 @@
     <string name="dismiss">Dismiss</string>
     <string name="UpdateAvailable">Update available</string>
     <string name="UpdateDescription">Update to ensure that you are enjoying the latest features of the app.</string>
+    <string name="apps_permission">Install apps</string>
 </resources>

@@ -59,4 +59,5 @@
     <string name="dismiss">Ausblenden</string>
     <string name="UpdateAvailable">Update verfügbar</string>
     <string name="UpdateDescription">Aktualisieren Sie, um die neuesten Funktionen zu genießen.</string>
+    <string name="apps_permission">Apps installieren</string>
 </resources>
