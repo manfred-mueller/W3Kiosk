@@ -213,7 +213,7 @@
                     android:nextFocusUp="@id/client1EditText"
                     android:singleLine="true"
                     android:text=""
-                    android:textCursorDrawable="@color/colorPrimary"
+                    android:textCursorDrawable="@drawable/custom_cursor"
                     android:textSize="15sp"
                     tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
 
@@ -240,7 +240,7 @@
                     android:nextFocusUp="@id/client2EditText"
                     android:singleLine="true"
                     android:text=""
-                    android:textCursorDrawable="@color/colorPrimary"
+                    android:textCursorDrawable="@drawable/custom_cursor"
                     android:textSize="15sp"
                     android:visibility="visible"
                     tools:ignore="TouchTargetSizeCheck" />

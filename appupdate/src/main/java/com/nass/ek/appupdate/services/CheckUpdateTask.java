@@ -4,7 +4,10 @@ package com.nass.ek.appupdate.services;
 import android.content.Context;
 import android.util.Log;
 
+import com.nass.ek.appupdate.BuildConfig;
+import com.nass.ek.appupdate.R;
 import com.nass.ek.appupdate.utils.PackageUtils;
+import com.nass.ek.appupdate.utils.ToastUtils;
 
 import org.json.JSONException;
 
@@ -100,7 +103,12 @@ public class CheckUpdateTask extends Thread {
             VersionModel model = new VersionModel();
             try {
                 model.parse(data);
-                mCallBack.callBack(model, hasNewVersion(PackageUtils.getVersionCode(mContext), model.getVersionCode()));
+                String localVersion = PackageUtils.getVersionName(mContext) + PackageUtils.getVersionCode(mContext);
+                String onlineVersion = model.getVersionName() + model.getVersionCode();
+                int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
+                int online_int = Integer.parseInt(onlineVersion.replaceAll("[\\D]", ""));
+                mCallBack.callBack(model, hasNewVersion(local_int, online_int));
+                Log.d(TAG, "Local version: " + local_int + " Online version: " + online_int);
             } catch (JSONException e) {
                 e.printStackTrace();
                 mCallBack.callBack(null, false);
@@ -116,7 +124,7 @@ public class CheckUpdateTask extends Thread {
     }
 
     private boolean hasNewVersion(int old, int n) {
-        return old < n;
+        return (n - old > 0);
     }
 
     public interface Callback {

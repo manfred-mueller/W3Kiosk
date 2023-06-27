@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         else if (!clientUrl2.isEmpty()) {
             checkPasswordDialog.setNeutralButton(R.string.toggleUrl, (dialog, id) -> toggleUrl());
         }
-        else if (appsCount > 0 && clientUrl2.isEmpty())
+        else if (appsCount > 0)
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
         } else

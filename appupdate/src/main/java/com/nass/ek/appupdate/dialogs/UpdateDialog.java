@@ -106,7 +106,11 @@ public class UpdateDialog extends AbstractFragment implements View.OnClickListen
     }
 
     private void closeIfNoNewVersionUpdate() {
-        if (mModel.getVersionCode() <= PackageUtils.getVersionCode(getActivity().getApplicationContext())) {
+        String localVersion = PackageUtils.getVersionName(getActivity().getApplicationContext()) + PackageUtils.getVersionCode(getActivity().getApplicationContext());
+        String onlineVersion = mModel.getVersionName() + mModel.getVersionCode();
+        int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
+        int online_int = Integer.parseInt(onlineVersion.replaceAll("[\\D]", ""));
+        if (online_int <= local_int) {
             isLatest();
             getActivity().finish();
         }
