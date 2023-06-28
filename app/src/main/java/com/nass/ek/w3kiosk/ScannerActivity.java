@@ -44,6 +44,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
+import com.nass.ek.appupdate.UpdateWrapper;
+
 import org.json.JSONArray;
 
 import java.io.File;
@@ -64,6 +66,7 @@ public class ScannerActivity extends AppCompatActivity {
     public String urlPreset;
     public String clientUrl;
     public int appsCount;
+    public boolean autoUpdate;
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
@@ -101,6 +104,10 @@ public class ScannerActivity extends AppCompatActivity {
         clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
         urlPreset = getString(R.string.url_preset);
         webView = findViewById(R.id.scannerView);
+        autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
+        if (autoUpdate) {
+            checkUpdate();
+        }
         initWebView(urlPreset + clientUrl);
         findViewById(R.id.settingsButton).bringToFront();
         if (getIntent().getBooleanExtra("EXIT", false))
@@ -326,4 +333,28 @@ public class ScannerActivity extends AppCompatActivity {
         }
     }
 
+    public void checkUpdate() {
+
+        String updateFound=(String.format(getString(R.string.UpdateAvailable), getString(R.string.app_name)));
+        UpdateWrapper updateWrapper = new UpdateWrapper.Builder(ScannerActivity.this)
+                .setTime(3000)
+                .setNotificationIcon(R.mipmap.ic_launcher)
+                .setUpdateTitle(updateFound)
+                .setUpdateContentText(getString(R.string.UpdateDescription))
+                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
+                .setIsShowToast(true)
+
+                .setCallback((model, hasNewVersion) -> {
+                    Log.d("Latest Version", hasNewVersion + "");
+                    Log.d("Version Name", model.getVersionName());
+                    Log.d("Version Code", model.getVersionCode() + "");
+                    Log.d("Version Description", model.getContentText());
+                    Log.d("Min Support", model.getMinSupport() + "");
+                    Log.d("Download URL", model.getUrl() + "");
+                })
+                .build();
+
+        updateWrapper.start();
+
+    }
 }

@@ -537,7 +537,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         handler.postDelayed(runnable, handlerTimeout);
     }
 
-    private void checkUpdate() {
+    public void checkUpdate() {
 
         String updateFound=(String.format(getString(R.string.UpdateAvailable), getString(R.string.app_name)));
         UpdateWrapper updateWrapper = new UpdateWrapper.Builder(MainActivity.this)
