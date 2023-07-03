@@ -1,6 +1,7 @@
 package com.nass.ek.w3kiosk;
 
 
+import static android.os.Build.VERSION_CODES.O;
 import static com.nass.ek.w3kiosk.MainActivity.PW1;
 import static com.nass.ek.w3kiosk.MainActivity.PW2;
 import static com.nass.ek.w3kiosk.MainActivity.PW3;
@@ -10,6 +11,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -26,6 +28,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.webkit.CookieManager;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
@@ -37,6 +40,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -67,6 +71,8 @@ public class ScannerActivity extends AppCompatActivity {
     public String clientUrl;
     public int appsCount;
     public boolean autoUpdate;
+    Context context = this;
+    public Intent intent;
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
@@ -121,7 +127,9 @@ public class ScannerActivity extends AppCompatActivity {
 
         webView.setVisibility(View.VISIBLE);
 
-        checkPermissions();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermissions();
+        }
 
         webView.setWebViewClient(new myWebClient());
         webView.getSettings().setJavaScriptEnabled(true);
@@ -180,6 +188,29 @@ public class ScannerActivity extends AppCompatActivity {
         return tempFile;
     }
 
+    private void runIntent(String wantedIntent){
+        switch (wantedIntent) {
+            case "Install_Apps":
+                intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                intent.setData(Uri.parse("package:" + ScannerActivity.this.getPackageName()));
+                break;
+            case "Write_Settings":
+                intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:" + ScannerActivity.this.getPackageName()));
+                break;
+            case "Manage_Overlay":
+                intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                intent.setData(Uri.parse("package:" + ScannerActivity.this.getPackageName()));
+                break;
+            case "Power_Menu":
+                intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                break;
+        }
+        startActivity(intent);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermissions() {
 
         int permissionCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -194,7 +225,24 @@ public class ScannerActivity extends AppCompatActivity {
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), REQUEST_ID_MULTIPLE_PERMISSIONS);
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), REQUEST_ID_MULTIPLE_PERMISSIONS);
+        }
+        PackageManager packageManager = context.getPackageManager();
+        if (android.os.Build.VERSION.SDK_INT >= O && !packageManager.canRequestPackageInstalls()) {
+            runIntent("Install_Apps");
+        }
+        if (! Settings.System.canWrite(this))
+        {
+            runIntent("Write_Settings");
+        }
+        if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(ScannerActivity.this)) {
+            runIntent("Manage_Overlay");
+        }
+        if (!isAccessibilitySettingsOn()) {
+            runIntent("Power_Menu");
+//            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//            startActivityForResult(intent, 4713);
         }
     }
 
@@ -357,4 +405,14 @@ public class ScannerActivity extends AppCompatActivity {
         updateWrapper.start();
 
     }
+    public boolean isAccessibilitySettingsOn() {
+        AccessibilityManager am = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
+        ContentResolver cr = getApplicationContext().getContentResolver();
+        if (am.isEnabled()) {
+            String settingValue = Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            return settingValue != null && settingValue.contains("com.nass.ek.w3kiosk/com.nass.ek.w3kiosk.ShutdownService");
+        }
+        return false;
+    }
+
 }

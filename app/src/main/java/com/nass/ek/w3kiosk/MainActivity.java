@@ -559,6 +559,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 .build();
 
         updateWrapper.start();
-
     }
 }

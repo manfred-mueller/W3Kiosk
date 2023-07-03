@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -265,7 +266,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void checkAccessibilityPermission(View v){
-        if (!isAccessibilitySettingsOn()) {
+            if (isAccessibilitySettingsOn()) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             startActivityForResult(intent, 4713);
@@ -329,13 +330,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public boolean isAccessibilitySettingsOn() {
-        int accessibilityEnabled = 0;
+        AccessibilityManager am = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
         ContentResolver cr = getApplicationContext().getContentResolver();
-        try {
-            accessibilityEnabled = Settings.Secure.getInt(cr, Settings.Secure.ACCESSIBILITY_ENABLED);
-        } catch (Settings.SettingNotFoundException ignored) {
-        }
-        if (accessibilityEnabled == 1) {
+        if (am.isEnabled()) {
             String settingValue = Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
             return settingValue != null && settingValue.contains("com.nass.ek.w3kiosk/com.nass.ek.w3kiosk.ShutdownService");
         }
