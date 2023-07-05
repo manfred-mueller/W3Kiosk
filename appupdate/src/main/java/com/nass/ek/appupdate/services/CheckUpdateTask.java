@@ -4,10 +4,7 @@ package com.nass.ek.appupdate.services;
 import android.content.Context;
 import android.util.Log;
 
-import com.nass.ek.appupdate.BuildConfig;
-import com.nass.ek.appupdate.R;
 import com.nass.ek.appupdate.utils.PackageUtils;
-import com.nass.ek.appupdate.utils.ToastUtils;
 
 import org.json.JSONException;
 
@@ -18,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;

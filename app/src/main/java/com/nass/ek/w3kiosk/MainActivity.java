@@ -42,6 +42,7 @@ import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.nass.ek.appupdate.UpdateWrapper;
+import com.nass.ek.appupdate.services.TrustAllCertificates;
 
 import java.util.Objects;
 
@@ -394,6 +395,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             if (isTablet()) {
                 if (!clientUrl2.startsWith("https://") && !clientUrl2.startsWith("http://")){
                     clientUrl2 = "https://" + clientUrl2;
+                    if (clientUrl2.startsWith("https://")) {
+                        TrustAllCertificates.install();
+                        kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
+                    }
                 }
                 commitURL(clientUrl2);
                 if (handlerTimeout > 0) {

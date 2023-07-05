@@ -8,11 +8,11 @@ import android.view.WindowManager;
 
 import androidx.fragment.app.Fragment;
 
+import com.nass.ek.appupdate.R;
 import com.nass.ek.appupdate.base.AbstractUpdateActivity;
 import com.nass.ek.appupdate.services.VersionModel;
 import com.nass.ek.appupdate.utils.Constant;
 import com.nass.ek.appupdate.utils.PackageUtils;
-import com.nass.ek.appupdate.R;
 
 public class UpdateActivity extends AbstractUpdateActivity implements DownloadDialog.OnFragmentOperation {
 

@@ -10,8 +10,8 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.nass.ek.appupdate.utils.FileUtils;
 import com.nass.ek.appupdate.R;
+import com.nass.ek.appupdate.utils.FileUtils;
 
 import java.io.File;
 
