@@ -44,7 +44,7 @@
     <string name="permissions">Permissions</string>
     <string name="scanner_button" translatable="false">scannerButton</string>
     <string name="service_description">Service to call the powermenu</string>
-    <string name="noNetwork">Searching network…</string>
+    <string name="noNetwork">No network: Please check and reload application.</string>
     <string name="website2">Second client url</string>
     <string name="chooseAction">Choose an action</string>
     <string name="toggleUrl">Toggle URL</string>

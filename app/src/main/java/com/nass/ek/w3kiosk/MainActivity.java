@@ -378,7 +378,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                 });
             }
-                kioskWeb.loadUrl(url);
+            kioskWeb.setWebContentsDebuggingEnabled(true);
+            kioskWeb.loadUrl(url);
         }
         else
         {

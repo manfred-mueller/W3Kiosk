@@ -30,7 +30,7 @@
     <string name="write_system_settings">Systemeinstellungen</string>
     <string name="permissions">Berechtigungen</string>
     <string name="service_description">Dienst zum Starten des Powermenüs</string>
-    <string name="noNetwork">Suche Netzwerk…</string>
+    <string name="noNetwork">Kein Netzwerk: Bitte prüfen und Anwendung neu laden.</string>
     <string name="website2">Zweite Kunden-Url</string>
     <string name="chooseAction">Bitte auswählen</string>
     <string name="toggleUrl">URL umschalten</string>
