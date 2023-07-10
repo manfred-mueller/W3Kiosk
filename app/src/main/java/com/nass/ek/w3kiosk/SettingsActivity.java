@@ -82,8 +82,8 @@ public class SettingsActivity extends AppCompatActivity {
             if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
-            findViewById(R.id.client2Text).setVisibility(View.GONE);
-            findViewById(R.id.client2EditText).setVisibility(View.GONE);
+//            findViewById(R.id.client2Text).setVisibility(View.GONE);
+//            findViewById(R.id.client2EditText).setVisibility(View.GONE);
             findViewById(R.id.timeoutText).setVisibility(View.GONE);
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
         }

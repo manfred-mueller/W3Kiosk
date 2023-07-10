@@ -19,6 +19,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,6 +48,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
@@ -61,6 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ScannerActivity extends AppCompatActivity {
+    static String TAG = ScannerActivity .class.getSimpleName();
 
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private final int REQUEST_ID_MULTIPLE_PERMISSIONS = 100;
@@ -68,11 +73,16 @@ public class ScannerActivity extends AppCompatActivity {
     private ValueCallback<Uri[]> mFilePathCallback;
     private String mCameraPhotoPath;
     public String urlPreset;
-    public String clientUrl;
+    public String clientUrl1;
+    public String clientUrl2;
+    public String nextUrl;
     public int appsCount;
     public boolean autoUpdate;
     Context context = this;
     public Intent intent;
+
+    private boolean connected = false;
+
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
@@ -84,8 +94,17 @@ public class ScannerActivity extends AppCompatActivity {
                         ((ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE),
                                 intent)).isConnected();
 
+                if(connected == isConnected) {
+                    return;
+                }
+
+                connected = isConnected;
+
                 if (isConnected) {
-                    initWebView(urlPreset + clientUrl);
+                    Log.i( TAG, "*** Init WebView connectionReceiver ***");
+
+                    initWebView(urlPreset + clientUrl1);
+                    nextUrl = clientUrl2;
                 } else {
                     String noNet = context.getString(R.string.noNetwork);
                     String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
@@ -96,8 +115,28 @@ public class ScannerActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        webView.restoreState(savedInstanceState);
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        webView.saveState(savedInstanceState);
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.i(TAG, "***************** create *************");
+
+        connected = isNetworkConnected(this) ;
         setContentView(R.layout.activity_scanner);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnLongClickListener(v -> {
@@ -107,14 +146,16 @@ public class ScannerActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         appsCount = sharedPreferences.getInt("appsCount", 0);
-        clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
+        clientUrl1 = sharedPreferences.getString("clientUrl1", "w3c");
+        clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         urlPreset = getString(R.string.url_preset);
         webView = findViewById(R.id.scannerView);
         autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
         if (autoUpdate) {
             checkUpdate();
         }
-        initWebView(urlPreset + clientUrl);
+        initWebView(urlPreset + clientUrl1);
+        nextUrl = clientUrl2;
         findViewById(R.id.settingsButton).bringToFront();
         if (getIntent().getBooleanExtra("EXIT", false))
         {
@@ -124,6 +165,7 @@ public class ScannerActivity extends AppCompatActivity {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView(String web_url) {
+        Log.i( TAG, "*** Init WebView ***");
 
         webView.setVisibility(View.VISIBLE);
 
@@ -131,10 +173,17 @@ public class ScannerActivity extends AppCompatActivity {
             checkPermissions();
         }
 
+        if (BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+
         webView.setWebViewClient(new myWebClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAllowFileAccessFromFileURLs(true);
+        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.loadUrl(web_url);
+
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
 
@@ -168,21 +217,29 @@ public class ScannerActivity extends AppCompatActivity {
                         Log.e("TAG", "Unable to create Image File", ex);
                     }
                     if (photoFile != null) {
+                        Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", photoFile);
+
                         mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(photoFile));
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                        takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
                 }
                 startActivityForResult(takePictureIntent, INPUT_FILE_REQUEST_CODE);
                 return true;
             }
         });
+
+        webView.setWebViewClient( new WebViewClient() {
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                Log.i(TAG, "WebView load page " + url);
+            }
+        });
     }
 
     private File createImageFile() throws IOException {
         String imageFileName = "w3coach";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File tempFile = new File(storageDir + imageFileName + ".jpg");
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File tempFile = new File(storageDir + "/" + imageFileName + ".jpg");
         if (tempFile.exists())
             tempFile.delete();
         return tempFile;
@@ -240,9 +297,6 @@ public class ScannerActivity extends AppCompatActivity {
         }
         if (!isAccessibilitySettingsOn()) {
             runIntent("Power_Menu");
-//            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-//            startActivityForResult(intent, 4713);
         }
     }
 
@@ -352,7 +406,10 @@ public class ScannerActivity extends AppCompatActivity {
         if (appsCount > 0)
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
-        } else
+        } else if (!clientUrl2.isEmpty()) {
+            checkPasswordDialog.setNeutralButton(R.string.toggleUrl, (dialog, id) -> toggleUrl());
+        }
+        else
         {
             checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
         }
@@ -369,6 +426,8 @@ public class ScannerActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, filter);
+
+        webView.onResume();
     }
 
     @Override
@@ -379,6 +438,8 @@ public class ScannerActivity extends AppCompatActivity {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
+
+        webView.onPause();
     }
 
     public void checkUpdate() {
@@ -415,4 +476,34 @@ public class ScannerActivity extends AppCompatActivity {
         return false;
     }
 
+
+    private Boolean isNetworkConnected(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network nw = connectivityManager.getActiveNetwork();
+            if (nw == null) return false;
+            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+        } else {
+            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
+            return nwInfo != null && nwInfo.isConnected();
+        }
+    }
+    private void toggleUrl(){
+        if (nextUrl.equals(clientUrl2)){
+            if (clientUrl2.startsWith("http")) {
+                initWebView(clientUrl2);
+            } else {
+                initWebView(urlPreset + clientUrl2);
+            }
+            findViewById(R.id.settingsButton).bringToFront();
+            nextUrl = clientUrl1;
+        }
+        else if (nextUrl.equals(clientUrl1)){
+            initWebView(urlPreset + clientUrl1);
+            findViewById(R.id.settingsButton).bringToFront();
+            nextUrl = clientUrl2;
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -22,6 +23,13 @@ public class AboutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new CountDownTimer(15000, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+            public void onFinish() {
+                finish();
+            }
+        }.start();
         setContentView(R.layout.activity_about);
         String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
