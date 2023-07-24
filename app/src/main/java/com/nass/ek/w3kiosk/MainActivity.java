@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public static boolean isScanner() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
+        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
     }
 
     public static boolean isTablet() {
@@ -236,6 +236,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                     else if (PwInput.equals("a")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
+                        startActivity(intent);
+                    }
+                    else if (PwInput.equals("b")) {
+                        Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                         startActivity(intent);
                     }
                     else if (PwInput.equals("r")) {

@@ -383,6 +383,10 @@ public class ScannerActivity extends AppCompatActivity {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + MainActivity.adUri));
                         startActivity(intent);
                     }
+                    else if (PwInput.equals("b")) {
+                        Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+                        startActivity(intent);
+                    }
                     else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
