@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public String urlPreset;
     public String autoName;
     public String autoPassWord;
-    public boolean checkAutofill;
+    public boolean enableAutoscale;
     public boolean checkmobileMode;
     public boolean checkAutoLogin;
     public boolean autoUpdate;
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
-        checkAutofill = sharedPreferences.getBoolean("checkAutofill", true);
+        enableAutoscale = sharedPreferences.getBoolean("enableAutoscale", false);
         autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }.start();
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26 && checkAutofill && !isTv()) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv()) {
             Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
             dialogIntent.setData(Uri.parse("package:none"));
             if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
@@ -339,6 +339,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
         registerForContextMenu(kioskWeb);
+        if (enableAutoscale) {
+            kioskWeb.getSettings().setUseWideViewPort(true);
+            kioskWeb.setInitialScale(1);
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")

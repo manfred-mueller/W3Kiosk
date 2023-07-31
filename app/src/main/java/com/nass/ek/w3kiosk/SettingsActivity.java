@@ -82,8 +82,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
-//            findViewById(R.id.client2Text).setVisibility(View.GONE);
-//            findViewById(R.id.client2EditText).setVisibility(View.GONE);
             findViewById(R.id.timeoutText).setVisibility(View.GONE);
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
         }
@@ -92,8 +90,8 @@ public class SettingsActivity extends AppCompatActivity {
         b.setOnClickListener(view -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            s = findViewById(R.id.autofillToggle);
-            editor.putBoolean("checkAutofill", s.isChecked());
+            s = findViewById(R.id.autoscaleToggle);
+            editor.putBoolean("enableAutoscale", s.isChecked());
 
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
@@ -124,8 +122,8 @@ public class SettingsActivity extends AppCompatActivity {
             finish();
         });
 
-        s = findViewById(R.id.autofillToggle);
-        s.setChecked(sharedPreferences.getBoolean("checkAutofill", false));
+        s = findViewById(R.id.autoscaleToggle);
+        s.setChecked(sharedPreferences.getBoolean("enableAutoscale", false));
 
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
@@ -389,22 +387,6 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             }
 
-        }
-    }
-
-    public void checkAutofill(View V) {
-        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv()) {
-            Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
-            dialogIntent.setData(Uri.parse("package:none"));
-            if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-                builder.setTitle(getString(R.string.disable_autofill))
-                        .setMessage(R.string.autofill_text)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", (dialog, which) -> startActivity(dialogIntent));
-                android.app.AlertDialog dialog = builder.create();
-                dialog.show();
-            }
         }
     }
 }

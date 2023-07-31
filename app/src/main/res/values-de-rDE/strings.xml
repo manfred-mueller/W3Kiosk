@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings">Einstellungen</string>
-    <string name="check_autofill">AutoFill prüfen</string>
+    <string name="enable_autoscale">Anzeige automatisch skalieren</string>
     <string name="mobile_mode">Mobiler Modus</string>
     <string name="website1">Erste Kunden-Url (ohne %s)</string>
     <string name="code_or_help">Code oder \'h\' für Hilfe</string>
