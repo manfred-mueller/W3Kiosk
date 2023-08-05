@@ -43,8 +43,9 @@
                     <TextView
                         android:id="@+id/mobileText"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:focusable="auto"
+                        android:gravity="center"
                         android:text="@string/mobile_mode"
                         android:textSize="15sp"
                         android:visibility="gone" />
@@ -52,32 +53,33 @@
                     <Switch
                         android:id="@+id/mobileToggle"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="60dp"
                         android:background="?android:attr/colorBackground"
                         android:visibility="gone"
                         tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:focusable="auto"
+                        android:gravity="center"
                         android:text="@string/check_update"
                         android:textSize="15sp" />
 
                     <Switch
                         android:id="@+id/updateToggle"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="60dp"
                         android:background="?android:attr/colorBackground"
                         tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_centerVertical="true"
+                        android:gravity="center"
                         android:layout_toStartOf="@id/appsSpinner"
                         android:focusable="auto"
                         android:paddingRight="10dp"
@@ -87,7 +89,7 @@
                     <Spinner
                         android:id="@+id/appsSpinner"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="60dp"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
@@ -100,11 +102,11 @@
                     <TextView
                         android:id="@+id/timeoutText"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_centerVertical="true"
+                        android:gravity="center"
                         android:layout_toEndOf="@id/appsSpinner"
                         android:focusable="auto"
                         android:paddingLeft="25dp"
@@ -115,7 +117,7 @@
                     <Spinner
                         android:id="@+id/timeoutSpinner"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
@@ -128,11 +130,11 @@
                     <TextView
                         android:id="@+id/zoomText"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_centerVertical="true"
+                        android:gravity="center"
                         android:layout_toEndOf="@id/timeoutSpinner"
                         android:focusable="auto"
                         android:paddingLeft="25dp"
@@ -143,7 +145,7 @@
                     <Spinner
                         android:id="@+id/zoomSpinner"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="60dp"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
