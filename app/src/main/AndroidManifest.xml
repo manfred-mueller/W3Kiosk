@@ -55,7 +55,7 @@
             android:name=".MainActivity"
             android:stateNotNeeded="true"
             android:launchMode="singleInstance"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode"
             tools:targetApi="m"
             android:exported="true">
             <intent-filter>
@@ -95,23 +95,23 @@
         <activity
             android:name=".AboutActivity"
             android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"/>
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".AppsActivity"
             android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"/>
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".ScannerActivity"
             android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"/>
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".SettingsActivity"
             android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"/>
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".SupportActivity"
             android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"/>
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <service
             android:name=".ShutdownService"
             android:enabled="true"

@@ -1,10 +1,16 @@
 package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.KeyEvent;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +26,9 @@ public class AboutActivity extends AppCompatActivity {
         finish();
     }
 
+    WindowManager windowManager;
+    DisplayMetrics displayMetrics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,14 +39,45 @@ public class AboutActivity extends AppCompatActivity {
                 finish();
             }
         }.start();
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        displayMetrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         setContentView(R.layout.activity_about);
         String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
         @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
+        @SuppressLint("StringFormatMatches") String resolution=(String.format(getString(R.string.resolution) , displayMetrics.widthPixels, displayMetrics.heightPixels, displayMetrics.densityDpi));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
-        findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
+        TextView resolutionText = findViewById(R.id.textView4);
+        resolutionText.setText(resolution);
+        findViewById(R.id.logo_id).setOnClickListener(view -> adjustFontSize());
         checkUpdate();
+    }
+
+    public void adjustFontScale() {
+        Configuration configuration = getResources().getConfiguration();
+        if (configuration.fontScale > 0.70) {
+            configuration.fontScale = 0.75f;
+        } else {
+            configuration.fontScale = 1.50f;
+        }
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+            wm.getDefaultDisplay().getMetrics(metrics);
+            metrics.scaledDensity = configuration.fontScale * metrics.density;
+            getBaseContext().getResources().updateConfiguration(configuration, metrics);
+    }
+
+
+    public void adjustFontSize() {
+        Configuration configuration = getResources().getConfiguration();
+        configuration.fontScale=(float) 0.75; //0.85 small size, 1 normal size, 1,15 big etc
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        metrics.scaledDensity = configuration.fontScale * metrics.density;
+        getBaseContext().getResources().updateConfiguration(configuration, metrics);
     }
 
     private void checkUpdate() {

@@ -76,7 +76,20 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="170dp"
+        android:text="Resolution"
+        android:textColor="#FFFEFE"
+        android:textSize="15dp"
+        android:textStyle="bold|italic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo_id" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="190dp"
         android:text="Copyright ©W3Coach 2018-2023"
         android:textColor="#FFFEFE"
         android:textSize="10dp"
@@ -84,5 +97,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView1" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

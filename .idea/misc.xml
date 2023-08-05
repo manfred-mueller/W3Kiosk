@@ -5,7 +5,9 @@
       <map>
         <entry key="..\:/Android/W3Kiosk-Appupdate/app/src/main/res/drawable/custom_cursor.xml" value="0.1935" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/app/src/main/res/layout/activity_about.xml" value="0.18541666666666667" />
+        <entry key="..\:/Android/W3Kiosk-Appupdate/app/src/main/res/layout/activity_main.xml" value="0.16614583333333333" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/app/src/main/res/layout/activity_settings.xml" value="0.18541666666666667" />
+        <entry key="..\:/Android/W3Kiosk-Appupdate/app/src/main/res/layout/activity_support.xml" value="0.165625" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/app/src/main/res/xml/provider_paths.xml" value="0.10989583333333333" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/drawable-v21/selector_update_lib_download_dialog_button.xml" value="0.1935" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/drawable/selector_update_lib_button.xml" value="0.1935" />

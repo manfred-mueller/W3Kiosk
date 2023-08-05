@@ -36,104 +36,46 @@
                 android:orientation="horizontal"
                 android:padding="5dp">
 
-                <Switch
-                    android:id="@+id/mobileToggle"
+                <com.google.android.material.chip.ChipGroup
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="?android:attr/colorBackground"
-                    tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_toStartOf="@id/mobileToggle"
-                    android:focusable="auto"
-                    android:text="@string/mobile_mode"
-                    android:textSize="15sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="auto"
+                        android:text="@string/mobile_mode"
+                        android:textSize="15sp" />
+
+                    <Switch
+                        android:id="@+id/mobileToggle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="?android:attr/colorBackground"
+                        tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:focusable="auto"
+                        android:text="@string/check_update"
+                        android:textSize="15sp" />
+
+                    <Switch
+                        android:id="@+id/updateToggle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="?android:attr/colorBackground"
+                        tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+                </com.google.android.material.chip.ChipGroup>
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:padding="5dp">
-
-                <Switch
-                    android:id="@+id/autoscaleToggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="?android:attr/colorBackground"
-                    tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_toStartOf="@id/autoscaleToggle"
-                    android:focusable="auto"
-                    android:text="@string/enable_autoscale"
-                    android:textSize="15sp" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <Switch
-                    android:id="@+id/updateToggle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="?android:attr/colorBackground"
-                    tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_toStartOf="@id/updateToggle"
-                    android:focusable="auto"
-                    android:text="@string/check_update"
-                    android:textSize="15sp" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="5dp">
-                <Spinner
-                    android:id="@+id/appsSpinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:dropDownWidth="50dp"
-                    android:spinnerMode="dropdown"
-                    tools:ignore="SpeakableTextPresentCheck" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -142,19 +84,13 @@
                     android:layout_alignParentBottom="true"
                     android:layout_centerVertical="true"
                     android:layout_toStartOf="@id/appsSpinner"
+                    android:paddingRight="10dp"
                     android:focusable="auto"
                     android:text="@string/enable_apps"
                     android:textSize="15sp" />
 
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="5dp">
                 <Spinner
-                    android:id="@+id/timeoutSpinner"
+                    android:id="@+id/appsSpinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -173,12 +109,62 @@
                     android:layout_alignParentTop="true"
                     android:layout_alignParentBottom="true"
                     android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/timeoutSpinner"
+                    android:layout_toEndOf="@id/appsSpinner"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="10dp"
                     android:focusable="auto"
                     android:text="@string/urlTimeout"
                     android:textSize="15sp" />
 
-            </RelativeLayout>
+                <Spinner
+                    android:id="@+id/timeoutSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toEndOf="@id/timeoutText"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:dropDownWidth="50dp"
+                    android:spinnerMode="dropdown"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+                <TextView
+                    android:id="@+id/zoomText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/timeoutSpinner"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="10dp"
+                    android:focusable="auto"
+                    android:text="@string/zoomFactor"
+                    android:textSize="15sp" />
+
+                <Spinner
+                    android:id="@+id/zoomSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toEndOf="@id/zoomText"
+                    android:background="@android:drawable/btn_dropdown"
+                    android:dropDownWidth="50dp"
+                    android:spinnerMode="dropdown"
+                    tools:ignore="SpeakableTextPresentCheck" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="5dp">
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -498,19 +484,6 @@
                     </RelativeLayout>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
-
-                    </RelativeLayout>
-                </LinearLayout>
             </LinearLayout>
 
 
@@ -541,6 +514,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/displayButton"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="end"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/displayButton"
+            android:onClick="openDisplaySettings"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:srcCompat="@drawable/monitor"
+            tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
         <ImageButton
             android:id="@+id/scannerButton"

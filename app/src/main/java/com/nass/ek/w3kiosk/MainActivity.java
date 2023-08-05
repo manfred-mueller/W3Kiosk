@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public String urlPreset;
     public String autoName;
     public String autoPassWord;
-    public boolean enableAutoscale;
     public boolean checkmobileMode;
     public boolean checkAutoLogin;
     public boolean autoUpdate;
@@ -80,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int toSetting;
     public int handlerTimeout;
     public int toggleKey;
+    public int zoom;
     public String nextUrl;
     public Handler handler;
     public Runnable runnable;
@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
-        enableAutoscale = sharedPreferences.getBoolean("enableAutoscale", false);
         autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
@@ -140,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } else {
             handlerTimeout = toSetting;
         }
+        zoom = sharedPreferences.getInt("zoomFactor", 5);
         clientUrl1 = sharedPreferences.getString("clientUrl1", "");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         autoName = sharedPreferences.getString("loginName", "");
@@ -339,10 +339,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
         registerForContextMenu(kioskWeb);
-        if (enableAutoscale) {
-            kioskWeb.getSettings().setUseWideViewPort(true);
-            kioskWeb.setInitialScale(1);
-        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -364,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void commitURL(String url) {
+        kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
         if (url.equals(urlPreset))
         {
             @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
@@ -493,11 +490,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isTv()) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_HOME) {
-                recreate();
-                return true;
-            }
-            else if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
             }

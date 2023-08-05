@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings">Einstellungen</string>
-    <string name="enable_autoscale">Anzeige automatisch skalieren</string>
+    <string name="enable_autoscale">Bildgröße anpassen</string>
     <string name="mobile_mode">Mobiler Modus</string>
     <string name="website1">Erste Kunden-Url (ohne %s)</string>
     <string name="code_or_help">Code oder \'h\' für Hilfe</string>
@@ -44,14 +44,14 @@
     <string name="app5">App 5</string>
     <string name="appPw">"Anwendungspasswort"</string>
     <string name="choose_app">App wählen</string>
-    <string name="enable_apps">Erlaubte Apps</string>
+    <string name="enable_apps">Erlaubte Apps: </string>
     <string name="apps">Apps</string>
     <string name="reboot">Neustart</string>
     <string name="enterPassword">Bitte Passwort eingeben:</string>
     <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
     <string name="updateAvailable">Update-Version %1$s gefunden!</string>
     <string name="versionUptodate">Ihre Version %1$s vom %2$s ist aktuell!</string>
-    <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden</string>
+    <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden: </string>
     <string name="appInfo">%1$s %2$s vom %3$s</string>
     <string name="apply">Installieren</string>
     <string name="ignore">Ignorieren</string>
@@ -60,4 +60,10 @@
     <string name="UpdateAvailable">%1$s-Aktualisierung verfügbar</string>
     <string name="UpdateDescription">Aktualisieren Sie jetzt, um die neueste Version zu benutzen.</string>
     <string name="apps_permission">Apps installieren</string>
+    <string name="resolution">Auflösung: %1sx%2s, Dichte: %3s</string>
+    <string name="smallFont">Kleine Schrift</string>
+    <string name="largeFont">Große Schrift</string>
+    <string name="normalFont">Normale Schrift</string>
+    <string name="screenZoom">Bildschirm-Zoom: %d%%</string>
+    <string name="zoomFactor">"Webview-Zoom in %: "</string>
 </resources>

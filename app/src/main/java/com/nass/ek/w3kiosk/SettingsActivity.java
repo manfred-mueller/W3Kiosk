@@ -43,17 +43,22 @@ public class SettingsActivity extends AppCompatActivity {
     Switch s;
     EditText e;
     CheckBox c;
+    ImageButton b;
+
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
+    String[] zoomFactor = new String[]{"75", "80", "85", "90", "95", "100", "105", "110", "115", "120", "125"};
     private Spinner appsDropdown;
     private Spinner timeoutDropdown;
+    private Spinner zoomDropdown;
 
-    @SuppressLint("ApplySharedPref")
+
+    @SuppressLint({"ApplySharedPref", "StringFormatMatches"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
@@ -71,6 +76,10 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeoutDropdown.setAdapter(timeoutAdapter);
+        zoomDropdown = findViewById(R.id.zoomSpinner);
+        ArrayAdapter<String> zoomAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, zoomFactor);
+        zoomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        zoomDropdown.setAdapter(zoomAdapter);
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
         if (MainActivity.isTablet()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -86,12 +95,9 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
         }
 
-        ImageButton b = findViewById(R.id.updateCloseButton);
+        b = findViewById(R.id.updateCloseButton);
         b.setOnClickListener(view -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            s = findViewById(R.id.autoscaleToggle);
-            editor.putBoolean("enableAutoscale", s.isChecked());
 
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
@@ -102,6 +108,8 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
 
             editor.putInt("urlTimeout", timeoutDropdown.getSelectedItemPosition());
+
+            editor.putInt("zoomFactor", zoomDropdown.getSelectedItemPosition());
 
             s = findViewById(R.id.autoLogin);
             editor.putBoolean("autoLogin", s.isChecked());
@@ -122,9 +130,6 @@ public class SettingsActivity extends AppCompatActivity {
             finish();
         });
 
-        s = findViewById(R.id.autoscaleToggle);
-        s.setChecked(sharedPreferences.getBoolean("enableAutoscale", false));
-
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
 
@@ -134,7 +139,9 @@ public class SettingsActivity extends AppCompatActivity {
         appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
         int spinnerValue = sharedPreferences.getInt("urlTimeout",-1);
         if(spinnerValue != -1)
-        timeoutDropdown.setSelection(spinnerValue);
+            timeoutDropdown.setSelection(spinnerValue);
+        int zoomValue = sharedPreferences.getInt("zoomFactor",5);
+        zoomDropdown.setSelection(zoomValue);
 
         s = findViewById(R.id.autoLogin);
         s.setChecked(sharedPreferences.getBoolean("autoLogin", false));
@@ -164,14 +171,21 @@ public class SettingsActivity extends AppCompatActivity {
         e.setText(sharedPreferences.getString("loginPassword", ""));
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            b = findViewById(R.id.displayButton);
+            if (isTv()) {
+                b.setVisibility(View.VISIBLE);
+            }
+
             c = findViewById(R.id.writeStorage);
             c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             if (isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+                c.setEnabled(context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED);
             }
 
             c = findViewById(R.id.overlayPerm);
@@ -179,22 +193,26 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
+                c.setEnabled(!Settings.canDrawOverlays(this));
             }
 
             c = findViewById(R.id.powerMenu);
             c.setChecked(isAccessibilitySettingsOn());
+            c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
             if (isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));
+                c.setEnabled(!Settings.System.canWrite(this));
             }
 
             c = findViewById(R.id.installApps);
             PackageManager packageManager = context.getPackageManager();
             if (Build.VERSION.SDK_INT >= O) {
                 c.setChecked(packageManager.canRequestPackageInstalls());
+                c.setEnabled(!packageManager.canRequestPackageInstalls());
             } else {
                 c.setVisibility(View.GONE);
             }
@@ -249,6 +267,12 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(new Intent(Settings.ACTION_SETTINGS));
     }
 
+    public void openDisplaySettings(View v) {
+        Intent intent = new Intent(Settings.ACTION_DISPLAY_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        startActivity(intent);
+    }
+
     public void sdClick(View v) {
         startService(new Intent(this, ShutdownService.class));
     }
@@ -264,10 +288,10 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void checkAccessibilityPermission(View v){
-            if (isAccessibilitySettingsOn()) {
+            if (!isAccessibilitySettingsOn()) {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            startActivityForResult(intent, 4713);
+            startActivity(intent);
         }
     }
 
@@ -275,7 +299,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(SettingsActivity.this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
             intent.setData(Uri.parse("package:" + getPackageName()));
-            ((Activity) context).startActivityForResult(intent, 4712);
+            ((Activity) context).startActivity(intent);
         }
     }
 
@@ -292,7 +316,7 @@ public class SettingsActivity extends AppCompatActivity {
         {
             Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
             intent.setData(Uri.parse("package:" + this.getPackageName()));
-            startActivityForResult(intent, 4714);
+            startActivity(intent);
         }
     }
 
@@ -351,15 +375,21 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            int zoomValue = sharedPreferences.getInt("zoomFactor",5);
+            zoomDropdown.setSelection(zoomValue);
+
             c = findViewById(R.id.writeStorage);
             c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             if (isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
+                c.setEnabled(context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED);
             }
 
             c = findViewById(R.id.overlayPerm);
@@ -367,26 +397,29 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
+                c.setEnabled(!Settings.canDrawOverlays(this));
             }
 
             c = findViewById(R.id.powerMenu);
             c.setChecked(isAccessibilitySettingsOn());
+            c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
             if (isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));
+                c.setEnabled(!Settings.System.canWrite(this));
             }
 
             c = findViewById(R.id.installApps);
             if (android.os.Build.VERSION.SDK_INT >= O) {
                 PackageManager packageManager = context.getPackageManager();
-            c.setChecked(packageManager.canRequestPackageInstalls());
+                c.setChecked(packageManager.canRequestPackageInstalls());
+                c.setEnabled(!packageManager.canRequestPackageInstalls());
             } else {
                 c.setVisibility(View.GONE);
             }
-
         }
     }
 }
