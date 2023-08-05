@@ -75,10 +75,5 @@
     <string name="UpdateAvailable">%1$s-Update available</string>
     <string name="UpdateDescription">Update to ensure that you are using the latest version of the app.</string>
     <string name="apps_permission">Install apps</string>
-    <string name="resolution">Resolution: %1sx%2s, density: %3s</string>
-    <string name="smallFont">Small font</string>
-    <string name="normalFont">Normal font</string>
-    <string name="largeFont">Large font</string>
-    <string name="screenZoom">Screen zoom: %d%%</string>
-    <string name="zoomFactor">"Webview zoom in %: "</string>
+    <string name="zoomFactor">"Webview zoom: "</string>
 </resources>

@@ -41,17 +41,20 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:id="@+id/mobileText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:focusable="auto"
                         android:text="@string/mobile_mode"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:visibility="gone" />
 
                     <Switch
                         android:id="@+id/mobileToggle"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:background="?android:attr/colorBackground"
+                        android:visibility="gone"
                         tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                     <TextView
@@ -67,104 +70,91 @@
                         android:layout_height="match_parent"
                         android:background="?android:attr/colorBackground"
                         tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/appsSpinner"
+                        android:focusable="auto"
+                        android:paddingRight="10dp"
+                        android:text="@string/enable_apps"
+                        android:textSize="15sp" />
+
+                    <Spinner
+                        android:id="@+id/appsSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerVertical="true"
+                        android:background="@android:drawable/btn_dropdown"
+                        android:dropDownWidth="50dp"
+                        android:spinnerMode="dropdown"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                    <TextView
+                        android:id="@+id/timeoutText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/appsSpinner"
+                        android:focusable="auto"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/urlTimeout"
+                        android:textSize="15sp" />
+
+                    <Spinner
+                        android:id="@+id/timeoutSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toEndOf="@id/timeoutText"
+                        android:background="@android:drawable/btn_dropdown"
+                        android:dropDownWidth="50dp"
+                        android:spinnerMode="dropdown"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                    <TextView
+                        android:id="@+id/zoomText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/timeoutSpinner"
+                        android:focusable="auto"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/zoomFactor"
+                        android:textSize="15sp" />
+
+                    <Spinner
+                        android:id="@+id/zoomSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toEndOf="@id/zoomText"
+                        android:background="@android:drawable/btn_dropdown"
+                        android:dropDownWidth="70dp"
+                        android:spinnerMode="dropdown"
+                        tools:ignore="SpeakableTextPresentCheck" />
                 </com.google.android.material.chip.ChipGroup>
 
             </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="5dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@id/appsSpinner"
-                    android:paddingRight="10dp"
-                    android:focusable="auto"
-                    android:text="@string/enable_apps"
-                    android:textSize="15sp" />
-
-                <Spinner
-                    android:id="@+id/appsSpinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:dropDownWidth="50dp"
-                    android:spinnerMode="dropdown"
-                    tools:ignore="SpeakableTextPresentCheck" />
-
-                <TextView
-                    android:id="@+id/timeoutText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/appsSpinner"
-                    android:paddingLeft="25dp"
-                    android:paddingRight="10dp"
-                    android:focusable="auto"
-                    android:text="@string/urlTimeout"
-                    android:textSize="15sp" />
-
-                <Spinner
-                    android:id="@+id/timeoutSpinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_toEndOf="@id/timeoutText"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:dropDownWidth="50dp"
-                    android:spinnerMode="dropdown"
-                    tools:ignore="SpeakableTextPresentCheck" />
-
-                <TextView
-                    android:id="@+id/zoomText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@id/timeoutSpinner"
-                    android:paddingLeft="25dp"
-                    android:paddingRight="10dp"
-                    android:focusable="auto"
-                    android:text="@string/zoomFactor"
-                    android:textSize="15sp" />
-
-                <Spinner
-                    android:id="@+id/zoomSpinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_toEndOf="@id/zoomText"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:dropDownWidth="50dp"
-                    android:spinnerMode="dropdown"
-                    tools:ignore="SpeakableTextPresentCheck" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="5dp">
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

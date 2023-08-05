@@ -47,7 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
-    String[] zoomFactor = new String[]{"75", "80", "85", "90", "95", "100", "105", "110", "115", "120", "125"};
+    String[] zoomFactor = new String[]{"75%", "80%", "85%", "90%", "95%", "100%", "105%", "110%", "115%", "120%", "125%"};
     private Spinner appsDropdown;
     private Spinner timeoutDropdown;
     private Spinner zoomDropdown;
@@ -91,8 +91,12 @@ public class SettingsActivity extends AppCompatActivity {
             if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
+            findViewById(R.id.mobileToggle).setVisibility(View.VISIBLE);
+            findViewById(R.id.mobileText).setVisibility(View.VISIBLE);
             findViewById(R.id.timeoutText).setVisibility(View.GONE);
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
+            findViewById(R.id.zoomText).setVisibility(View.GONE);
+            findViewById(R.id.zoomSpinner).setVisibility(View.GONE);
         }
 
         b = findViewById(R.id.updateCloseButton);

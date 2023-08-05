@@ -46,11 +46,8 @@ public class AboutActivity extends AppCompatActivity {
         String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
         @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
-        @SuppressLint("StringFormatMatches") String resolution=(String.format(getString(R.string.resolution) , displayMetrics.widthPixels, displayMetrics.heightPixels, displayMetrics.densityDpi));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
-        TextView resolutionText = findViewById(R.id.textView4);
-        resolutionText.setText(resolution);
         findViewById(R.id.logo_id).setOnClickListener(view -> adjustFontSize());
         checkUpdate();
     }

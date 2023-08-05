@@ -55,15 +55,10 @@
     <string name="appInfo">%1$s %2$s vom %3$s</string>
     <string name="apply">Installieren</string>
     <string name="ignore">Ignorieren</string>
-    <string name="check_update">Automatisches Update</string>
+    <string name="check_update">Auto-Update</string>
     <string name="dismiss">Ausblenden</string>
     <string name="UpdateAvailable">%1$s-Aktualisierung verfügbar</string>
     <string name="UpdateDescription">Aktualisieren Sie jetzt, um die neueste Version zu benutzen.</string>
     <string name="apps_permission">Apps installieren</string>
-    <string name="resolution">Auflösung: %1sx%2s, Dichte: %3s</string>
-    <string name="smallFont">Kleine Schrift</string>
-    <string name="largeFont">Große Schrift</string>
-    <string name="normalFont">Normale Schrift</string>
-    <string name="screenZoom">Bildschirm-Zoom: %d%%</string>
-    <string name="zoomFactor">"Webview-Zoom in %: "</string>
+    <string name="zoomFactor">"Webview-Zoom: "</string>
 </resources>
