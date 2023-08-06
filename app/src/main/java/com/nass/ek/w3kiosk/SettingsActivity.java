@@ -62,8 +62,10 @@ public class SettingsActivity extends AppCompatActivity {
         toggleLogin(findViewById(R.id.autologinLayout));
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
+        TextView client3Text = findViewById(R.id.client3Text);
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(getString(R.string.website2));
+        client3Text.setText(getString(R.string.website3));
         appsDropdown = findViewById(R.id.appsSpinner);
         ArrayAdapter<String> appAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, allowedApps);
         appAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -97,6 +99,8 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
             findViewById(R.id.zoomText).setVisibility(View.GONE);
             findViewById(R.id.zoomSpinner).setVisibility(View.GONE);
+            findViewById(R.id.client3Text).setVisibility(View.GONE);
+            findViewById(R.id.client3EditText).setVisibility(View.GONE);
         }
 
         b = findViewById(R.id.updateCloseButton);
@@ -129,6 +133,9 @@ public class SettingsActivity extends AppCompatActivity {
 
             e = findViewById(R.id.client2EditText);
             editor.putString("clientUrl2", e.getText().toString());
+
+            e = findViewById(R.id.client3EditText);
+            editor.putString("clientUrl3", e.getText().toString());
 
             editor.commit();
             finish();
@@ -168,6 +175,9 @@ public class SettingsActivity extends AppCompatActivity {
         e = findViewById(R.id.client2EditText);
         e.setText(sharedPreferences.getString("clientUrl2", ""));
 
+        e = findViewById(R.id.client3EditText);
+        e.setText(sharedPreferences.getString("clientUrl3", ""));
+
         e = findViewById(R.id.loginEditText);
         e.setText(sharedPreferences.getString("loginName", ""));
 
@@ -176,7 +186,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             b = findViewById(R.id.displayButton);
-            if (isTv()) {
+            if (!isScanner()) {
                 b.setVisibility(View.VISIBLE);
             }
 
@@ -247,7 +257,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static boolean isScanner() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
+        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
     }
 
     public void setLauncher(View v) {
@@ -273,6 +283,12 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void openDisplaySettings(View v) {
         Intent intent = new Intent(Settings.ACTION_DISPLAY_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        startActivity(intent);
+    }
+
+    public void openKeyboardSettings(View v) {
+        Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         startActivity(intent);
     }

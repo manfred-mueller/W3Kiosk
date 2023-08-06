@@ -51,7 +51,7 @@
     <string name="about">Informationen finden Sie unter https://github.com/manfred-mueller/W3Kiosk. Email-Support unter support@nass-ek.de.</string>
     <string name="updateAvailable">Update-Version %1$s gefunden!</string>
     <string name="versionUptodate">Ihre Version %1$s vom %2$s ist aktuell!</string>
-    <string name="urlTimeout">Timeout zweite Kunden-Url in Sekunden: </string>
+    <string name="urlTimeout">Timeout zweite/dritte Kunden-Url in Sekunden: </string>
     <string name="appInfo">%1$s %2$s vom %3$s</string>
     <string name="apply">Installieren</string>
     <string name="ignore">Ignorieren</string>
@@ -61,4 +61,5 @@
     <string name="UpdateDescription">Aktualisieren Sie jetzt, um die neueste Version zu benutzen.</string>
     <string name="apps_permission">Apps installieren</string>
     <string name="zoomFactor">"Webview-Zoom: "</string>
+    <string name="website3">Dritte Kunden-Url</string>
 </resources>

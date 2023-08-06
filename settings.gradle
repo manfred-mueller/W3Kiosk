@@ -1,3 +1,4 @@
 rootProject.name = "W3Kiosk"
 include ':app'
 include ':appupdate'
+include ':simplekeyboard'

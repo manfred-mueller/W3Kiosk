@@ -222,6 +222,34 @@
                     android:visibility="visible"
                     tools:ignore="TouchTargetSizeCheck" />
 
+                <TextView
+                    android:id="@+id/client3Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:focusable="auto"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:visibility="visible" />
+
+                <EditText
+                    android:id="@+id/client3EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="no"
+                    android:cursorVisible="true"
+                    android:gravity="start"
+                    android:hint="@string/default_url"
+                    android:inputType="textUri|text"
+                    android:nextFocusLeft="@id/client3EditText"
+                    android:nextFocusUp="@id/client3EditText"
+                    android:singleLine="true"
+                    android:text=""
+                    android:textCursorDrawable="@drawable/custom_cursor"
+                    android:textSize="15sp"
+                    android:visibility="visible"
+                    tools:ignore="TouchTargetSizeCheck" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -506,6 +534,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/keyboardButton"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="end"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/keyboardButton"
+            android:onClick="openKeyboardSettings"
+            android:scaleType="fitCenter"
+            android:visibility="visible"
+            app:srcCompat="@drawable/keyboard"
+            tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
         <ImageButton
             android:id="@+id/displayButton"
