@@ -48,33 +48,8 @@ public class AboutActivity extends AppCompatActivity {
         @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
-        findViewById(R.id.logo_id).setOnClickListener(view -> adjustFontSize());
+        findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
         checkUpdate();
-    }
-
-    public void adjustFontScale() {
-        Configuration configuration = getResources().getConfiguration();
-        if (configuration.fontScale > 0.70) {
-            configuration.fontScale = 0.75f;
-        } else {
-            configuration.fontScale = 1.50f;
-        }
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-            wm.getDefaultDisplay().getMetrics(metrics);
-            metrics.scaledDensity = configuration.fontScale * metrics.density;
-            getBaseContext().getResources().updateConfiguration(configuration, metrics);
-    }
-
-
-    public void adjustFontSize() {
-        Configuration configuration = getResources().getConfiguration();
-        configuration.fontScale=(float) 0.75; //0.85 small size, 1 normal size, 1,15 big etc
-
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        metrics.scaledDensity = configuration.fontScale * metrics.density;
-        getBaseContext().getResources().updateConfiguration(configuration, metrics);
     }
 
     private void checkUpdate() {

@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean autoUpdate;
     public String clientUrl1;
     public String clientUrl2;
+    public String clientUrl3;
     public int appsCount;
     public int toSetting;
     public int handlerTimeout;
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         zoom = sharedPreferences.getInt("zoomFactor", 5);
         clientUrl1 = sharedPreferences.getString("clientUrl1", "");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
+        clientUrl3 = sharedPreferences.getString("clientUrl3", "");
         autoName = sharedPreferences.getString("loginName", "");
         toggleKey = sharedPreferences.getInt("toggleKey", 82);
         autoPassWord = sharedPreferences.getString("loginPassword", "");
@@ -152,7 +154,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         handler = new Handler();
         runnable = () -> {
             commitURL(urlPreset + clientUrl1);
-            nextUrl = clientUrl2;
+            if (!clientUrl2.equals("")) {
+                nextUrl = clientUrl2;
+            } else
+            {
+                nextUrl = clientUrl1;
+            }
         };
 
         if (autoUpdate) {
@@ -197,11 +204,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
             });
 
-        setupSettings();
         if (isScanner()) {
             Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
             startActivity(startScannerActivityIntent);
         } else {
+            setupSettings();
             commitURL(urlPreset + clientUrl1);
         }
         nextUrl = clientUrl2;
@@ -397,14 +404,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void toggleUrl(){
-        if (nextUrl.equals(clientUrl2)){
-            if (isTablet()) {
-                if (!clientUrl2.startsWith("https://") && !clientUrl2.startsWith("http://")){
-                    clientUrl2 = "https://" + clientUrl2;
-                    if (clientUrl2.startsWith("https://")) {
-                        TrustAllCertificates.install();
-                        kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
-                    }
+        if (nextUrl.equals(clientUrl3)){
+            if (clientUrl3.startsWith("http")) {
+                if (isTablet()) {
+                    TrustAllCertificates.install();
+                    kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
+                }
+                commitURL(clientUrl3);
+                if (handlerTimeout > 0) {
+                    startHandler();
+                }
+            } else {
+                commitURL(urlPreset + clientUrl3);
+            }
+            nextUrl = clientUrl1;
+        }
+        else if (nextUrl.equals(clientUrl2)){
+            if (clientUrl2.startsWith("http")) {
+                if (isTablet()) {
+                    TrustAllCertificates.install();
+                    kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
                 }
                 commitURL(clientUrl2);
                 if (handlerTimeout > 0) {
@@ -413,7 +432,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             } else {
                 commitURL(urlPreset + clientUrl2);
             }
-            nextUrl = clientUrl1;
+            if (!clientUrl3.equals("")) {
+                nextUrl = clientUrl3;
+            } else
+            {
+                nextUrl = clientUrl1;
+            }
         }
         else if (nextUrl.equals(clientUrl1)){
             commitURL(urlPreset + clientUrl1);
