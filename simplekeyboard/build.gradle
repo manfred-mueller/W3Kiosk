@@ -1,0 +1,14 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion 33
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 31
+    }
+ }
+
+dependencies {
+}
