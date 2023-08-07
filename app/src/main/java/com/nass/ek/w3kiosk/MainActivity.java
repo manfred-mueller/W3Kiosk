@@ -517,6 +517,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 23){
+                recreate();
+                return true;
             }
         }
         return super.dispatchKeyEvent(event);

@@ -190,6 +190,11 @@ public class SettingsActivity extends AppCompatActivity {
                 b.setVisibility(View.VISIBLE);
             }
 
+            b = findViewById(R.id.keyboardButton);
+            if (isTv()) {
+                b.setVisibility(View.VISIBLE);
+            }
+
             c = findViewById(R.id.writeStorage);
             c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);

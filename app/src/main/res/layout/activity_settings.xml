@@ -544,7 +544,7 @@
             android:contentDescription="@string/keyboardButton"
             android:onClick="openKeyboardSettings"
             android:scaleType="fitCenter"
-            android:visibility="visible"
+            android:visibility="gone"
             app:srcCompat="@drawable/keyboard"
             tools:ignore="UsingOnClickInXml,RedundantDescriptionCheck,ImageContrastCheck" />
 
