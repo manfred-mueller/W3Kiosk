@@ -78,4 +78,13 @@
     <string name="apps_permission">Install apps</string>
     <string name="zoomFactor">"Webview zoom: "</string>
     <string name="website3">Third client url</string>
+    <string name="setAsStartAppText">Would you like to set this app as your Start app?</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+    <string name="NoStartApp">No Start app</string>
+    <string name="NoStartAppRationale">Setting this kiosk app as the Start app gives you more security and reliability. Are you sure you don\'t want to set it as the Start app?</string>
+    <string name="setAsStartApp">Set as Start app</string>
+    <string name="changeStartApp">Change Start app</string>
+    <string name="imSure">I\'m Sure</string>
+    <string name="alreadyStartApp">This app is already set as your Start app.</string>
 </resources>

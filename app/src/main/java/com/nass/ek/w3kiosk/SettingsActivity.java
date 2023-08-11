@@ -9,6 +9,7 @@ import android.app.UiModeManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -30,6 +31,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -262,23 +264,56 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static boolean isScanner() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
+        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("MC3") || Build.PRODUCT.startsWith("cedric");
+    }
+
+    private boolean isMyAppLauncherDefault() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        ComponentName defaultLauncher = intent.resolveActivity(getPackageManager());
+        ComponentName myAppLauncher = new ComponentName(this, MainActivity.class);
+        return defaultLauncher != null && defaultLauncher.equals(myAppLauncher);
+    }
+
+    private void showSetDefaultLauncherDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.setAsStartApp);
+        builder.setMessage(R.string.setAsStartAppText);
+        builder.setPositiveButton(R.string.Yes, (dialog, which) -> {
+            Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            startActivity(intent);
+        });
+        builder.setNegativeButton(R.string.No, (dialog, which) -> {
+            // Handle user's choice not to set as default launcher
+            showRationaleForNo();
+        });
+        builder.show();
+    }
+
+    private void showRationaleForNo() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.NoStartApp);
+        builder.setMessage(R.string.NoStartAppRationale);
+        builder.setPositiveButton(R.string.imSure, (dialog, which) -> {
+        });
+        builder.setNegativeButton(R.string.setAsStartApp, (dialog, which) -> {
+            // Handle user's decision to set as default launcher
+            Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            startActivity(intent);
+        });
+        builder.show();
     }
 
     public void setLauncher(View v) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            PackageManager packageManager = context.getPackageManager();
-        ComponentName componentName = new ComponentName(context, DummyActivity.class);
-        packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-
-        Intent selector = new Intent(Intent.ACTION_MAIN);
-        selector.addCategory(Intent.CATEGORY_HOME);
-        selector.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(selector);
-
-        packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
-    } else {
-            startActivity(new Intent(Settings.ACTION_HOME_SETTINGS));
+        if (isMyAppLauncherDefault()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.changeStartApp);
+            builder.setMessage(R.string.alreadyStartApp);
+            builder.setPositiveButton("Ok", (dialog, which) -> {
+            });
+            builder.show();
+        } else {
+            showSetDefaultLauncherDialog();
         }
     }
 
@@ -324,7 +359,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(SettingsActivity.this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
             intent.setData(Uri.parse("package:" + getPackageName()));
-            ((Activity) context).startActivity(intent);
+            context.startActivity(intent);
         }
     }
 

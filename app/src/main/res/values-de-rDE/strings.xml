@@ -62,4 +62,13 @@
     <string name="apps_permission">Apps installieren</string>
     <string name="zoomFactor">"Webview-Zoom: "</string>
     <string name="website3">Dritte Kunden-Url</string>
+    <string name="setAsStartAppText">Möchten Sie diese Anwendung als Start-App setzen?</string>
+    <string name="Yes">Ja</string>
+    <string name="No">Nein</string>
+    <string name="NoStartApp">Keine Start-App</string>
+    <string name="NoStartAppRationale">Diese Kiosk-Anwendung als Start-App zu setzen, bietet Ihnen mehr Sicherheit und Zuverlässigkeit. Sind Sicher, dass Sie die Anwendung nicht als Start-App setzen wollen?</string>
+    <string name="setAsStartApp">Als Start-App setzen</string>
+    <string name="changeStartApp">Start-App ändern</string>
+    <string name="imSure">Ich bin Sicher</string>
+    <string name="alreadyStartApp">Diese Anwendung ist bereits als Start-App gesetzt.</string>
 </resources>
