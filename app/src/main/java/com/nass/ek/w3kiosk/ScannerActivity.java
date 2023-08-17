@@ -381,6 +381,7 @@ public class ScannerActivity extends AppCompatActivity {
                     }
                     else if (PwInput.equals("a")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + MainActivity.adUri));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     }
                     else if (PwInput.equals("b")) {
@@ -392,6 +393,7 @@ public class ScannerActivity extends AppCompatActivity {
                     }
                     else if (PwInput.equals("t")) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + MainActivity.tvUri));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                     }
                     else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {

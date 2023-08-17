@@ -281,6 +281,7 @@ public class SettingsActivity extends AppCompatActivity {
         builder.setMessage(R.string.setAsStartAppText);
         builder.setPositiveButton(R.string.Yes, (dialog, which) -> {
             Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
         builder.setNegativeButton(R.string.No, (dialog, which) -> {
@@ -299,6 +300,7 @@ public class SettingsActivity extends AppCompatActivity {
         builder.setNegativeButton(R.string.setAsStartApp, (dialog, which) -> {
             // Handle user's decision to set as default launcher
             Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
         builder.show();

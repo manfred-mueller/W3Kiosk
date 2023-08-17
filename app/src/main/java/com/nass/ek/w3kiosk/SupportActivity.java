@@ -81,6 +81,7 @@ public class SupportActivity extends AppCompatActivity {
             if (t == null)
                 throw new PackageManager.NameNotFoundException();
             t.addCategory(Intent.CATEGORY_LAUNCHER);
+            t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(t);
         } catch (PackageManager.NameNotFoundException ignored) {
         }
