@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">W3Kiosk</string>
-    <string name="url_preset" translatable="false">https://w3coach.de/</string>
-    <string name="default_url" translatable="false">w3c</string>
     <string name="settings">Ustawienia</string>
-    <string name="keButton" translatable="false">PrzyciskEmulatoraKlawiatury</string>
-    <string name="keyboardButton" translatable="false">PrzyciskKlawiatury</string>
-    <string name="displayButton" translatable="false">PrzyciskEkranu</string>
-    <string name="settingsButton" translatable="false">PrzyciskUstawień</string>
     <string name="enable_autoscale">Dopasuj rozmiar ekranu</string>
     <string name="mobile_mode">Tryb mobilny</string>
     <string name="website1">Pierwszy adres URL klienta (bez %s)</string>
-    <string name="copyright" translatable="false">© 2023, NASS e.K.</string>
-    <string name="set_home_button" translatable="false">Ustaw przycisk \"Home\"</string>
-    <string name="set_launcher_button" translatable="false">Ustaw przycisk \"Launcher\"</string>
-    <string name="settings_save_button" translatable="false">Przycisk zapisywania ustawień</string>
-    <string name="system_settings_button" translatable="false">Przycisk ustawień systemowych</string>
     <string name="code_or_help">Wprowadź kod lub \'h\' dla pomocy</string>
     <string name="cancel">Anuluj</string>
     <string name="an_error_occurred">Wystąpił błąd:\u0020</string>
-    <string name="teamviewerbutton" translatable="false">PrzyciskTeamviewer</string>
-    <string name="anydeskbutton" translatable="false">PrzyciskAnydesk</string>
-    <string name="closebutton" translatable="false">PrzyciskZamknij</string>
-    <string name="logo" translatable="false">logo</string>
     <string name="helpText">Jeśli zainstalowano, powyżej pojawią się przyciski TeamviewerⓇ lub AnydeskⓇ. Uruchamiaj te aplikacje tylko na żądanie wsparcia.\n\nJeśli nie widać przycisku(y), przejdź do GoogleⓇ Playstore™ i zainstaluj TeamviewerⓇ Quicksupport™ lub AnydeskⓇ.\n\nAby ponownie załadować skonfigurowany adres URL, przytrzymaj przycisk W3Coach w prawym dolnym rogu.</string>
     <string name="helpTextTv">Jeśli skonfigurowano 2 adresy URL, można przełączać się między nimi za pomocą przycisku \"Wstecz\".\n\nAby wywołać menu, naciśnij przycisk \"Menu\".\n\nAby ponownie załadować aplikację, naciśnij przycisk \"Home\".\n\n</string>
     <string name="invalid_url">Nieprawidłowy lub niedostępny adres URL:\u0020</string>
