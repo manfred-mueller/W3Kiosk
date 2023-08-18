@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -82,6 +83,8 @@ public class ScannerActivity extends AppCompatActivity {
     public Intent intent;
 
     private boolean connected = false;
+    public static String tvUri = "com.teamviewer.quicksupport.market";
+    public static String adUri = "com.anydesk.anydeskandroid";
 
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
@@ -379,11 +382,14 @@ public class ScannerActivity extends AppCompatActivity {
                         Intent startAboutActivityIntent = new Intent(getApplicationContext(), AboutActivity.class);
                         startActivity(startAboutActivityIntent);
                     }
-                    else if (PwInput.equals("a")) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + MainActivity.adUri));
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
+                    else if (PwInput.equals("ad")) {
+                        if (checkApps(adUri))
+                        {
+                            appClick(adUri);
+                        } else {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
+                            startActivity(intent);
+                        }                    }
                     else if (PwInput.equals("b")) {
                         Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                         startActivity(intent);
@@ -391,11 +397,14 @@ public class ScannerActivity extends AppCompatActivity {
                     else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
-                    else if (PwInput.equals("t")) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + MainActivity.tvUri));
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
+                    else if (PwInput.equals("tv")) {
+                        if (checkApps(tvUri))
+                        {
+                            appClick(tvUri);
+                        } else {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
+                            startActivity(intent);
+                        }                    }
                     else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
                         @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                         startActivity(startSettingsActivityIntent);
@@ -510,6 +519,29 @@ public class ScannerActivity extends AppCompatActivity {
             initWebView(urlPreset + clientUrl1);
             findViewById(R.id.settingsButton).bringToFront();
             nextUrl = clientUrl2;
+        }
+    }
+    private boolean checkApps(String uri) {
+        PackageInfo pkgInfo;
+        try {
+            pkgInfo = getPackageManager().getPackageInfo(uri, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+        return pkgInfo != null;
+    }
+    public void appClick(String uri) {
+
+        Intent t;
+        PackageManager manager = getPackageManager();
+        try {
+            t = manager.getLaunchIntentForPackage(uri);
+            if (t == null)
+                throw new PackageManager.NameNotFoundException();
+            t.addCategory(Intent.CATEGORY_LAUNCHER);
+            t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(t);
+        } catch (PackageManager.NameNotFoundException ignored) {
         }
     }
 }
