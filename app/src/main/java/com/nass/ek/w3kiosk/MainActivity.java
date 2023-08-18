@@ -204,11 +204,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
             });
 
+        setupSettings();
         if (isScanner()) {
             Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
             startActivity(startScannerActivityIntent);
         } else {
-            setupSettings();
             commitURL(urlPreset + clientUrl1);
         }
         nextUrl = clientUrl2;
