@@ -2,7 +2,10 @@ package com.nass.ek.appupdate.services;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.nass.ek.appupdate.utils.PackageUtils;
 
@@ -99,12 +102,10 @@ public class CheckUpdateTask extends Thread {
             VersionModel model = new VersionModel();
             try {
                 model.parse(data);
-                String localVersion = PackageUtils.getVersionName(mContext) + PackageUtils.getVersionCode(mContext);
-                String onlineVersion = model.getVersionName() + model.getVersionCode();
-                int local_int = Integer.parseInt(localVersion.replaceAll("[\\D]", ""));
-                int online_int = Integer.parseInt(onlineVersion.replaceAll("[\\D]", ""));
-                mCallBack.callBack(model, hasNewVersion(local_int, online_int));
-                Log.d(TAG, "Local version: " + local_int + " Online version: " + online_int);
+                int localVersion = PackageUtils.getVersionCode(mContext);
+                int onlineVersion = model.getVersionCode();
+                mCallBack.callBack(model, hasNewVersion(localVersion, onlineVersion));
+                Log.d(TAG, "Local release: " + localVersion + " Online release: " + onlineVersion);
             } catch (JSONException e) {
                 e.printStackTrace();
                 mCallBack.callBack(null, false);

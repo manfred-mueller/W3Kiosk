@@ -43,7 +43,7 @@ public class AboutActivity extends AppCompatActivity {
         displayMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         setContentView(R.layout.activity_about);
-        String localVersion = BuildConfig.VERSION_NAME + "." + BuildConfig.VERSION_CODE;
+        String localVersion = BuildConfig.VERSION_NAME;
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
         @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
         TextView appinfoText = findViewById(R.id.textView3);
@@ -66,7 +66,7 @@ public class AboutActivity extends AppCompatActivity {
                 .setCallback((model, hasNewVersion) -> {
                     Log.d("Latest Version", hasNewVersion + "");
                     Log.d("Version Name", model.getVersionName());
-                    Log.d("Version Code", model.getVersionCode() + "");
+                    Log.d("Release", model.getVersionCode() + "");
                     Log.d("Version Description", model.getContentText());
                     Log.d("Min Support", model.getMinSupport() + "");
                     Log.d("Download URL", model.getUrl() + "");
