@@ -5,7 +5,6 @@ import static android.os.Build.VERSION_CODES.O;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.UiModeManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -14,7 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,9 +22,11 @@ import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -37,7 +38,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
-@RequiresApi(api = Build.VERSION_CODES.M)
 public class SettingsActivity extends AppCompatActivity {
 
     Context context = this;
@@ -46,11 +46,14 @@ public class SettingsActivity extends AppCompatActivity {
     EditText e;
     CheckBox c;
     ImageButton b;
+    RadioButton r;
 
-    String[] allowedApps = new String[]{"0", "1", "2", "3", "4", "5"};
+    String[] allowedApps = new String[]{"0", "1", "2", "3", "4"};
+    String[] marqueeTimeout = new String[]{"1", "5", "10", "15", "20", "25", "30"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
     String[] zoomFactor = new String[]{"75%", "80%", "85%", "90%", "95%", "100%", "105%", "110%", "115%", "120%", "125%"};
     private Spinner appsDropdown;
+    private Spinner marqueeDropdown;
     private Spinner timeoutDropdown;
     private Spinner zoomDropdown;
 
@@ -62,6 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
+        toggleMarquee(findViewById(R.id.marqueeLayout));
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         TextView client3Text = findViewById(R.id.client3Text);
@@ -76,6 +80,10 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(new Intent(this, AppsActivity.class));
             return true;
         });
+        marqueeDropdown = findViewById(R.id.marqueeSpinner);
+        ArrayAdapter<String> mqtimeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marqueeTimeout);
+        mqtimeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        marqueeDropdown.setAdapter(mqtimeoutAdapter);
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -85,13 +93,14 @@ public class SettingsActivity extends AppCompatActivity {
         zoomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         zoomDropdown.setAdapter(zoomAdapter);
         findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
-        if (MainActivity.isTablet()){
+        if (ChecksAndConfigs.isTablet()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                findViewById(R.id.marqueeLayout).setVisibility(View.VISIBLE);
                 findViewById(R.id.autologinLayout).setVisibility(View.VISIBLE);
             }
         }
 
-        if (isScanner()){
+        if (ChecksAndConfigs.isScanner()){
             if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
@@ -115,14 +124,34 @@ public class SettingsActivity extends AppCompatActivity {
             s = findViewById(R.id.updateToggle);
             editor.putBoolean("autoUpdate", s.isChecked());
 
+            r = findViewById(R.id.radioSlow);
+            if (r.isChecked())
+            editor.putInt("marqueeSpeed", 10);
+
+            r = findViewById(R.id.radioNormal);
+            if (r.isChecked())
+                editor.putInt("marqueeSpeed", 25);
+
+            r = findViewById(R.id.radioFast);
+            if (r.isChecked())
+                editor.putInt("marqueeSpeed", 40);
+
             editor.putInt("appsCount", Integer.parseInt(appsDropdown.getSelectedItem().toString()));
 
             editor.putInt("urlTimeout", timeoutDropdown.getSelectedItemPosition());
 
+            editor.putInt("marqueeTimeout", marqueeDropdown.getSelectedItemPosition());
+
             editor.putInt("zoomFactor", zoomDropdown.getSelectedItemPosition());
+
+            s = findViewById(R.id.marquee);
+            editor.putBoolean("marquee", s.isChecked());
 
             s = findViewById(R.id.autoLogin);
             editor.putBoolean("autoLogin", s.isChecked());
+
+            e = findViewById(R.id.marqueeEditText);
+            editor.putString("marqueeText", e.getText().toString());
 
             e = findViewById(R.id.loginEditText);
             editor.putString("loginName", e.getText().toString());
@@ -149,12 +178,45 @@ public class SettingsActivity extends AppCompatActivity {
         s = findViewById(R.id.updateToggle);
         s.setChecked(sharedPreferences.getBoolean("autoUpdate", false));
 
+        int i = sharedPreferences.getInt("marqueeSpeed", 25);
+        if (i < 25) {
+            r = findViewById(R.id.radioSlow);
+        }
+        else if (i == 25) {
+            r = findViewById(R.id.radioNormal);
+        }
+        else {
+            r = findViewById(R.id.radioFast);
+        }
+        r.setChecked(true);
+
         appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
-        int spinnerValue = sharedPreferences.getInt("urlTimeout",-1);
-        if(spinnerValue != -1)
-            timeoutDropdown.setSelection(spinnerValue);
+        int urlSpinnerValue = sharedPreferences.getInt("urlTimeout",-1);
+        if(urlSpinnerValue != -1)
+            timeoutDropdown.setSelection(urlSpinnerValue);
+        int marqueeSpinnerValue = sharedPreferences.getInt("marqueeTimeout",-1);
+        if(marqueeSpinnerValue != -1)
+            marqueeDropdown.setSelection(marqueeSpinnerValue);
         int zoomValue = sharedPreferences.getInt("zoomFactor",5);
         zoomDropdown.setSelection(zoomValue);
+
+        s = findViewById(R.id.marquee);
+        s.setChecked(sharedPreferences.getBoolean("marquee", false));
+        s.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                findViewById(R.id.marqueeEditText).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeTimeoutText).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeSpinner).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeSpeedText).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeSpeedGroup).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.marqueeEditText).setVisibility(View.GONE);
+                findViewById(R.id.marqueeTimeoutText).setVisibility(View.GONE);
+                findViewById(R.id.marqueeSpinner).setVisibility(View.GONE);
+                findViewById(R.id.marqueeSpeedText).setVisibility(View.GONE);
+                findViewById(R.id.marqueeSpeedGroup).setVisibility(View.GONE);
+            }
+        });
 
         s = findViewById(R.id.autoLogin);
         s.setChecked(sharedPreferences.getBoolean("autoLogin", false));
@@ -183,17 +245,20 @@ public class SettingsActivity extends AppCompatActivity {
         e = findViewById(R.id.loginEditText);
         e.setText(sharedPreferences.getString("loginName", ""));
 
+        e = findViewById(R.id.marqueeEditText);
+        e.setText(sharedPreferences.getString("marqueeText", ""));
+
         e = findViewById(R.id.pwEditText);
         e.setText(sharedPreferences.getString("loginPassword", ""));
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             b = findViewById(R.id.displayButton);
-            if (!isScanner()) {
+            if (!ChecksAndConfigs.isScanner()) {
                 b.setVisibility(View.VISIBLE);
             }
 
             b = findViewById(R.id.keyboardButton);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 b.setVisibility(View.VISIBLE);
             }
 
@@ -202,7 +267,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -210,7 +275,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.overlayPerm);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
@@ -222,7 +287,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));
@@ -240,6 +305,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+
     public void toggleLogin(View v) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
@@ -256,15 +322,22 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public boolean isTv() {
-        UiModeManager uiModeManager =
-                (UiModeManager) this.getApplicationContext().getSystemService(UI_MODE_SERVICE);
-        return uiModeManager != null
-                && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
-    }
-
-    public static boolean isScanner() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("MC3") || Build.PRODUCT.startsWith("cedric");
+    public void toggleMarquee(View v) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean checkMarquee = sharedPreferences.getBoolean("marquee", false);
+        if (checkMarquee) {
+                findViewById(R.id.marqueeEditText).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeTimeoutText).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeSpinner).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeSpeedText).setVisibility(View.VISIBLE);
+                findViewById(R.id.marqueeSpeedGroup).setVisibility(View.VISIBLE);
+            } else {
+                findViewById(R.id.marqueeEditText).setVisibility(View.GONE);
+                findViewById(R.id.marqueeTimeoutText).setVisibility(View.GONE);
+                findViewById(R.id.marqueeSpinner).setVisibility(View.GONE);
+                findViewById(R.id.marqueeSpeedText).setVisibility(View.GONE);
+                findViewById(R.id.marqueeSpeedGroup).setVisibility(View.GONE);
+            }
     }
 
     private boolean isMyAppLauncherDefault() {
@@ -280,7 +353,11 @@ public class SettingsActivity extends AppCompatActivity {
         builder.setTitle(R.string.setAsStartApp);
         builder.setMessage(R.string.setAsStartAppText);
         builder.setPositiveButton(R.string.Yes, (dialog, which) -> {
-            Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            Intent intent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            }
+            assert intent != null;
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
@@ -299,7 +376,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
         builder.setNegativeButton(R.string.setAsStartApp, (dialog, which) -> {
             // Handle user's decision to set as default launcher
-            Intent intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            Intent intent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                intent = new Intent(Settings.ACTION_HOME_SETTINGS);
+            }
+            assert intent != null;
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
@@ -366,19 +447,23 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void checkStoragePermission(View v){
-        if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_DENIED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4710);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4710);
+            }
         }
     }
 
     public void checkWritePermission(View v){
-        if (! Settings.System.canWrite(this))
-        {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            intent.setData(Uri.parse("package:" + this.getPackageName()));
-            startActivity(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (! Settings.System.canWrite(this))
+            {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:" + this.getPackageName()));
+                startActivity(intent);
+            }
         }
     }
 
@@ -447,7 +532,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -455,7 +540,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.overlayPerm);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
@@ -467,7 +552,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
-            if (isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));

@@ -54,7 +54,7 @@
                         android:id="@+id/mobileToggle"
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
-                        android:background="?android:attr/colorBackground"
+                        android:background="@android:color/transparent"
                         android:visibility="gone"
                         tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
@@ -70,7 +70,7 @@
                         android:id="@+id/updateToggle"
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
-                        android:background="?android:attr/colorBackground"
+                        android:background="@android:color/transparent"
                         tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
                     <TextView
@@ -79,9 +79,9 @@
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:gravity="center"
                         android:layout_toStartOf="@id/appsSpinner"
                         android:focusable="auto"
+                        android:gravity="center"
                         android:paddingRight="10dp"
                         android:text="@string/enable_apps"
                         android:textSize="15sp" />
@@ -106,9 +106,9 @@
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:gravity="center"
                         android:layout_toEndOf="@id/appsSpinner"
                         android:focusable="auto"
+                        android:gravity="center"
                         android:paddingLeft="25dp"
                         android:paddingRight="10dp"
                         android:text="@string/urlTimeout"
@@ -134,9 +134,9 @@
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:gravity="center"
                         android:layout_toEndOf="@id/timeoutSpinner"
                         android:focusable="auto"
+                        android:gravity="center"
                         android:paddingLeft="25dp"
                         android:paddingRight="10dp"
                         android:text="@string/zoomFactor"
@@ -252,91 +252,161 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/autologinLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone">
-
                 <RelativeLayout
+                    android:id="@+id/marqueeLayout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:padding="5dp">
+                    android:padding="5dp"
+                    android:visibility="gone">
 
-                    <Switch
-                        android:id="@+id/autoLogin"
+
+                <com.google.android.material.chip.ChipGroup
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentBottom="true"
-                        android:background="?android:attr/colorBackground"
-                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/marqueeText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:focusable="auto"
+                            android:gravity="center"
+                            android:text="@string/marquee"
+                            android:textSize="15sp" />
+
+                        <Switch
+                            android:id="@+id/marquee"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:background="@android:color/transparent"
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                        <EditText
+                            android:id="@+id/marqueeEditText"
+                            android:layout_width="300px"
+                            android:layout_height="50dp"
+                            android:hint="@string/marqueeHint"
+                            android:cursorVisible="true"
+                            android:gravity="bottom"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            android:maxLength="35"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:textCursorDrawable="@color/colorPrimary"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/marqueeTimeoutText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:focusable="auto"
+                            android:gravity="center"
+                            android:paddingLeft="25dp"
+                            android:paddingRight="10dp"
+                            android:text="@string/marqueeTimeout"
+                            android:textSize="15sp" />
+
+                        <Spinner
+                            android:id="@+id/marqueeSpinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:background="@android:drawable/btn_dropdown"
+                            android:dropDownWidth="50dp"
+                            android:spinnerMode="dropdown"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <TextView
+                            android:id="@+id/marqueeSpeedText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:focusable="auto"
+                            android:gravity="center"
+                            android:paddingLeft="25dp"
+                            android:paddingRight="10dp"
+                            android:text="@string/marqueeSpeed"
+                            android:textSize="15sp" />
+
+                        <RadioGroup
+                            android:id="@+id/marqueeSpeedGroup"
+                            android:layout_width="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_height="wrap_content" >
+
+                            <RadioButton
+                                android:id="@+id/radioSlow"
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:text="@string/slow" />
+                            <RadioButton
+                                android:id="@+id/radioNormal"
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:text="@string/normal" />
+                            <RadioButton
+                                android:id="@+id/radioFast"
+                                android:layout_width="match_parent"
+                                android:layout_height="60dp"
+                                android:text="@string/fast" />
+                        </RadioGroup>
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/autologinLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:visibility="gone">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <TextView
+                        android:id="@+id/autoLoginText"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60dp"
+                        android:gravity="center"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_toStartOf="@id/autoLogin"
                         android:focusable="auto"
                         android:text="@string/autologin"
                         android:textSize="15sp" />
 
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
-                    <EditText
-                        android:id="@+id/loginEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerVertical="true"
-                        android:layout_toEndOf="@id/loginName"
-                        android:autofillHints="no"
-                        android:cursorVisible="true"
-                        android:gravity="start"
-                        android:inputType="text"
-                        android:singleLine="true"
-                        android:textCursorDrawable="@color/colorPrimary"
-                        android:textSize="15sp" />
+                    <Switch
+                        android:id="@+id/autoLogin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_toEndOf="@id/autoLoginText"
+                        android:layout_alignParentBottom="true"
+                        android:background="@android:color/transparent"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
                     <TextView
                         android:id="@+id/loginName"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentBottom="false"
-                        android:layout_centerVertical="true"
+                        android:layout_height="60dp"
+                        android:layout_toEndOf="@id/autoLogin"
+                        android:gravity="center"
                         android:focusable="auto"
                         android:text="@string/login_name"
                         android:textSize="15sp" />
 
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:padding="5dp">
-
                     <EditText
-                        android:id="@+id/pwEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/loginEditText"
+                        android:layout_width="400px"
+                        android:layout_height="50dp"
                         android:layout_centerVertical="true"
-                        android:layout_toEndOf="@id/loginPw"
+                        android:layout_toEndOf="@id/loginName"
                         android:autofillHints="no"
                         android:cursorVisible="true"
-                        android:gravity="start"
+                        android:gravity="bottom"
                         android:inputType="text"
                         android:singleLine="true"
                         android:textCursorDrawable="@color/colorPrimary"
@@ -345,17 +415,29 @@
                     <TextView
                         android:id="@+id/loginPw"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentBottom="false"
-                        android:layout_centerVertical="true"
+                        android:layout_height="60dp"
+                        android:layout_toEndOf="@id/loginEditText"
+                        android:gravity="center"
                         android:focusable="auto"
                         android:text="@string/login_password"
                         android:textSize="15sp" />
 
-                </RelativeLayout>
-            </LinearLayout>
+                <EditText
+                        android:id="@+id/pwEditText"
+                        android:layout_width="400px"
+                        android:layout_height="50dp"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/loginPw"
+                        android:autofillHints="no"
+                        android:cursorVisible="true"
+                        android:gravity="bottom"
+                        android:inputType="text"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:textSize="15sp" />
+
+                </com.google.android.material.chip.ChipGroup>
+            </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/permissionLayout"

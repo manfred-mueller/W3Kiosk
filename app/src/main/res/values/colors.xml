@@ -4,4 +4,15 @@
     <color name="colorPrimaryDark">#165352</color>
     <color name="colorAccent">#34C1BF</color>
     <color name="colorRed">#FA2111</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorGray">#E8E8E8</color>
+    <color name="colorDarkGray">#B4B4B4</color>
+    <color name="colorLightGray">#C8C8C8</color>
+    <color name="colorON">#2e7d32</color>
+    <color name="colorOFF">#851B4D</color>
+    <color name="grey">#212121</color>
+    <color name="lightgrey">#BFBFBF</color>
+    <color name="port_active">#9CD16F</color>
+    <color name="color_bg">#2A2A2A</color>
 </resources>

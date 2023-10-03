@@ -1,15 +1,16 @@
 package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.res.Configuration;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -28,7 +29,7 @@ public class AboutActivity extends AppCompatActivity {
 
     WindowManager windowManager;
     DisplayMetrics displayMetrics;
-
+    public String Rooted;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,12 +45,56 @@ public class AboutActivity extends AppCompatActivity {
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         setContentView(R.layout.activity_about);
         String localVersion = BuildConfig.VERSION_NAME;
+        if (ChecksAndConfigs.isRooted()) {
+            Rooted = getString(R.string.Yes);
+        } else
+        {
+            Rooted = getString(R.string.No);
+        }
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
-        @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate)));
+        @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name) + "Verbindung: " + connectionType(this), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), Rooted));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
         findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
         checkUpdate();
+    }
+
+    public static String connectionType(Context context) {
+        String result = ""; // Returns connection type. 0: none; 1: mobile data; 2: wifi; 3: vpn
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (cm != null) {
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        result = "Wifi";
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                        result = "LAN";
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        result = "Mobile";
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        result = "VPN";
+                    }
+                }
+            }
+        } else {
+            if (cm != null) {
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                if (activeNetwork != null) {
+                    // connected to the internet
+                    if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                        result = "Wifi";
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) {
+                        result = "LAN";
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                        result = "Mobile";
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_VPN) {
+                        result = "VPN";
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private void checkUpdate() {
@@ -74,6 +119,5 @@ public class AboutActivity extends AppCompatActivity {
                 .build();
 
         updateWrapper.start();
-
     }
 }

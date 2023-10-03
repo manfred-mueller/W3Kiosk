@@ -18,6 +18,16 @@
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/layout/activity_update.xml" value="0.18541666666666667" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/layout/fragment_download.xml" value="0.18541666666666667" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/layout/fragment_update.xml" value="0.18541666666666667" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/drawable/launch_screen.xml" value="0.182" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_about.xml" value="0.1734375" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_adb.xml" value="0.171875" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_apps.xml" value="0.1734375" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_input.xml" value="0.184375" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_key_test.xml" value="0.21770833333333334" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_main.xml" value="0.18958333333333333" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_marquee.xml" value="0.18541666666666667" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_settings.xml" value="0.18541666666666667" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/xml/lint.xml" value="0.17239583333333333" />
       </map>
     </option>
   </component>

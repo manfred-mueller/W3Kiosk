@@ -2,12 +2,8 @@ package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.UiModeManager;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,26 +12,20 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 public class SupportActivity extends AppCompatActivity {
 
     String tvUri = "com.teamviewer.quicksupport.market";
     String adUri = "com.anydesk.anydeskandroid";
+    boolean tvCheck = ChecksAndConfigs.checkApps(this, tvUri);
+    boolean adCheck = ChecksAndConfigs.checkApps(this, adUri);
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_support);
-        boolean tvCheck = checkApps(tvUri);
-        boolean adCheck = checkApps(adUri);
 
-        if (isTv()) {
+        if (ChecksAndConfigs.isTv(this)) {
             TextView txtTv = findViewById(R.id.textView);
             txtTv.setText(getString(R.string.helpTextTv));
             ImageView imgView = findViewById(R.id.imageView);
@@ -87,16 +77,6 @@ public class SupportActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkApps(String uri) {
-        PackageInfo pkgInfo;
-        try {
-            pkgInfo = getPackageManager().getPackageInfo(uri, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-        return pkgInfo != null;
-    }
-
     public void hideKeyboard(View v) {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
 
@@ -105,12 +85,5 @@ public class SupportActivity extends AppCompatActivity {
             view = new View(this);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    public boolean isTv() {
-        UiModeManager uiModeManager =
-                (UiModeManager) this.getApplicationContext().getSystemService(UI_MODE_SERVICE);
-        return uiModeManager != null
-                && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 }

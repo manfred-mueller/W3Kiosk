@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
@@ -20,8 +21,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />
@@ -29,17 +29,13 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
-        android:fullBackupContent="true"
         android:banner="@drawable/w3coach_logo_tv1"
         android:logo="@drawable/w3coach_logo_tv1"
         android:usesCleartextTraffic="true"
@@ -56,7 +52,7 @@
             android:stateNotNeeded="true"
             android:launchMode="singleInstance"
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode"
-            tools:targetApi="m"
+            tools:targetApi="lollipop"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -98,6 +94,14 @@
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".AppsActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".KeyTestActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".MarqueeActivity"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity

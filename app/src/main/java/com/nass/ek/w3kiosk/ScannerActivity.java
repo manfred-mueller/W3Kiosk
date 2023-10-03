@@ -1,11 +1,10 @@
 package com.nass.ek.w3kiosk;
 
 
-import static android.os.Build.VERSION_CODES.O;
-import static com.nass.ek.w3kiosk.MainActivity.PW1;
-import static com.nass.ek.w3kiosk.MainActivity.PW2;
-import static com.nass.ek.w3kiosk.MainActivity.PW3;
-import static com.nass.ek.w3kiosk.MainActivity.PW4;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW1;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW3;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW4;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -20,9 +19,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -126,7 +122,7 @@ public class ScannerActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
         webView.saveState(savedInstanceState);
@@ -139,7 +135,7 @@ public class ScannerActivity extends AppCompatActivity {
 
         Log.i(TAG, "***************** create *************");
 
-        connected = isNetworkConnected(this) ;
+        connected = ChecksAndConfigs.isNetworkConnected(this) ;
         setContentView(R.layout.activity_scanner);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnLongClickListener(v -> {
@@ -251,15 +247,21 @@ public class ScannerActivity extends AppCompatActivity {
     private void runIntent(String wantedIntent){
         switch (wantedIntent) {
             case "Install_Apps":
-                intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                }
                 intent.setData(Uri.parse("package:" + ScannerActivity.this.getPackageName()));
                 break;
             case "Write_Settings":
-                intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                }
                 intent.setData(Uri.parse("package:" + ScannerActivity.this.getPackageName()));
                 break;
             case "Manage_Overlay":
-                intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                }
                 intent.setData(Uri.parse("package:" + ScannerActivity.this.getPackageName()));
                 break;
             case "Power_Menu":
@@ -288,10 +290,10 @@ public class ScannerActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), REQUEST_ID_MULTIPLE_PERMISSIONS);
         }
         PackageManager packageManager = context.getPackageManager();
-        if (android.os.Build.VERSION.SDK_INT >= O && !packageManager.canRequestPackageInstalls()) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !packageManager.canRequestPackageInstalls()) {
             runIntent("Install_Apps");
         }
-        if (! Settings.System.canWrite(this))
+        if (!Settings.System.canWrite(this))
         {
             runIntent("Write_Settings");
         }
@@ -491,20 +493,6 @@ public class ScannerActivity extends AppCompatActivity {
         return false;
     }
 
-
-    private Boolean isNetworkConnected(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Network nw = connectivityManager.getActiveNetwork();
-            if (nw == null) return false;
-            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
-            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
-        } else {
-            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
-            return nwInfo != null && nwInfo.isConnected();
-        }
-    }
     private void toggleUrl(){
         if (nextUrl.equals(clientUrl2)){
             if (clientUrl2.startsWith("http")) {
@@ -521,6 +509,7 @@ public class ScannerActivity extends AppCompatActivity {
             nextUrl = clientUrl2;
         }
     }
+
     private boolean checkApps(String uri) {
         PackageInfo pkgInfo;
         try {
@@ -530,6 +519,7 @@ public class ScannerActivity extends AppCompatActivity {
         }
         return pkgInfo != null;
     }
+
     public void appClick(String uri) {
 
         Intent t;

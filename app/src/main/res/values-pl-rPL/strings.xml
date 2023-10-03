@@ -29,7 +29,6 @@
     <string name="login_password">Hasło logowania:</string>
     <string name="write_system_settings">Ustawienia systemowe</string>
     <string name="permissions">Uprawnienia</string>
-    <string name="scanner_button" translatable="false">PrzyciskSkanera</string>
     <string name="service_description">Usługa do wywoływania menu zasilania</string>
     <string name="noNetwork">Brak sieci: Sprawdź i ponownie załaduj aplikację.</string>
     <string name="website2">Drugi adres URL klienta</string>
@@ -53,7 +52,7 @@
     <string name="updateAvailable">Dostępna aktualizacja wersji %1$s!</string>
     <string name="versionUptodate">Twoja wersja %1$s z %2$s jest aktualna!</string>
     <string name="urlTimeout">Limit czasu drugiego/trzeciego adresu URL klienta w sekundach: </string>
-    <string name="appInfo">%1$s %2$s z %3$s</string>
+    <string name="appInfo">%1$s %2$s z %3$s\n\nDevice rooted: %4$s</string>
     <string name="apply">Zastosuj</string>
     <string name="ignore">ignoruj</string>
     <string name="check_update">Aktualizacja automatyczna</string>
@@ -72,4 +71,12 @@
     <string name="changeStartApp">Zmień aplikację Startową</string>
     <string name="imSure">Jestem pewny/pewna</string>
     <string name="alreadyStartApp">Ta aplikacja jest już ustawiona jako Twoja aplikacja Startowa.</string>
+    <string name="marquee">Marquee</string>
+    <string name="marqueeText">Tekst marquee:</string>
+    <string name="marqueeTimeout">Czas marquee w minutach:</string>
+    <string name="marqueeSpeed">Prędkość:</string>
+    <string name="slow">wolno</string>
+    <string name="normal">normalnie</string>
+    <string name="fast">szybko</string>
+    <string name="marqueeHint">np. www.w3coach.de (maks. 35 znaków)</string>
 </resources>

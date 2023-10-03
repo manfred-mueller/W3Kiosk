@@ -52,7 +52,7 @@
     <string name="updateAvailable">Update-Version %1$s gefunden!</string>
     <string name="versionUptodate">Ihre Version %1$s vom %2$s ist aktuell!</string>
     <string name="urlTimeout">Timeout zweite/dritte Kunden-Url in Sekunden: </string>
-    <string name="appInfo">%1$s %2$s vom %3$s</string>
+    <string name="appInfo">%1$s %2$s vom %3$s\n\nGerät gerooted: %4$s</string>
     <string name="apply">Installieren</string>
     <string name="ignore">Ignorieren</string>
     <string name="check_update">Auto-Update</string>
@@ -71,4 +71,12 @@
     <string name="changeStartApp">Start-App ändern</string>
     <string name="imSure">Ich bin Sicher</string>
     <string name="alreadyStartApp">Diese Anwendung ist bereits als Start-App gesetzt.</string>
+    <string name="marquee">Marquee</string>
+    <string name="marqueeText">Marquee-Text:</string>
+    <string name="marqueeTimeout">Marquee-Timeout in Minuten:</string>
+    <string name="marqueeSpeed">Geschwindigkeit:</string>
+    <string name="slow">Langsam</string>
+    <string name="normal">Normal</string>
+    <string name="fast">Schnell</string>
+    <string name="marqueeHint">z.B. www.w3coach.de (maximal 35 Zeichen)</string>
 </resources>

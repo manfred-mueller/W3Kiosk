@@ -30,7 +30,7 @@ android {
      defaultConfig {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
-        targetSdkVersion 33
+        targetSdkVersion 32
         versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
@@ -69,5 +69,6 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation project(':appupdate')
 }
