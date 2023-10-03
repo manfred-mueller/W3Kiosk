@@ -52,7 +52,7 @@ public class AboutActivity extends AppCompatActivity {
             Rooted = getString(R.string.No);
         }
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
-        @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name) + "Verbindung: " + connectionType(this), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), Rooted));
+        @SuppressLint("StringFormatMatches") String appinfo=(String.format(getString(R.string.appInfo) , getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), connectionType(this), Rooted));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
         findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
