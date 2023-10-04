@@ -8,12 +8,10 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -305,39 +302,23 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    public void toggleMarquee(View v) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean checkMarquee = sharedPreferences.getBoolean("marquee", false);
+        findViewById(R.id.marqueeEditText).setVisibility(checkMarquee ? View.VISIBLE : View.GONE);
+        findViewById(R.id.marqueeTimeoutText).setVisibility(checkMarquee ? View.VISIBLE : View.GONE);
+        findViewById(R.id.marqueeSpinner).setVisibility(checkMarquee ? View.VISIBLE : View.GONE);
+        findViewById(R.id.marqueeSpeedText).setVisibility(checkMarquee ? View.VISIBLE : View.GONE);
+        findViewById(R.id.marqueeSpeedGroup).setVisibility(checkMarquee ? View.VISIBLE : View.GONE);
+    }
 
     public void toggleLogin(View v) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
-        if (checkAutoLogin) {
-            findViewById(R.id.loginEditText).setVisibility(View.VISIBLE);
-            findViewById(R.id.loginName).setVisibility(View.VISIBLE);
-            findViewById(R.id.pwEditText).setVisibility(View.VISIBLE);
-            findViewById(R.id.loginPw).setVisibility(View.VISIBLE);
-        } else {
-            findViewById(R.id.loginEditText).setVisibility(View.GONE);
-            findViewById(R.id.loginName).setVisibility(View.GONE);
-            findViewById(R.id.pwEditText).setVisibility(View.GONE);
-            findViewById(R.id.loginPw).setVisibility(View.GONE);
-        }
-    }
-
-    public void toggleMarquee(View v) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean checkMarquee = sharedPreferences.getBoolean("marquee", false);
-        if (checkMarquee) {
-                findViewById(R.id.marqueeEditText).setVisibility(View.VISIBLE);
-                findViewById(R.id.marqueeTimeoutText).setVisibility(View.VISIBLE);
-                findViewById(R.id.marqueeSpinner).setVisibility(View.VISIBLE);
-                findViewById(R.id.marqueeSpeedText).setVisibility(View.VISIBLE);
-                findViewById(R.id.marqueeSpeedGroup).setVisibility(View.VISIBLE);
-            } else {
-                findViewById(R.id.marqueeEditText).setVisibility(View.GONE);
-                findViewById(R.id.marqueeTimeoutText).setVisibility(View.GONE);
-                findViewById(R.id.marqueeSpinner).setVisibility(View.GONE);
-                findViewById(R.id.marqueeSpeedText).setVisibility(View.GONE);
-                findViewById(R.id.marqueeSpeedGroup).setVisibility(View.GONE);
-            }
+        findViewById(R.id.loginEditText).setVisibility(checkAutoLogin ? View.VISIBLE : View.GONE);
+        findViewById(R.id.loginName).setVisibility(checkAutoLogin ? View.VISIBLE : View.GONE);
+        findViewById(R.id.pwEditText).setVisibility(checkAutoLogin ? View.VISIBLE : View.GONE);
+        findViewById(R.id.loginPw).setVisibility(checkAutoLogin ? View.VISIBLE : View.GONE);
     }
 
     private boolean isMyAppLauncherDefault() {
