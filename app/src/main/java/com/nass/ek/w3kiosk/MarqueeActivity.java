@@ -6,15 +6,14 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 public class MarqueeActivity extends AppCompatActivity {
 
     private WebView webView;
-    public String Marquee;
-    public int MarqueeSpeed;
+    private String marquee;
+    private int marqueeSpeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,22 +24,30 @@ public class MarqueeActivity extends AppCompatActivity {
         webView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Marquee = sharedPreferences.getString("marqueeText", getString(R.string.W3Lager));
-        if (Marquee.isEmpty()) {
-            Marquee = getString(R.string.W3Lager);
-        }
-        MarqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
+        marquee = sharedPreferences.getString("marqueeText", getString(R.string.W3Lager));
+        marqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
 
-        String htmlContent = "<html><head><style>" +
+        if (marquee.isEmpty()) {
+            marquee = getString(R.string.W3Lager);
+        }
+
+        String htmlContent = generateMarqueeHtml(marquee, marqueeSpeed);
+        loadHtmlContent(htmlContent);
+
+        webView.setWebViewClient(new WebViewClient());
+    }
+
+    private String generateMarqueeHtml(String text, int speed) {
+        return "<html><head><style>" +
                 "marquee {position: absolute; font-size: 20vh; white-space: nowrap; " +
                 "color: #f0f0f0; top: 50%; transform: translateY(-50%);}" +
                 "</style></head><body>" +
-                "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + MarqueeSpeed + "\">" + Marquee + "</marquee>" +
+                "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + speed + "\">" + text + "</marquee>" +
                 "</body></html>";
+    }
 
+    private void loadHtmlContent(String htmlContent) {
         webView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
-
-        webView.setWebViewClient(new WebViewClient());
     }
 
     @Override
