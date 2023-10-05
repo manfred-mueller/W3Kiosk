@@ -18,6 +18,9 @@
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/layout/activity_update.xml" value="0.18541666666666667" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/layout/fragment_download.xml" value="0.18541666666666667" />
         <entry key="..\:/Android/W3Kiosk-Appupdate/appupdate/src/main/res/layout/fragment_update.xml" value="0.18541666666666667" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/drawable-nodpi/appbg.xml" value="0.2245" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/drawable/ic_github_logo.xml" value="0.2245" />
+        <entry key="..\:/Android/W3Kiosk/app/src/main/res/drawable/ic_restore_24dp.xml" value="0.2245" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/drawable/launch_screen.xml" value="0.182" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_about.xml" value="0.1734375" />
         <entry key="..\:/Android/W3Kiosk/app/src/main/res/layout/activity_adb.xml" value="0.171875" />
