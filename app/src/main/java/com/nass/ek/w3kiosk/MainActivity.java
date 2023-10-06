@@ -151,8 +151,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeColor);
                 loadHtmlContent(htmlContent);
                 marqueeVisible = true;
-//                Intent startMarqueeActivityIntent = new Intent(getApplicationContext(), MarqueeActivity.class);
-//                startActivity(startMarqueeActivityIntent);
             };
                 startmarqueeHandler();
         }
@@ -269,13 +267,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             startActivity(intent);
                         }                    }
                     else if (PwInput.equals("m")) {
-                        String htmlContent = generateMarqueeHtml("marqueeText", 30, 25);
+                        String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeColor);
                         loadHtmlContent(htmlContent);
                         marqueeVisible = true;
-/*                        Intent startMarqueeActivityIntent = new Intent(getApplicationContext(), MarqueeActivity.class);
-                        startMarqueeActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(startMarqueeActivityIntent);
-*/                    }
+                    }
                     else if (PwInput.equals("b")) {
                         Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                         startActivity(intent);
