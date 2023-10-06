@@ -5,6 +5,7 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW1;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW3;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW4;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.checkApps;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
 
 import android.annotation.SuppressLint;
@@ -32,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -49,6 +51,7 @@ import androidx.preference.PreferenceManager;
 import com.nass.ek.appupdate.UpdateWrapper;
 import com.nass.ek.appupdate.services.TrustAllCertificates;
 
+import java.io.File;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -63,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean checkAutoLogin;
     public boolean autoUpdate;
     public boolean marquee;
+    private String marqueeText;
+    private boolean marqueeVisible;
     public String clientUrl1;
     public String clientUrl2;
     public String clientUrl3;
@@ -71,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int mqtoSetting;
     public int handlerTimeout;
     public int marqueeTimeout;
+    private int marqueeColor;
+    private int marqueeSpeed;
     public int toggleKey;
     public int zoom;
     public String nextUrl;
@@ -115,6 +122,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         marquee = sharedPreferences.getBoolean("marquee", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
+        marqueeText = sharedPreferences.getString("marqueeText", getString(R.string.W3Lager));
+        if (marqueeText.isEmpty()) {
+            File marqueeFile = new File("/storage/emulated/0/Pictures/marquee.png");
+            if (marqueeFile.exists()) {
+                marqueeText="<img src=\"file:///storage/emulated/0/Pictures/marquee.png\"/>";
+            } else {
+                marqueeText="<img src=\"file:///android_res/drawable/logo_splash.png\"/>";
+            }
+        }
+        marqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
+        marqueeColor = getResources().getColor(R.color.colorPrimary);
         mqtoSetting = sharedPreferences.getInt("marqueeTimeout", 0);
         if (mqtoSetting > 0) {
             marqueeTimeout = mqtoSetting * 300000;
@@ -130,8 +148,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             marqueeHandler = new Handler();
             marqueeRunnable = () -> {
-                Intent startMarqueeActivityIntent = new Intent(getApplicationContext(), MarqueeActivity.class);
-                startActivity(startMarqueeActivityIntent);
+                String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeColor);
+                loadHtmlContent(htmlContent);
+                marqueeVisible = true;
+//                Intent startMarqueeActivityIntent = new Intent(getApplicationContext(), MarqueeActivity.class);
+//                startActivity(startMarqueeActivityIntent);
             };
                 startmarqueeHandler();
         }
@@ -147,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         kioskWeb = findViewById(R.id.kioskView);
+        if (savedInstanceState != null)
+            ((WebView)findViewById(R.id.kioskView)).restoreState(savedInstanceState);
         handler = new Handler();
         runnable = () -> {
             commitURL(urlPreset + clientUrl1);
@@ -238,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         startActivity(startAboutActivityIntent);
                     }
                     else if (PwInput.equals("ad")) {
-                        if (ChecksAndConfigs.checkApps(this, adUri))
+                        if (checkApps(this, adUri))
                         {
                             appClick(adUri);
                         } else {
@@ -246,10 +269,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             startActivity(intent);
                         }                    }
                     else if (PwInput.equals("m")) {
-                        Intent startMarqueeActivityIntent = new Intent(getApplicationContext(), MarqueeActivity.class);
+                        String htmlContent = generateMarqueeHtml("marqueeText", 30, 25);
+                        loadHtmlContent(htmlContent);
+                        marqueeVisible = true;
+/*                        Intent startMarqueeActivityIntent = new Intent(getApplicationContext(), MarqueeActivity.class);
                         startMarqueeActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(startMarqueeActivityIntent);
-                    }
+*/                    }
                     else if (PwInput.equals("b")) {
                         Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                         startActivity(intent);
@@ -258,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         startService(new Intent(this, ShutdownService.class));
                     }
                     else if (PwInput.equals("tv")) {
-                        if (ChecksAndConfigs.checkApps(this, tvUri))
+                        if (checkApps(this, tvUri))
                         {
                             appClick(tvUri);
                         } else {
@@ -394,8 +420,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
                 kioskWeb.setWebViewClient(new WebViewClient() {
                     public void onPageFinished(WebView view, String url) {
-                            view.evaluateJavascript(JavaString, s -> {
-                            });
+                        CookieSyncManager.getInstance().sync();
+                        view.evaluateJavascript(JavaString, s -> {
+                        });
                     }
                 });
             }
@@ -568,6 +595,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onUserInteraction() {
         super.onUserInteraction();
         if (isTablet() && marquee && marqueeTimeout > 0) {
+            if (marqueeVisible) {
+                kioskWeb.goBack();
+                marqueeVisible = false;
+            }
             stopmarqueeHandler();
             startmarqueeHandler();
         }
@@ -628,5 +659,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             startActivity(t);
         } catch (PackageManager.NameNotFoundException ignored) {
         }
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState )
+    {
+        super.onSaveInstanceState(outState);
+        kioskWeb.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
+        super.onRestoreInstanceState(savedInstanceState);
+        kioskWeb.restoreState(savedInstanceState);
+    }
+    private String generateMarqueeHtml(String text, int speed, int bgColor) {
+        return "<html><head><style>" +
+                "marquee {position: absolute; font-size: 20vh; white-space: nowrap; " +
+                "color: #f0f0f0; top: 50%; transform: translateY(-50%);}" +
+                "</style></head><body bgcolor=\"" + bgColor + "\">" +
+                "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + speed + "\">" + text + "</marquee>" +
+                "</body></html>";
+    }
+
+    private void loadHtmlContent(String htmlContent) {
+        kioskWeb.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
     }
 }

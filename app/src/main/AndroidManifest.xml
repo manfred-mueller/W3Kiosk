@@ -98,10 +98,6 @@
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
-            android:name=".MarqueeActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
-        <activity
             android:name=".ScannerActivity"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
