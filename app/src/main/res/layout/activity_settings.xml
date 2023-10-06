@@ -295,12 +295,6 @@
                             android:textCursorDrawable="@color/colorPrimary"
                             android:textSize="15sp" />
 
-                        <Button
-                            android:id="@+id/marqueeImageButton"
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"
-                            android:text="\u2026" />
-
                         <TextView
                             android:id="@+id/marqueeTimeoutText"
                             android:layout_width="wrap_content"

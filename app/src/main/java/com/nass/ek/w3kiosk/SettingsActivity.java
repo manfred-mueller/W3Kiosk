@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,10 +27,7 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,8 +53,6 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner marqueeDropdown;
     private Spinner timeoutDropdown;
     private Spinner zoomDropdown;
-    private static final String MIME_TYPE_IMAGE = "image/png";
-    private ActivityResultLauncher<Intent> filePickerLauncher;
 
 
     @SuppressLint({"ApplySharedPref", "StringFormatMatches"})
@@ -87,7 +81,6 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> mqtimeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marqueeTimeout);
         mqtimeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         marqueeDropdown.setAdapter(mqtimeoutAdapter);
-        findViewById(R.id.marqueeImageButton).setOnClickListener(view -> openFileChooser());
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -209,14 +202,12 @@ public class SettingsActivity extends AppCompatActivity {
         s.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 findViewById(R.id.marqueeEditText).setVisibility(View.VISIBLE);
-                findViewById(R.id.marqueeImageButton).setVisibility(View.VISIBLE);
                 findViewById(R.id.marqueeTimeoutText).setVisibility(View.VISIBLE);
                 findViewById(R.id.marqueeSpinner).setVisibility(View.VISIBLE);
                 findViewById(R.id.marqueeSpeedText).setVisibility(View.VISIBLE);
                 findViewById(R.id.marqueeSpeedGroup).setVisibility(View.VISIBLE);
             } else {
                 findViewById(R.id.marqueeEditText).setVisibility(View.GONE);
-                findViewById(R.id.marqueeImageButton).setVisibility(View.GONE);
                 findViewById(R.id.marqueeTimeoutText).setVisibility(View.GONE);
                 findViewById(R.id.marqueeSpinner).setVisibility(View.GONE);
                 findViewById(R.id.marqueeSpeedText).setVisibility(View.GONE);
@@ -309,16 +300,6 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             }
         }
-        filePickerLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Uri selectedImageUri = result.getData().getData();
-                        e = findViewById(R.id.marqueeEditText);
-                        e.setText(selectedImageUri.toString());
-                    }
-                }
-        );
     }
 
     public void toggleMarquee(View v) {
@@ -516,19 +497,6 @@ public class SettingsActivity extends AppCompatActivity {
             return false;
         }
         return pkgInfo != null;
-    }
-
-    private void openFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType(MIME_TYPE_IMAGE); // Filter to only show PNG images
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        try {
-            filePickerLauncher.launch(Intent.createChooser(intent, "Select a PNG image"));
-        } catch (android.content.ActivityNotFoundException ex) {
-            // Handle exception if no file picker app is installed
-            Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
