@@ -5,6 +5,11 @@ android {
     buildToolsVersion '32.0.0'
     def keyProps = new Properties()
     def keyPropsFile = rootProject.file('keystore/credentials')
+    def apiKeyLocal = System.getenv('API_KEY')
+    def apiUrlLocal = System.getenv('API_URL')
+    def apiKeyGit = keyProps['apiKey']
+    def apiUrlGit = keyProps['apiUrl']
+
     if (keyPropsFile.exists()) {
         keyProps.load(new FileInputStream(keyPropsFile))
     }
@@ -32,8 +37,15 @@ android {
         minSdkVersion 19
         targetSdkVersion 32
         multiDexEnabled true
-        buildConfigField "String", "API_KEY", "\"${System.getenv('API_KEY')}\""
-        buildConfigField "String", "API_URL", "\"${System.getenv('API_URL')}\""
+
+         if (apiKeyLocal != null && apiUrlLocal != null) {
+             buildConfigField "String", "API_KEY", "\"$apiKeyLocal\""
+             buildConfigField "String", "API_URL", "\"$apiUrlLocal\""
+         } else if (apiKeyGit != null && apiUrlGit != null)
+         {
+             buildConfigField "String", "API_KEY", "\"$apiKeyGit\""
+             buildConfigField "String", "API_URL", "\"$apiUrlGit\""
+         }
         versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
