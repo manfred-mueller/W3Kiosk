@@ -60,7 +60,6 @@
     <string name="app5">App5</string>
     <string name="appPw">"application password"</string>
     <string name="choose_app">Choose an app</string>
-    <string name="enable_apps">Allowed apps: </string>
     <string name="apps">Apps</string>
     <string name="reboot">Reboot</string>
     <string name="enterPassword">Please enter password:</string>
@@ -96,4 +95,6 @@
     <string name="fast">fast</string>
     <string name="W3Lager" translatable="false">www.w3coach.de</string>
     <string name="marqueeHint">eg. www.w3coach.de (max. 35 characters)</string>
+    <string name="apiKey" translatable="false">Api-Key:</string>
+    <string name="deviceId">Device-Id:</string>
 </resources>

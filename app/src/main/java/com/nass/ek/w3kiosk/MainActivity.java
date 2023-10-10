@@ -10,6 +10,8 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int toggleKey;
     public int zoom;
     public String nextUrl;
+    public String apiKey;
     public Handler handler;
     public Runnable runnable;
     public Handler marqueeHandler;
@@ -122,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         marquee = sharedPreferences.getBoolean("marquee", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
+        apiKey = sharedPreferences.getString("apiKey", "");
         marqueeText = sharedPreferences.getString("marqueeText", getString(R.string.W3Lager));
         if (marqueeText.isEmpty()) {
             File marqueeFile = new File("/storage/emulated/0/Pictures/marquee.png");
@@ -222,6 +226,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
 
         setupSettings();
+
+        if (!apiKey.isEmpty() && !clientUrl1.isEmpty()) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, DeviceStatus.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+            long interval = AlarmManager.INTERVAL_HALF_DAY;
+            long initialDelay = System.currentTimeMillis();
+
+            alarmManager.setInexactRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    initialDelay,
+                    interval,
+                    pendingIntent
+            );
+        }
+
         if (ChecksAndConfigs.isScanner()) {
             Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
             startActivity(startScannerActivityIntent);

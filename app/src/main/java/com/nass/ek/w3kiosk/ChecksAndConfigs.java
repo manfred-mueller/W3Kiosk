@@ -85,4 +85,42 @@ public class ChecksAndConfigs extends AppCompatActivity {
 
         return executedSuccesfully;
     }
+    public static String connectionType(Context context) {
+        String result = ""; // Returns connection type. 0: none; 1: mobile data; 2: wifi; 3: vpn
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (cm != null) {
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        result = "Wifi";
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                        result = "LAN";
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        result = "Mobile";
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        result = "VPN";
+                    }
+                }
+            }
+        } else {
+            if (cm != null) {
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                if (activeNetwork != null) {
+                    // connected to the internet
+                    if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                        result = "Wifi";
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) {
+                        result = "LAN";
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                        result = "Mobile";
+                    } else if (activeNetwork.getType() == ConnectivityManager.TYPE_VPN) {
+                        result = "VPN";
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
 }

@@ -59,8 +59,58 @@
                         tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                     <TextView
+                        android:id="@+id/apiKey"
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
+                        android:focusable="auto"
+                        android:gravity="center"
+                        android:text="Api-Key:"
+                        android:textSize="15sp" />
+
+                    <EditText
+                        android:id="@+id/apiEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_toEndOf="@id/apiKey"
+                        android:cursorVisible="true"
+                        android:ellipsize="end"
+                        android:gravity="bottom"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:enabled="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/devId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:onClick="overwriteConfigFile"
+                        android:gravity="center"
+                        android:text="Device-Id:"
+                        android:textSize="15sp" />
+
+                    <EditText
+                        android:id="@+id/devIdEditText"
+                        android:layout_width="100px"
+                        android:layout_height="50dp"
+                        android:cursorVisible="true"
+                        android:ellipsize="end"
+                        android:gravity="bottom"
+                        android:hint="W3C01"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_toEndOf="@id/apiEditText"
                         android:focusable="auto"
                         android:gravity="center"
                         android:text="@string/check_update"
@@ -83,7 +133,7 @@
                         android:focusable="auto"
                         android:gravity="center"
                         android:paddingRight="10dp"
-                        android:text="@string/enable_apps"
+                        android:text="@string/apps"
                         android:textSize="15sp" />
 
                     <Spinner

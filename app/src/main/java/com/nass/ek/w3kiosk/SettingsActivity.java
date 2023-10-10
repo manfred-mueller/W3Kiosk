@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -27,6 +28,7 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -34,6 +36,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Random;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -45,6 +53,8 @@ public class SettingsActivity extends AppCompatActivity {
     ImageButton b;
     RadioButton r;
 
+    String Model;
+    String devId;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4"};
     String[] marqueeTimeout = new String[]{"1", "5", "10", "15", "20", "25", "30"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
@@ -53,6 +63,8 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner marqueeDropdown;
     private Spinner timeoutDropdown;
     private Spinner zoomDropdown;
+
+    public static File configDirectory;
 
 
     @SuppressLint({"ApplySharedPref", "StringFormatMatches"})
@@ -63,6 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         toggleMarquee(findViewById(R.id.marqueeLayout));
+        devId = sharedPreferences.getString("devId", "");
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         TextView client3Text = findViewById(R.id.client3Text);
@@ -101,8 +114,6 @@ public class SettingsActivity extends AppCompatActivity {
             if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
             }
-            findViewById(R.id.mobileToggle).setVisibility(View.VISIBLE);
-            findViewById(R.id.mobileText).setVisibility(View.VISIBLE);
             findViewById(R.id.timeoutText).setVisibility(View.GONE);
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
             findViewById(R.id.zoomText).setVisibility(View.GONE);
@@ -146,6 +157,12 @@ public class SettingsActivity extends AppCompatActivity {
 
             s = findViewById(R.id.autoLogin);
             editor.putBoolean("autoLogin", s.isChecked());
+
+            e = findViewById(R.id.apiEditText);
+            editor.putString("apiKey", e.getText().toString());
+
+            e = findViewById(R.id.devIdEditText);
+            editor.putString("devId", e.getText().toString());
 
             e = findViewById(R.id.marqueeEditText);
             editor.putString("marqueeText", e.getText().toString());
@@ -234,13 +251,19 @@ public class SettingsActivity extends AppCompatActivity {
         e.setText(sharedPreferences.getString("clientUrl1", ""));
 
         e = findViewById(R.id.client2EditText);
-        e.setText(sharedPreferences.getString("clientUrl2", ""));
+        e.setText(sharedPreferences.getString("clientUrl2", BuildConfig.API_URL));
 
         e = findViewById(R.id.client3EditText);
         e.setText(sharedPreferences.getString("clientUrl3", ""));
 
         e = findViewById(R.id.loginEditText);
         e.setText(sharedPreferences.getString("loginName", ""));
+
+        e = findViewById(R.id.apiEditText);
+        e.setText(sharedPreferences.getString("apiKey", BuildConfig.API_KEY));
+
+        e = findViewById(R.id.devIdEditText);
+        e.setText(sharedPreferences.getString("devId", ""));
 
         e = findViewById(R.id.marqueeEditText);
         e.setText(sharedPreferences.getString("marqueeText", ""));
@@ -260,8 +283,45 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.writeStorage);
-            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    c.setChecked(true);
+                    c.setEnabled(false);
+                } else
+                {
+                    c.setChecked(false);
+                    c.setEnabled(true);
+                }
+            } else
+            {
+                c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+            }
+
+            String configFileContent = readConfigFileContents();
+
+            if (configFileContent.isEmpty()) {
+                if (ChecksAndConfigs.isTv(this)) {
+                    Model = "TV";
+                } else if (ChecksAndConfigs.isTablet()) {
+                    Model = "TB";
+                } else if (ChecksAndConfigs.isScanner()) {
+                    Model = Build.MODEL.toUpperCase();
+                } else
+                {
+                    Model = "UNKNOWN";
+                }
+                if (devId.isEmpty())
+                {
+                    devId = Model + "-" + generateRandomNumber();
+                    e = findViewById(R.id.devIdEditText);
+                    e.setText(devId);
+                    writeConfigFileContents(devId);
+                } else
+                {
+                    writeConfigFileContents(devId);
+                }
+            }
 
             c = findViewById(R.id.camAccess);
             if (ChecksAndConfigs.isTv(this)) {
@@ -381,6 +441,11 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+    public void overwriteConfigFile(View v) {
+        e = findViewById(R.id.devIdEditText);
+        writeConfigFileContents(e.getText().toString());
+    }
+
     public void startSystemSettings(View v){
         startActivity(new Intent(Settings.ACTION_SETTINGS));
     }
@@ -428,12 +493,16 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void checkStoragePermission(View v){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_DENIED) {
-
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4710);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (! Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                context.startActivity(intent);
             }
+        } else {
+            ActivityCompat.requestPermissions(SettingsActivity.this,new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4710);
         }
     }
 
@@ -499,16 +568,6 @@ public class SettingsActivity extends AppCompatActivity {
         return pkgInfo != null;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 4712 && resultCode == RESULT_OK && data != null) {
-            Uri selectedImageUri = data.getData();
-            // Now you can work with the selected image URI, e.g., display it or process it.
-        }
-    }
-
     @RequiresApi(api = O)
     @Override
     protected void onResume() {
@@ -559,5 +618,80 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             }
         }
+    }
+    static String readConfigFileContents() {
+        if (android.os.Build.VERSION.SDK_INT >= O) {
+            configDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        } else
+        {
+            File dir = new File(Environment.getExternalStorageDirectory() + "/Download/");
+            dir.mkdirs(); // creates needed dirs
+        }
+
+        if (configDirectory != null) {
+            File configFile = new File(configDirectory, "w3coach.cfg");
+
+            if (configFile.exists()) {
+                try {
+                    FileInputStream inputStream = new FileInputStream(configFile);
+                    int size = inputStream.available();
+                    byte[] buffer = new byte[size];
+                    inputStream.read(buffer);
+                    inputStream.close();
+                    return new String(buffer);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return "";
+    }
+
+    private void writeConfigFileContents(String content) {
+        Context context = getApplicationContext();
+        configDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        if (configDirectory != null) {
+            File configFile = new File(configDirectory, "w3coach.cfg");
+
+            try {
+                if (!configFile.exists()) {
+                    if (configFile.createNewFile()) {
+                        Toast.makeText(context, "Config file 'w3coach.cfg' created in Documents directory", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Failed to create config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
+                        return; // Exit early if file creation fails
+                    }
+                }
+
+                FileOutputStream outputStream = null;
+                try {
+                    outputStream = new FileOutputStream(configFile);
+                    outputStream.write(content.getBytes());
+                    Toast.makeText(context, "Content written to config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Error writing to config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
+                } finally {
+                    if (outputStream != null) {
+                        try {
+                            outputStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            // Handle closing error if necessary
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Error creating config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private String generateRandomNumber() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(1000000); // Change this range as needed
+        return String.valueOf(randomNumber);
     }
 }

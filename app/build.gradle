@@ -31,6 +31,9 @@ android {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 32
+        multiDexEnabled true
+        buildConfigField "String", "API_KEY", "\"${System.getenv('API_KEY')}\""
+        buildConfigField "String", "API_URL", "\"${System.getenv('API_URL')}\""
         versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
@@ -70,5 +73,7 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation project(':appupdate')
 }

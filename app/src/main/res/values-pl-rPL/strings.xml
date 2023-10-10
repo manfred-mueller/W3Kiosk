@@ -44,7 +44,6 @@
     <string name="app5">Aplikacja5</string>
     <string name="appPw">"hasło aplikacji"</string>
     <string name="choose_app">Wybierz aplikację</string>
-    <string name="enable_apps">Dozwolone aplikacje: </string>
     <string name="apps">Aplikacje</string>
     <string name="reboot">Uruchom ponownie</string>
     <string name="enterPassword">Wprowadź hasło:</string>
@@ -79,4 +78,5 @@
     <string name="normal">normalnie</string>
     <string name="fast">szybko</string>
     <string name="marqueeHint">np. www.w3coach.de (maks. 35 znaków)</string>
+    <string name="deviceId">Device-Id:</string>
 </resources>
