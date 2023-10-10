@@ -24,10 +24,8 @@ jobs:
        run:  |
              export apiKey=${{ secrets.API_KEY }}
              echo "API_KEY=$apiKey" >> $GITHUB_ENV
-             echo "API_KEY=$apiKey"
              export apiUrl=${{ secrets.API_URL }}
              echo "API_URL=$apiUrl" >> $GITHUB_ENV
-             echo "API_URL=$apiUrl"
      - name: Setup JDK
        uses: actions/setup-java@v3
        with:
