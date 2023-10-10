@@ -70,6 +70,7 @@ public class AboutActivity extends AppCompatActivity {
             deviceId = deviceName;
         }
         DeviceStatus.sendData(getString(R.string.app_name), deviceId, clientUrl, connectionType(this));
+        checkUpdate();
     }
 
     private void checkUpdate() {

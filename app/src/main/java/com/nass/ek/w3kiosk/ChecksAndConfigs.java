@@ -10,8 +10,11 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.nass.ek.appupdate.UpdateWrapper;
 
 public class ChecksAndConfigs extends AppCompatActivity {
     public static String PW1;
@@ -122,5 +125,4 @@ public class ChecksAndConfigs extends AppCompatActivity {
         }
         return result;
     }
-
 }
