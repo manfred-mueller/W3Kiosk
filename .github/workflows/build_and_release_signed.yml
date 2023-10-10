@@ -20,6 +20,10 @@ jobs:
          repository: manfred-mueller/signing
          token: ${{ secrets.ACCESS_TOKEN }}
          path: keystore
+     - name: Set environment variables
+       run: |
+        echo "API_KEY=$API_KEY" >> $GITHUB_ENV
+        echo "API_URL=$API_URL" >> $GITHUB_ENV
      - name: Setup JDK
        uses: actions/setup-java@v3
        with:
