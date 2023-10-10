@@ -27,15 +27,6 @@ cd "$SAVED" >/dev/null
 APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
-# Add a section to set environment variables for API_KEY and API_URL
-API_KEY_ENV="API_KEY"
-API_URL_ENV="API_URL"
-
-if [ -n "$API_KEY_ENV" ] && [ -n "$API_URL_ENV" ]; then
-    buildConfigField "String", "API_KEY", "\"${!API_KEY_ENV}\""
-    buildConfigField "String", "API_URL", "\"${!API_URL_ENV}\""
-fi
-
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS=""
 
