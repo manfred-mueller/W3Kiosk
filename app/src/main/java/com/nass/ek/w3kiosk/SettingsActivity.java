@@ -251,7 +251,7 @@ public class SettingsActivity extends AppCompatActivity {
         e.setText(sharedPreferences.getString("clientUrl1", ""));
 
         e = findViewById(R.id.client2EditText);
-        e.setText(sharedPreferences.getString("clientUrl2", BuildConfig.API_URL));
+        e.setText(sharedPreferences.getString("clientUrl2", ""));
 
         e = findViewById(R.id.client3EditText);
         e.setText(sharedPreferences.getString("clientUrl3", ""));
@@ -648,7 +648,6 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void writeConfigFileContents(String content) {
-        Context context = getApplicationContext();
         configDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
         if (configDirectory != null) {
@@ -656,10 +655,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             try {
                 if (!configFile.exists()) {
-                    if (configFile.createNewFile()) {
-                        Toast.makeText(context, "Config file 'w3coach.cfg' created in Documents directory", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(context, "Failed to create config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
+                    if (!configFile.createNewFile()) {
                         return; // Exit early if file creation fails
                     }
                 }
@@ -668,10 +664,8 @@ public class SettingsActivity extends AppCompatActivity {
                 try {
                     outputStream = new FileOutputStream(configFile);
                     outputStream.write(content.getBytes());
-                    Toast.makeText(context, "Content written to config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, "Error writing to config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
                 } finally {
                     if (outputStream != null) {
                         try {
@@ -684,7 +678,6 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(context, "Error creating config file 'w3coach.cfg'", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -1,14 +1,8 @@
 package com.nass.ek.w3kiosk;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Base64;
-
-import androidx.preference.PreferenceManager;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -20,20 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class DeviceStatus extends BroadcastReceiver {
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String appName = context.getString(R.string.app_name);
-        String connType = ChecksAndConfigs.connectionType(context);
-        String clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
-        String deviceId = sharedPreferences.getString("devId", "");
-        if (deviceId.isEmpty()) {
-            deviceId = SettingsActivity.readConfigFileContents();
-        }
-        sendData(appName, deviceId, clientUrl, connType);
-    }
+public class StatusSender {
     @SuppressLint("StaticFieldLeak")
     static void sendData(String App, String Device, String URL, String Connection) {
         new AsyncTask<Void, Void, Integer>() {

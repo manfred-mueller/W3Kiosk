@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (!apiKey.isEmpty() && !clientUrl1.isEmpty()) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(this, DeviceStatus.class);
+            Intent intent = new Intent(this, StatusReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
             long interval = AlarmManager.INTERVAL_HALF_DAY;

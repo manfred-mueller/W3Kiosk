@@ -133,7 +133,7 @@
         </provider>
 
         <receiver
-            android:name=".DeviceStatus">
+            android:name=".StatusReceiver">
         </receiver>
 
     </application>

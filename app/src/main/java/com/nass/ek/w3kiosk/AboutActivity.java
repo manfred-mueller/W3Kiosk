@@ -3,7 +3,6 @@ package com.nass.ek.w3kiosk;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.connectionType;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -69,7 +68,7 @@ public class AboutActivity extends AppCompatActivity {
         if (deviceId.isEmpty()) {
             deviceId = deviceName;
         }
-        DeviceStatus.sendData(getString(R.string.app_name), deviceId, clientUrl, connectionType(this));
+        StatusSender.sendData(getString(R.string.app_name), deviceId, clientUrl, connectionType(this));
         checkUpdate();
     }
 
