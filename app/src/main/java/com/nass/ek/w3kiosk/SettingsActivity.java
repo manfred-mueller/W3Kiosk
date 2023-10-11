@@ -55,6 +55,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     String Model;
     String devId;
+    String randomId;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4"};
     String[] marqueeTimeout = new String[]{"1", "5", "10", "15", "20", "25", "30"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
@@ -75,7 +76,8 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         toggleMarquee(findViewById(R.id.marqueeLayout));
-        devId = sharedPreferences.getString("devId", "");
+        randomId = Model + "-" + generateRandomNumber();
+        devId = sharedPreferences.getString("devId", randomId);
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         TextView client3Text = findViewById(R.id.client3Text);
@@ -263,7 +265,7 @@ public class SettingsActivity extends AppCompatActivity {
         e.setText(sharedPreferences.getString("apiKey", BuildConfig.API_KEY));
 
         e = findViewById(R.id.devIdEditText);
-        e.setText(sharedPreferences.getString("devId", ""));
+        e.setText(sharedPreferences.getString("devId", randomId));
 
         e = findViewById(R.id.marqueeEditText);
         e.setText(sharedPreferences.getString("marqueeText", ""));
@@ -313,10 +315,9 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 if (devId.isEmpty())
                 {
-                    devId = Model + "-" + generateRandomNumber();
                     e = findViewById(R.id.devIdEditText);
-                    e.setText(devId);
-                    writeConfigFileContents(devId);
+                    e.setText(randomId);
+                    writeConfigFileContents(randomId);
                 } else
                 {
                     writeConfigFileContents(devId);

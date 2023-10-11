@@ -100,7 +100,6 @@
                         android:cursorVisible="true"
                         android:ellipsize="end"
                         android:gravity="bottom"
-                        android:hint="W3C01"
                         android:inputType="text"
                         android:maxLines="1"
                         android:singleLine="true"
