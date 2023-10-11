@@ -76,9 +76,11 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         toggleMarquee(findViewById(R.id.marqueeLayout));
+        TextView marqueeEditText = findViewById(R.id.marqueeEditText);
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         TextView client3Text = findViewById(R.id.client3Text);
+        marqueeEditText.setText(getString(R.string.W3Lager));
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(getString(R.string.website2));
         client3Text.setText(getString(R.string.website3));
@@ -171,9 +173,6 @@ public class SettingsActivity extends AppCompatActivity {
 
             e = findViewById(R.id.devIdEditText);
             editor.putString("devId", e.getText().toString());
-
-            e = findViewById(R.id.marqueeEditText);
-            editor.putString("marqueeText", e.getText().toString());
 
             e = findViewById(R.id.loginEditText);
             editor.putString("loginName", e.getText().toString());
@@ -272,9 +271,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         e = findViewById(R.id.devIdEditText);
         e.setText(sharedPreferences.getString("devId", randomId));
-
-        e = findViewById(R.id.marqueeEditText);
-        e.setText(sharedPreferences.getString("marqueeText", ""));
 
         e = findViewById(R.id.pwEditText);
         e.setText(sharedPreferences.getString("loginPassword", ""));
