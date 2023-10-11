@@ -28,7 +28,7 @@ jobs:
      - name: Copy gradle properties file
        run: |
              mkdir -p $HOME/.gradle
-             cp keystore/gradle.properties $HOME/.gradle/
+             cp keystore/gradle.properties $HOME/.gradle/gradle.overwrite
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
      - name: Build APK
