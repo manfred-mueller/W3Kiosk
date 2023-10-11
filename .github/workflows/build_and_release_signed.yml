@@ -25,7 +25,7 @@ jobs:
        with:
          distribution: temurin
          java-version: "11"
-     - name: Copy gradle properties file
+     - name: Copy Gradle Properties
        run: |
              mkdir -p $HOME/.gradle
              cp keystore/gradle.properties $HOME/.gradle/gradle.properties
@@ -33,12 +33,6 @@ jobs:
        run: chmod +x gradlew
      - name: Build APK
        run: bash ./gradlew assembleRelease --stacktrace
-     - name: Read Gradle Properties
-       id: gradle-properties
-       run: |
-          echo "Reading Gradle properties"
-          cat $HOME/.gradle/gradle.properties
-       if: success()
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
