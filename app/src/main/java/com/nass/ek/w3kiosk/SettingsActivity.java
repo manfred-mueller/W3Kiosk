@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.InputMethodManager;
@@ -57,18 +59,20 @@ public class SettingsActivity extends AppCompatActivity {
     String devId;
     String randomId;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4"};
-    String[] marqueeTimeout = new String[]{"1", "5", "10", "15", "20", "25", "30"};
+    String[] marqueeTimeout = new String[]{"5", "10", "15", "20", "25", "30"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
     String[] zoomFactor = new String[]{"75%", "80%", "85%", "90%", "95%", "100%", "105%", "110%", "115%", "120%", "125%"};
     private Spinner appsDropdown;
     private Spinner marqueeDropdown;
     private Spinner timeoutDropdown;
     private Spinner zoomDropdown;
+    public EditText marqueeEditText;
+    private GestureDetector gestureDetector;
 
     public static File configDirectory;
 
 
-    @SuppressLint({"ApplySharedPref", "StringFormatMatches"})
+    @SuppressLint({"ApplySharedPref", "StringFormatMatches", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,11 +80,10 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         toggleMarquee(findViewById(R.id.marqueeLayout));
-        TextView marqueeEditText = findViewById(R.id.marqueeEditText);
+        marqueeEditText = findViewById(R.id.marqueeEditText);
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         TextView client3Text = findViewById(R.id.client3Text);
-        marqueeEditText.setText(getString(R.string.W3Lager));
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(getString(R.string.website2));
         client3Text.setText(getString(R.string.website3));
@@ -96,6 +99,18 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> mqtimeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marqueeTimeout);
         mqtimeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         marqueeDropdown.setAdapter(mqtimeoutAdapter);
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                toggleMarqueeEditText();
+                return true;
+            }
+        });
+
+        findViewById(R.id.marqueeText).setOnTouchListener((view, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return true;
+        });
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -174,6 +189,9 @@ public class SettingsActivity extends AppCompatActivity {
             e = findViewById(R.id.devIdEditText);
             editor.putString("devId", e.getText().toString());
 
+            e = findViewById(R.id.marqueeEditText);
+            editor.putString("marqueeText", e.getText().toString());
+
             e = findViewById(R.id.loginEditText);
             editor.putString("loginName", e.getText().toString());
 
@@ -222,7 +240,16 @@ public class SettingsActivity extends AppCompatActivity {
         zoomDropdown.setSelection(zoomValue);
 
         s = findViewById(R.id.marquee);
-        s.setChecked(sharedPreferences.getBoolean("marquee", false));
+        if (ChecksAndConfigs.isTablet()) {
+            s.setChecked(sharedPreferences.getBoolean("marquee", true));
+            findViewById(R.id.marqueeEditText).setVisibility(View.VISIBLE);
+            findViewById(R.id.marqueeTimeoutText).setVisibility(View.VISIBLE);
+            findViewById(R.id.marqueeSpinner).setVisibility(View.VISIBLE);
+            findViewById(R.id.marqueeSpeedText).setVisibility(View.VISIBLE);
+            findViewById(R.id.marqueeSpeedGroup).setVisibility(View.VISIBLE);
+        } else {
+            s.setChecked(sharedPreferences.getBoolean("marquee", false));
+        }
         s.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 findViewById(R.id.marqueeEditText).setVisibility(View.VISIBLE);
@@ -271,6 +298,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         e = findViewById(R.id.devIdEditText);
         e.setText(sharedPreferences.getString("devId", randomId));
+
+        e = findViewById(R.id.marqueeEditText);
+        e.setText(sharedPreferences.getString("marqueeText", getString(R.string.W3Lager)));
 
         e = findViewById(R.id.pwEditText);
         e.setText(sharedPreferences.getString("loginPassword", ""));
@@ -353,6 +383,10 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             }
         }
+    }
+
+    public void toggleMarqueeEditText() {
+        marqueeEditText.setEnabled(!marqueeEditText.isEnabled());
     }
 
     public void toggleMarquee(View v) {

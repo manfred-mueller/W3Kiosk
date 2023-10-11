@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int mqtoSetting;
     public int handlerTimeout;
     public int marqueeTimeout;
-    private int marqueeColor;
+    private int marqueeBgColor;
+    private int marqueeTxColor;
     private int marqueeSpeed;
     public int toggleKey;
     public int zoom;
@@ -136,13 +137,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         }
         marqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
-        marqueeColor = getResources().getColor(R.color.colorPrimary);
+        marqueeBgColor = getResources().getColor(R.color.colorPrimary);
+        marqueeTxColor = getResources().getColor(R.color.colorDarkGray);
         mqtoSetting = sharedPreferences.getInt("marqueeTimeout", 0);
-        if (mqtoSetting > 0) {
-            marqueeTimeout = mqtoSetting * 300000;
+        int[] marqueeTimeouts = {300000, 600000, 900000, 1200000, 1500000, 1800000, 2100000};
+        if (mqtoSetting >= 1 && mqtoSetting <= 6) {
+            marqueeTimeout = marqueeTimeouts[mqtoSetting - 1];
         } else {
-            marqueeTimeout = 60000;
+            marqueeTimeout = 300000;
         }
+
         if (toSetting > 0) {
             handlerTimeout = toSetting * 30000;
         } else {
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             marqueeHandler = new Handler();
             marqueeRunnable = () -> {
-                String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeColor);
+                String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeBgColor);
                 loadHtmlContent(htmlContent);
                 marqueeVisible = true;
             };
@@ -288,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             startActivity(intent);
                         }                    }
                     else if (PwInput.equals("m")) {
-                        String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeColor);
+                        String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeBgColor);
                         loadHtmlContent(htmlContent);
                         marqueeVisible = true;
                     }
@@ -689,12 +693,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onRestoreInstanceState(savedInstanceState);
         kioskWeb.restoreState(savedInstanceState);
     }
+
     private String generateMarqueeHtml(String text, int speed, int bgColor) {
+        String сolorString = String.format("%X", marqueeTxColor).substring(2);
+
         return "<html><head><style>" +
                 "marquee {position: absolute; font-size: 20vh; white-space: nowrap; " +
-                "color: #f0f0f0; top: 50%; transform: translateY(-50%);}" +
+                "color: " + сolorString + ";}" +
                 "</style></head><body bgcolor=\"" + bgColor + "\">" +
                 "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + speed + "\">" + text + "</marquee>" +
+                "<script>" +
+                "var marquee = document.getElementById('marqueeText');" +
+                "marquee.style.top = generateRandomPosition();" +
+                "function generateRandomPosition() {" +
+                "    return (Math.random() * 80) + 'vh';" + // Adjust as needed
+                "}" +
+                "</script>" +
                 "</body></html>";
     }
 
