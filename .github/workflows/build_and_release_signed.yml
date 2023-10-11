@@ -28,11 +28,17 @@ jobs:
      - name: Copy gradle properties file
        run: |
              mkdir -p $HOME/.gradle
-             cp keystore/gradle.properties $HOME/.gradle/gradle.overwrite
+             cp keystore/gradle.properties $HOME/.gradle/gradle.properties
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
      - name: Build APK
        run: bash ./gradlew assembleRelease --stacktrace
+     - name: Read Gradle Properties
+       id: gradle-properties
+       run: |
+          echo "Reading Gradle properties"
+          cat $HOME/.gradle/gradle.properties
+       if: success()
      - name: Get Application Name
        run: |
             appName=`grep " applicationId" app/build.gradle | cut -d'"' -f2 | cut -d'.' -f4`
