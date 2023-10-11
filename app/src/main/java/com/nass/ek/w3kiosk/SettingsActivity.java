@@ -76,8 +76,6 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         toggleMarquee(findViewById(R.id.marqueeLayout));
-        randomId = Model + "-" + generateRandomNumber();
-        devId = sharedPreferences.getString("devId", randomId);
         TextView client1Text = findViewById(R.id.client1Text);
         TextView client2Text = findViewById(R.id.client2Text);
         TextView client3Text = findViewById(R.id.client3Text);
@@ -129,6 +127,8 @@ public class SettingsActivity extends AppCompatActivity {
         if (ChecksAndConfigs.isTv(context)){
             Model = "TV";
         }
+        randomId = Model + "-" + generateRandomNumber();
+        devId = sharedPreferences.getString("devId", randomId);
 
         b = findViewById(R.id.updateCloseButton);
         b.setOnClickListener(view -> {
