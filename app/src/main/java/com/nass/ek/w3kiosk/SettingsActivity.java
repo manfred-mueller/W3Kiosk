@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
     ImageButton b;
     RadioButton r;
 
-    String Model;
+    String Model = "DEV";
     String devId;
     String randomId;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4"};
@@ -110,6 +110,7 @@ public class SettingsActivity extends AppCompatActivity {
                 findViewById(R.id.marqueeLayout).setVisibility(View.VISIBLE);
                 findViewById(R.id.autologinLayout).setVisibility(View.VISIBLE);
             }
+            Model = "TB";
         }
 
         if (ChecksAndConfigs.isScanner()){
@@ -122,6 +123,11 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.zoomSpinner).setVisibility(View.GONE);
             findViewById(R.id.client3Text).setVisibility(View.GONE);
             findViewById(R.id.client3EditText).setVisibility(View.GONE);
+            Model = Build.MODEL.toUpperCase();
+        }
+
+        if (ChecksAndConfigs.isTv(context)){
+            Model = "TV";
         }
 
         b = findViewById(R.id.updateCloseButton);
@@ -303,16 +309,6 @@ public class SettingsActivity extends AppCompatActivity {
             String configFileContent = readConfigFileContents();
 
             if (configFileContent.isEmpty()) {
-                if (ChecksAndConfigs.isTv(this)) {
-                    Model = "TV";
-                } else if (ChecksAndConfigs.isTablet()) {
-                    Model = "TB";
-                } else if (ChecksAndConfigs.isScanner()) {
-                    Model = Build.MODEL.toUpperCase();
-                } else
-                {
-                    Model = "UNKNOWN";
-                }
                 if (devId.isEmpty())
                 {
                     e = findViewById(R.id.devIdEditText);
