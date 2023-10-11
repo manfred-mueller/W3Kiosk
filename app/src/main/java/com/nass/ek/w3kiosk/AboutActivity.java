@@ -68,7 +68,7 @@ public class AboutActivity extends AppCompatActivity {
         if (deviceId.isEmpty()) {
             deviceId = deviceName;
         }
-        StatusSender.sendData(getString(R.string.app_name), deviceId, clientUrl, connectionType(this));
+        StatusSender.sendData(deviceId, clientUrl, connectionType(this));
         checkUpdate();
     }
 
@@ -79,7 +79,7 @@ public class AboutActivity extends AppCompatActivity {
                 .setNotificationIcon(R.mipmap.ic_launcher)
                 .setUpdateTitle(updateFound)
                 .setUpdateContentText(getString(R.string.UpdateDescription))
-                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
+                .setUrl(BuildConfig.UPDATE_URL)
                 .setIsShowToast(true)
                 .setCallback((model, hasNewVersion) -> {
                     Log.d("Latest Version", hasNewVersion + "");
@@ -90,7 +90,6 @@ public class AboutActivity extends AppCompatActivity {
                     Log.d("Download URL", model.getUrl() + "");
                 })
                 .build();
-
         updateWrapper.start();
     }
 }

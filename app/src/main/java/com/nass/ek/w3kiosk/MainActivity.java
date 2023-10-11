@@ -646,7 +646,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 .setNotificationIcon(R.mipmap.ic_launcher)
                 .setUpdateTitle(updateFound)
                 .setUpdateContentText(getString(R.string.UpdateDescription))
-                .setUrl("https://raw.githubusercontent.com/manfred-mueller/W3Kiosk/master/w3kiosk.json")
+                .setUrl(BuildConfig.UPDATE_URL)
                 .setIsShowToast(true)
 
                 .setCallback((model, hasNewVersion) -> {

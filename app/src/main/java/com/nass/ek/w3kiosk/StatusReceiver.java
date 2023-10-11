@@ -12,13 +12,12 @@ public class StatusReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String appName = context.getString(R.string.app_name);
         String connType = ChecksAndConfigs.connectionType(context);
         String clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
         String deviceId = sharedPreferences.getString("devId", "");
         if (deviceId.isEmpty()) {
             deviceId = SettingsActivity.readConfigFileContents();
         }
-        StatusSender.sendData(appName, deviceId, clientUrl, connType);
+        StatusSender.sendData(deviceId, clientUrl, connType);
     }
 }

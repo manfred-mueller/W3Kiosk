@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class StatusSender {
     @SuppressLint("StaticFieldLeak")
-    static void sendData(String App, String Device, String URL, String Connection) {
+    static void sendData(String Device, String URL, String Connection) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
@@ -31,7 +31,7 @@ public class StatusSender {
                     java.net.URL url = new URL(BuildConfig.API_URL);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
-                    String userCredentials = App + ":" + BuildConfig.API_KEY;
+                    String userCredentials = BuildConfig.API_NAME + ":" + BuildConfig.API_KEY;
                     String basicAuth = "Basic " + Base64.encodeToString(userCredentials.getBytes(), Base64.NO_WRAP);
                     connection.setRequestProperty("Authorization", basicAuth);
                     connection.setDoInput(true);
