@@ -25,6 +25,8 @@ jobs:
        with:
          distribution: temurin
          java-version: "11"
+     - name: Copy gradle.properties
+       run: cp keystore/gradle.properties $HOME/.gradle/
      - name: Set execution flag for gradlew
        run: chmod +x gradlew
      - name: Build APK
