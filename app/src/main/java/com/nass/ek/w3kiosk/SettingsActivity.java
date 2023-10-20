@@ -55,9 +55,7 @@ public class SettingsActivity extends AppCompatActivity {
     ImageButton b;
     RadioButton r;
 
-    String Model = "DEV";
     String devId;
-    String randomId;
     String[] allowedApps = new String[]{"0", "1", "2", "3", "4"};
     String[] marqueeTimeout = new String[]{"5", "10", "15", "20", "25", "30"};
     String[] urlTimeout = new String[]{"---", "30", "60", "90", "120", "150", "180"};
@@ -125,7 +123,6 @@ public class SettingsActivity extends AppCompatActivity {
                 findViewById(R.id.marqueeLayout).setVisibility(View.VISIBLE);
                 findViewById(R.id.autologinLayout).setVisibility(View.VISIBLE);
             }
-            Model = "TB";
         }
 
         if (ChecksAndConfigs.isScanner()){
@@ -138,14 +135,9 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.zoomSpinner).setVisibility(View.GONE);
             findViewById(R.id.client3Text).setVisibility(View.GONE);
             findViewById(R.id.client3EditText).setVisibility(View.GONE);
-            Model = Build.MODEL.toUpperCase();
         }
 
-        if (ChecksAndConfigs.isTv(context)){
-            Model = "TV";
-        }
-        randomId = Model + "-" + generateRandomNumber();
-        devId = sharedPreferences.getString("devId", randomId);
+        devId = sharedPreferences.getString("devId", ChecksAndConfigs.randomId());
 
         b = findViewById(R.id.updateCloseButton);
         b.setOnClickListener(view -> {
@@ -297,7 +289,7 @@ public class SettingsActivity extends AppCompatActivity {
         e.setText(sharedPreferences.getString("apiKey", BuildConfig.API_KEY));
 
         e = findViewById(R.id.devIdEditText);
-        e.setText(sharedPreferences.getString("devId", randomId));
+        e.setText(sharedPreferences.getString("devId", ChecksAndConfigs.randomId()));
 
         e = findViewById(R.id.marqueeEditText);
         e.setText(sharedPreferences.getString("marqueeText", getString(R.string.W3Lager)));
@@ -312,7 +304,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             b = findViewById(R.id.keyboardButton);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 b.setVisibility(View.VISIBLE);
             }
 
@@ -335,19 +327,12 @@ public class SettingsActivity extends AppCompatActivity {
             String configFileContent = readConfigFileContents();
 
             if (configFileContent.isEmpty()) {
-                if (devId.isEmpty())
-                {
-                    e = findViewById(R.id.devIdEditText);
-                    e.setText(randomId);
-                    writeConfigFileContents(randomId);
-                } else
-                {
-                    writeConfigFileContents(devId);
-                }
+                devId = sharedPreferences.getString("devId", findViewById(R.id.devIdEditText).toString());
+                writeConfigFileContents(devId);
             }
 
             c = findViewById(R.id.camAccess);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -355,7 +340,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.overlayPerm);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
@@ -367,7 +352,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));
@@ -609,7 +594,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -617,7 +602,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.overlayPerm);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
@@ -629,7 +614,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
-            if (ChecksAndConfigs.isTv(this)) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));
@@ -652,7 +637,7 @@ public class SettingsActivity extends AppCompatActivity {
         } else
         {
             File dir = new File(Environment.getExternalStorageDirectory() + "/Download/");
-            dir.mkdirs(); // creates needed dirs
+            dir.mkdirs();
         }
 
         if (configDirectory != null) {
@@ -699,7 +684,6 @@ public class SettingsActivity extends AppCompatActivity {
                             outputStream.close();
                         } catch (IOException e) {
                             e.printStackTrace();
-                            // Handle closing error if necessary
                         }
                     }
                 }
@@ -707,11 +691,5 @@ public class SettingsActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    private String generateRandomNumber() {
-        Random random = new Random();
-        int randomNumber = random.nextInt(1000000); // Change this range as needed
-        return String.valueOf(randomNumber);
     }
 }

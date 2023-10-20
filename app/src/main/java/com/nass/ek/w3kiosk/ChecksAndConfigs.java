@@ -16,12 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.nass.ek.appupdate.UpdateWrapper;
 
+import java.util.Random;
+
 public class ChecksAndConfigs extends AppCompatActivity {
     public static String PW1;
     public static String PW2;
     public static String PW3;
     public static String PW4;
-
+    Context context;
 
     static {
         try {
@@ -47,6 +49,21 @@ public class ChecksAndConfigs extends AppCompatActivity {
             return nwInfo != null && nwInfo.isConnected();
         }
     }
+
+    public static String randomId()
+    {
+        if (isTv()){
+            return "TV-" + generateRandomNumber();
+        }
+        else if (isTablet()){
+            return "TB-" + generateRandomNumber();
+        }
+        if (isScanner()){
+            return Build.MODEL.toUpperCase() + generateRandomNumber();
+        }
+        return "DEV-" + generateRandomNumber();
+    }
+
     public static boolean isScanner() {
         return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || Build.PRODUCT.startsWith("cedric");
     }
@@ -55,11 +72,8 @@ public class ChecksAndConfigs extends AppCompatActivity {
         return android.os.Build.MODEL.toUpperCase().startsWith("RK");
     }
 
-    public static boolean isTv(Context context) {
-        UiModeManager uiModeManager =
-                (UiModeManager) context.getApplicationContext().getSystemService(UI_MODE_SERVICE);
-        return uiModeManager != null
-                && uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION;
+    public static boolean isTv() {
+        return android.os.Build.MODEL.toUpperCase().startsWith("TV") || android.os.Build.MODEL.toUpperCase().startsWith("X8");
     }
     public static boolean checkApps(Context context, String uri) {
         PackageInfo pkgInfo;
@@ -124,5 +138,10 @@ public class ChecksAndConfigs extends AppCompatActivity {
             }
         }
         return result;
+    }
+    private static String generateRandomNumber() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(1000000); // Change this range as needed
+        return String.valueOf(randomNumber);
     }
 }

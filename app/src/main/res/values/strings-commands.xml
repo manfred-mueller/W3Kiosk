@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="commands_to_get_ip_on_wlan0" translatable="false">getprop dhcp.wlan0.ipaddress</string>
+    <string name="commands_to_get_ip_on_eth0" translatable="false">getprop dhcp.eth0.ipaddress</string>
+    <string name="commands_to_get_tcp_port_of_prop" translatable="false">getprop service.adb.tcp.port</string>
+    <string name="commands_to_set_tcp_port_of_prop" translatable="false">setprop service.adb.tcp.port %1$s</string>
+
+    <string-array name="commands_to_enable_tcp_forward">
+        <item>stop adbd</item>
+        <item>start adbd</item>
+    </string-array>
+</resources>

@@ -55,6 +55,9 @@ import com.nass.ek.appupdate.services.TrustAllCertificates;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -127,17 +130,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
         apiKey = sharedPreferences.getString("apiKey", "");
-        marqueeText = sharedPreferences.getString("marqueeText", getString(R.string.W3Lager));
-        if (marqueeText.isEmpty()) {
+//        marqueeText = sharedPreferences.getString("marqueeText", "");
+//        if (!marqueeText.isEmpty()) {
             File marqueeFile = new File("/storage/emulated/0/Pictures/marquee.png");
             if (marqueeFile.exists()) {
                 marqueeText="<img src=\"file:///storage/emulated/0/Pictures/marquee.png\"/>";
             } else {
-                marqueeText="<img src=\"file:///android_res/drawable/logo_splash.png\"/>";
+                marqueeText="<img src=\"file:///android_res/drawable/logo_splash_web.png\"/>";
             }
-        }
+//        }
         marqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
-        marqueeBgColor = getResources().getColor(R.color.colorPrimary);
+        marqueeBgColor = getResources().getColor(R.color.colorMarquee);
         marqueeTxColor = getResources().getColor(R.color.colorDarkGray);
         mqtoSetting = sharedPreferences.getInt("marqueeTimeout", 0);
         int[] marqueeTimeouts = {300000, 600000, 900000, 1200000, 1500000, 1800000, 2100000};
@@ -191,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             checkUpdate();
         }
 
-        if (ChecksAndConfigs.isTv(this)) {
+        if (ChecksAndConfigs.isTv()) {
             new CountDownTimer(60000, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }.start();
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26 && !ChecksAndConfigs.isTv(this)) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !ChecksAndConfigs.isTv()) {
             Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
             dialogIntent.setData(Uri.parse("package:none"));
             if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
@@ -232,19 +235,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setupSettings();
 
         if (!apiKey.isEmpty() && !clientUrl1.isEmpty()) {
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(this, StatusReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-            long interval = AlarmManager.INTERVAL_HALF_DAY;
-            long initialDelay = System.currentTimeMillis();
-
-            alarmManager.setInexactRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    initialDelay,
-                    interval,
-                    pendingIntent
-            );
+            String connType = ChecksAndConfigs.connectionType(context);
+            String clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
+            String deviceId = sharedPreferences.getString("devId", ChecksAndConfigs.randomId());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("devId", deviceId);
+            editor.commit();
+//            StatusSender.sendData(deviceId, clientUrl, connType);
+//            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+//            scheduler.scheduleAtFixedRate(() -> {StatusSender.sendData(deviceId, clientUrl, connType);}, 0, 1, TimeUnit.HOURS);
         }
 
         if (ChecksAndConfigs.isScanner()) {
@@ -350,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void setupSettings() {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
-        if (ChecksAndConfigs.isTv(this)) {
+        if (ChecksAndConfigs.isTv()) {
             settingsButton.setOnLongClickListener(v -> {
                 toggleUrl();
                 return true;
@@ -525,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onBackPressed() {
-        if (ChecksAndConfigs.isTv(this)) {
+        if (ChecksAndConfigs.isTv()) {
             toggleUrl();
         } else
         kioskWeb.goBack();
@@ -568,7 +567,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (ChecksAndConfigs.isTv(this)) {
+        if (ChecksAndConfigs.isTv()) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
@@ -697,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private String generateMarqueeHtml(String text, int speed, int bgColor) {
         String сolorString = String.format("%X", marqueeTxColor).substring(2);
 
-        return "<html><head><style>" +
+/*        return "<html><head><style>" +
                 "marquee {position: absolute; font-size: 20vh; white-space: nowrap; " +
                 "color: " + сolorString + ";}" +
                 "</style></head><body bgcolor=\"" + bgColor + "\">" +
@@ -708,6 +707,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 "function generateRandomPosition() {" +
                 "    return (Math.random() * 80) + 'vh';" + // Adjust as needed
                 "}" +
+                "</script>" +
+                "</body></html>";
+
+*/
+        return "<html><head><style>" +
+                "body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }" +
+                "marquee { font-size: 20vh; white-space: nowrap; " +
+                "color: " + сolorString + ";}" +
+                "</style></head><body bgcolor=\"" + bgColor + "\">" +
+                "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + speed + "\">" + text + "</marquee>" +
+                "<script>" +
+                "var marquee = document.getElementById('marqueeText');" +
                 "</script>" +
                 "</body></html>";
     }
