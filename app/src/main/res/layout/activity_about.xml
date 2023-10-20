@@ -27,7 +27,7 @@
         android:layout_width="350dp"
         android:layout_height="200dp"
         android:contentDescription="splash logo"
-        android:src="@drawable/logo_splash"
+        android:src="@drawable/logo_splash_web"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
