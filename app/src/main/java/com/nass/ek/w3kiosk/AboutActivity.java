@@ -17,6 +17,7 @@ import androidx.preference.PreferenceManager;
 
 import com.nass.ek.appupdate.UpdateWrapper;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -32,6 +33,7 @@ public class AboutActivity extends AppCompatActivity {
     public String passWord;
     public String deviceId;
     public String deviceName;
+    public String rooted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,13 @@ public class AboutActivity extends AppCompatActivity {
         clientUrl = sharedPreferences.getString("clientUrl1", "");
         deviceName = SettingsActivity.readConfigFileContents();
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
-        @SuppressLint("StringFormatMatches") String appinfo = (String.format(getString(R.string.appInfo), getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), connectionType(this)));
+        if (ChecksAndConfigs.isRooted()) {
+            rooted = getString(R.string.Yes);
+        } else
+        {
+            rooted = getString(R.string.No);
+        }
+        @SuppressLint("StringFormatMatches") String appinfo = (String.format(getString(R.string.appInfo), getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), connectionType(this), rooted));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
         findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
@@ -73,7 +81,7 @@ public class AboutActivity extends AppCompatActivity {
                 .setNotificationIcon(R.mipmap.ic_launcher)
                 .setUpdateTitle(updateFound)
                 .setUpdateContentText(getString(R.string.UpdateDescription))
-                .setUrl(BuildConfig.API_URL)
+                .setUrl(BuildConfig.UPDATE_URL)
                 .setIsShowToast(true)
                 .setCallback((model, hasNewVersion) -> {
                     Log.d("Latest Version", hasNewVersion + "");

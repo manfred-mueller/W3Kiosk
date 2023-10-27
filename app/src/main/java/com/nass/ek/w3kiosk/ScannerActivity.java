@@ -47,6 +47,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.net.ConnectivityManagerCompat;
+import androidx.multidex.BuildConfig;
 import androidx.preference.PreferenceManager;
 
 import com.nass.ek.appupdate.UpdateWrapper;

@@ -11,6 +11,7 @@ import android.os.Build;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
 import java.util.Random;
 
 public class ChecksAndConfigs extends AppCompatActivity {
@@ -78,6 +79,21 @@ public class ChecksAndConfigs extends AppCompatActivity {
             return false;
         }
         return pkgInfo != null;
+    }
+
+    public static boolean isRooted() {
+        Process checkRoot = null;
+        try {
+            checkRoot = Runtime.getRuntime().exec("su -c ls /data/data");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            checkRoot.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return checkRoot.exitValue() == 0;
     }
 
     public static String connectionType(Context context) {
