@@ -145,7 +145,7 @@ public class ScannerActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         appsCount = sharedPreferences.getInt("appsCount", 0);
-        clientUrl1 = sharedPreferences.getString("clientUrl1", "");
+        clientUrl1 = sharedPreferences.getString("clientUrl1", "w3c");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         urlPreset = getString(R.string.url_preset);
         webView = findViewById(R.id.scannerView);

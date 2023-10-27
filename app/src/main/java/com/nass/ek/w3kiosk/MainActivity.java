@@ -6,12 +6,12 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW3;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW4;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.checkApps;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.isScanner;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTv;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -55,9 +55,6 @@ import com.nass.ek.appupdate.services.TrustAllCertificates;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -167,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         zoom = sharedPreferences.getInt("zoomFactor", 5);
-        clientUrl1 = sharedPreferences.getString("clientUrl1", "");
+        clientUrl1 = sharedPreferences.getString("clientUrl1", "w3c");
         clientUrl2 = sharedPreferences.getString("clientUrl2", "");
         clientUrl3 = sharedPreferences.getString("clientUrl3", "");
         autoName = sharedPreferences.getString("loginName", "");
@@ -194,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             checkUpdate();
         }
 
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             new CountDownTimer(60000, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
@@ -204,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }.start();
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26 && !ChecksAndConfigs.isTv()) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv()) {
             Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
             dialogIntent.setData(Uri.parse("package:none"));
             if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
@@ -241,12 +238,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("devId", deviceId);
             editor.commit();
-//            StatusSender.sendData(deviceId, clientUrl, connType);
-//            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-//            scheduler.scheduleAtFixedRate(() -> {StatusSender.sendData(deviceId, clientUrl, connType);}, 0, 1, TimeUnit.HOURS);
+            // StatusSender.sendData(deviceId, clientUrl, connType); // Preparation for telemetry ;)
+            // ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Preparation for telemetry ;)
+            // scheduler.scheduleAtFixedRate(() -> {StatusSender.sendData(deviceId, clientUrl, connType);}, 0, 1, TimeUnit.HOURS); // Preparation for telemetry ;)
         }
 
-        if (ChecksAndConfigs.isScanner()) {
+        if (isScanner()) {
             Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
             startActivity(startScannerActivityIntent);
         } else {
@@ -349,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void setupSettings() {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             settingsButton.setOnLongClickListener(v -> {
                 toggleUrl();
                 return true;
@@ -406,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void setMobileMode(final boolean enabled) {
         final WebSettings webSettings = this.kioskWeb.getSettings();
         final String newUserAgent;
-        if ((enabled) || ChecksAndConfigs.isScanner()) {
+        if ((enabled) || isScanner()) {
             newUserAgent = webSettings.getUserAgentString().replace("Safari", "Mobile Safari");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
@@ -461,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void toggleUrl(){
         if (nextUrl.equals(clientUrl3)){
             if (clientUrl3.startsWith("http")) {
-                if (ChecksAndConfigs.isTablet()) {
+                if (isTablet()) {
                     TrustAllCertificates.install();
                     kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
                 }
@@ -476,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         else if (nextUrl.equals(clientUrl2)){
             if (clientUrl2.startsWith("http")) {
-                if (ChecksAndConfigs.isTablet()) {
+                if (isTablet()) {
                     TrustAllCertificates.install();
                     kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
                 }
@@ -524,10 +521,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onBackPressed() {
-        if (ChecksAndConfigs.isTv()) {
+        super.onBackPressed();
+        if (isTv()) {
             toggleUrl();
         } else
-        kioskWeb.goBack();
+            kioskWeb.goBack();
     }
 
     @Override
@@ -550,6 +548,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             startmarqueeHandler();
         }
+        if (isScanner()) {
+            Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
+            startActivity(startScannerActivityIntent);
+        }
     }
 
     @Override
@@ -567,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
