@@ -30,7 +30,6 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -43,7 +42,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Random;
+
+
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -151,7 +151,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             r = findViewById(R.id.radioSlow);
             if (r.isChecked())
-            editor.putInt("marqueeSpeed", 10);
+                editor.putInt("marqueeSpeed", 10);
 
             r = findViewById(R.id.radioNormal);
             if (r.isChecked())

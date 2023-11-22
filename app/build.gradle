@@ -2,46 +2,29 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 34
-    buildToolsVersion '32.0.0'
+    buildToolsVersion '33.0.2'
+    buildFeatures {
+        buildConfig = true
+    }
     def keyProps = new Properties()
     def keyPropsFile = rootProject.file('keystore/credentials')
 
     if (keyPropsFile.exists()) {
         keyProps.load(new FileInputStream(keyPropsFile))
     }
-    lintOptions {
-        warningsAsErrors false
-        abortOnError false
-    }
 
-     signingConfigs {
+    signingConfigs {
         dev {
             v2SigningEnabled true
         }
-        buildTypes {
-            debug {
-                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
-                buildConfigField 'String', "API_NAME", API_NAME
-                buildConfigField 'String', "API_KEY", API_KEY
-                buildConfigField 'String', "API_URL", API_URL
-                buildConfigField 'String', "UPDATE_URL", UPDATE_URL
-            }
-            release {
-                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
-                buildConfigField 'String', "API_NAME", API_NAME
-                buildConfigField 'String', "API_KEY", API_KEY
-                buildConfigField 'String', "API_URL", API_URL
-                buildConfigField 'String', "UPDATE_URL", UPDATE_URL
-            }
-        }
      }
-     
+
      defaultConfig {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
-        targetSdkVersion 32
+        targetSdkVersion 33
         multiDexEnabled true
-         versionCode rootProject.ext.verCode
+        versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
         setProperty("archivesBaseName", "w3kiosk-$versionName")
@@ -67,7 +50,25 @@ android {
             minifyEnabled false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
+            buildConfigField('String', "API_NAME", API_NAME)
+            buildConfigField('String', "API_KEY", API_KEY)
+            buildConfigField('String', "API_URL", API_URL)
+            buildConfigField('String', "UPDATE_URL", UPDATE_URL)
         }
+        debug {
+            minifyEnabled false
+            buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
+            buildConfigField('String', "API_NAME", API_NAME)
+            buildConfigField('String', "API_KEY", API_KEY)
+            buildConfigField('String', "API_URL", API_URL)
+            buildConfigField('String', "UPDATE_URL", UPDATE_URL)
+        }
+    }
+    namespace 'com.nass.ek.w3kiosk'
+    lint {
+        abortOnError false
+        warningsAsErrors false
     }
 }
 
@@ -79,7 +80,6 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.google.android.material:material:1.10.0'
-    implementation 'com.github.QuadFlask:colorpicker:0.0.13'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation project(':appupdate')

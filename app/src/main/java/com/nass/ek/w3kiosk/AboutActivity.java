@@ -73,7 +73,7 @@ public class AboutActivity extends AppCompatActivity {
                 .setNotificationIcon(R.mipmap.ic_launcher)
                 .setUpdateTitle(updateFound)
                 .setUpdateContentText(getString(R.string.UpdateDescription))
-                .setUrl(BuildConfig.UPDATE_URL)
+                .setUrl(BuildConfig.API_URL)
                 .setIsShowToast(true)
                 .setCallback((model, hasNewVersion) -> {
                     Log.d("Latest Version", hasNewVersion + "");
