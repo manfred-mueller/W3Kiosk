@@ -21,17 +21,17 @@ android {
         buildTypes {
             debug {
                 buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
-                buildConfigField 'String', "API_NAME", API_NAME
-                buildConfigField 'String', "API_KEY", API_KEY
-                buildConfigField 'String', "API_URL", API_URL
-                buildConfigField 'String', "UPDATE_URL", UPDATE_URL
+                buildConfigField 'String', "API_NAME", keyProps['apiName']
+                buildConfigField 'String', "API_KEY", keyProps['apiKey']
+                buildConfigField 'String', "API_URL", keyProps['apiUrl']
+                buildConfigField 'String', "UPDATE_URL", keyProps['updateUrl']
             }
             release {
                 buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
-                buildConfigField 'String', "API_NAME", API_NAME
-                buildConfigField 'String', "API_KEY", API_KEY
-                buildConfigField 'String', "API_URL", API_URL
-                buildConfigField 'String', "UPDATE_URL", UPDATE_URL
+                buildConfigField 'String', "API_NAME", keyProps['apiName']
+                buildConfigField 'String', "API_KEY", keyProps['apiKey']
+                buildConfigField 'String', "API_URL", keyProps['apiUrl']
+                buildConfigField 'String', "UPDATE_URL", keyProps['updateUrl']
             }
         }
      }
