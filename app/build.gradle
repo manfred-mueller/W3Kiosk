@@ -1,50 +1,48 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 34
-    buildToolsVersion '32.0.0'
+    compileSdk 34
+    namespace = "com.nass.ek.w3kiosk"
+    android.buildFeatures.buildConfig true
     def keyProps = new Properties()
     def keyPropsFile = rootProject.file('keystore/credentials')
 
     if (keyPropsFile.exists()) {
         keyProps.load(new FileInputStream(keyPropsFile))
+    } else {
+        throw new GradleException("Keystore credentials file not found: ${keyPropsFile}")
     }
     lintOptions {
         warningsAsErrors false
         abortOnError false
     }
 
-     signingConfigs {
+    signingConfigs {
         dev {
             v2SigningEnabled true
         }
-        buildTypes {
-            debug {
-                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
-                buildConfigField 'String', "API_NAME", keyProps['apiName']
-                buildConfigField 'String', "API_KEY", keyProps['apiKey']
-                buildConfigField 'String', "API_URL", keyProps['apiUrl']
-                buildConfigField 'String', "UPDATE_URL", keyProps['updateUrl']
-            }
-            release {
-                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
-                buildConfigField 'String', "API_NAME", keyProps['apiName']
-                buildConfigField 'String', "API_KEY", keyProps['apiKey']
-                buildConfigField 'String', "API_URL", keyProps['apiUrl']
-                buildConfigField 'String', "UPDATE_URL", keyProps['updateUrl']
-            }
-        }
-     }
-     
-     defaultConfig {
+    }
+
+    defaultConfig {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 32
         multiDexEnabled true
-         versionCode rootProject.ext.verCode
+        versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
         setProperty("archivesBaseName", "w3kiosk-$versionName")
+        def buildTime = new Date()
+        def apiName = keyProps['apiName']
+        def apiKey = keyProps['apiKey']
+        def apiUrl = keyProps['apiUrl']
+        def updateUrl = keyProps['updateUrl']
+        buildConfigField "String", "BUILD_TIME", "\"${buildTime.format('dd.MM.yyyy HH:mm:ss')}\""
+        buildConfigField "String", "API_NAME", "${apiName}"
+        buildConfigField "String", "API_KEY", "${apiKey}"
+        buildConfigField "String", "API_URL", "${apiUrl}"
+        buildConfigField "String", "UPDATE_URL", "${updateUrl}"
+
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
