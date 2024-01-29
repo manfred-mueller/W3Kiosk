@@ -28,7 +28,7 @@ public class StatusSender {
                 postData.put("last_contact_time", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault()).format(new Date()));
 
                 try {
-                    java.net.URL url = new URL("https://nass-ek.de/w3kiosk.php");
+                    java.net.URL url = new URL(BuildConfig.API_URL);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("POST");
                     String userCredentials = BuildConfig.API_NAME + ":" + BuildConfig.API_KEY;

@@ -1,17 +1,21 @@
 package com.nass.ek.w3kiosk;
 
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
+import com.nass.ek.appupdate.UpdateWrapper;
+
 import java.util.Random;
 
 public class ChecksAndConfigs extends AppCompatActivity {
@@ -82,20 +86,22 @@ public class ChecksAndConfigs extends AppCompatActivity {
     }
 
     public static boolean isRooted() {
-        Process checkRoot = null;
-        try {
-            checkRoot = Runtime.getRuntime().exec("su -c ls /data/data");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            checkRoot.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return checkRoot.exitValue() == 0;
+        // try executing commands
+        return canExecuteCommand("/system/xbin/which su")
+                || canExecuteCommand("/system/bin/which su") || canExecuteCommand("which su");
     }
+    // executes a command on the system
+    static boolean canExecuteCommand(String command) {
+        boolean executedSuccesfully;
+        try {
+            Runtime.getRuntime().exec(command);
+            executedSuccesfully = true;
+        } catch (Exception e) {
+            executedSuccesfully = false;
+        }
 
+        return executedSuccesfully;
+    }
     public static String connectionType(Context context) {
         String result = ""; // Returns connection type. 0: none; 1: mobile data; 2: wifi; 3: vpn
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

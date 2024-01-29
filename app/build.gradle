@@ -1,48 +1,50 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 34
-    namespace = "com.nass.ek.w3kiosk"
-    android.buildFeatures.buildConfig true
+    compileSdkVersion 33
+    buildToolsVersion '32.0.0'
     def keyProps = new Properties()
     def keyPropsFile = rootProject.file('keystore/credentials')
 
     if (keyPropsFile.exists()) {
         keyProps.load(new FileInputStream(keyPropsFile))
-    } else {
-        throw new GradleException("Keystore credentials file not found: ${keyPropsFile}")
     }
     lintOptions {
         warningsAsErrors false
         abortOnError false
     }
 
-    signingConfigs {
+     signingConfigs {
         dev {
             v2SigningEnabled true
         }
-    }
-
-    defaultConfig {
+        buildTypes {
+            debug {
+                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
+                buildConfigField 'String', "API_NAME", API_NAME
+                buildConfigField 'String', "API_KEY", API_KEY
+                buildConfigField 'String', "API_URL", API_URL
+                buildConfigField 'String', "UPDATE_URL", UPDATE_URL
+            }
+            release {
+                buildConfigField("String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\"")
+                buildConfigField 'String', "API_NAME", API_NAME
+                buildConfigField 'String', "API_KEY", API_KEY
+                buildConfigField 'String', "API_URL", API_URL
+                buildConfigField 'String', "UPDATE_URL", UPDATE_URL
+            }
+        }
+     }
+     
+     defaultConfig {
         applicationId "com.nass.ek.w3kiosk"
         minSdkVersion 19
         targetSdkVersion 32
         multiDexEnabled true
-        versionCode rootProject.ext.verCode
+         versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
         setProperty("archivesBaseName", "w3kiosk-$versionName")
-        def buildTime = new Date()
-        def apiName = keyProps['apiName']
-        def apiKey = keyProps['apiKey']
-        def apiUrl = keyProps['apiUrl']
-        def updateUrl = keyProps['updateUrl']
-        buildConfigField "String", "BUILD_TIME", "\"${buildTime.format('dd.MM.yyyy HH:mm:ss')}\""
-        buildConfigField "String", "API_NAME", "${apiName}"
-        buildConfigField "String", "API_KEY", "${apiKey}"
-        buildConfigField "String", "API_URL", "${apiUrl}"
-        buildConfigField "String", "UPDATE_URL", "${updateUrl}"
-
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,8 +60,8 @@ android {
 
     buildTypes {
         compileOptions {
-            sourceCompatibility JavaVersion.VERSION_17
-            targetCompatibility JavaVersion.VERSION_17
+            sourceCompatibility JavaVersion.VERSION_11
+            targetCompatibility JavaVersion.VERSION_11
         }
         release {
             minifyEnabled false
@@ -76,9 +78,9 @@ dependencies {
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation project(':appupdate')
 }

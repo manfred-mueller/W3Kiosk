@@ -68,6 +68,28 @@ public class SupportActivity extends AppCompatActivity {
         finish();
     }
 
+    public String getIP()
+    {
+        String ethAddr = execCommand(getString(R.string.commands_to_get_ip_on_eth0));
+        String wifiAddr = execCommand(getString(R.string.commands_to_get_ip_on_wlan0));
+        if (!ethAddr.isEmpty())
+        {
+            return ethAddr;
+        }
+        if (!wifiAddr.isEmpty())
+        {
+            return wifiAddr;
+        }
+        return "000.000.000.000";
+    }
+
+    public void setAdbPort(View view) {
+        String tcpPort = execCommand(getString(R.string.commands_to_get_tcp_port_of_prop));
+        execCommandsAsSU(new String[]{getString(R.string.commands_to_set_tcp_port_of_prop, tcpPort)});
+        execCommandsAsSU(getResources().getStringArray(R.array.commands_to_enable_tcp_forward));
+        Toast.makeText(this, "ADB active at: " + getIP() + ":" + tcpPort, Toast.LENGTH_LONG).show();
+    }
+
     public void appClick(String uri) {
 
         Intent t;
@@ -112,5 +134,33 @@ public class SupportActivity extends AppCompatActivity {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void execCommandsAsSU(String[] commands) {
+        DataOutputStream os = null;
+        try {
+            Process process = Runtime.getRuntime().exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+
+            for (String command : commands) {
+                os.writeBytes(command + "\n");
+                os.flush();
+            }
+
+            os.writeBytes("exit\n");
+            os.flush();
+
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
+        } finally {
+            try {
+                if (os != null) {
+                    os.close();
+                }
+            } catch (IOException e) {
+                // Handle the exception or log it as needed
+            }
+        }
+
     }
 }

@@ -4,12 +4,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.3'
+        classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 
 ext {
-    verCode = 30
+    verCode = 31
     verName = "2.4.0"
     releaseDir = file("${projectDir}/app/release")
 }
