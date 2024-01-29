@@ -24,7 +24,7 @@ jobs:
        uses: actions/setup-java@v3
        with:
          distribution: temurin
-         java-version: "17"
+         java-version: "11"
      - name: Copy Gradle Properties
        run: |
              mkdir -p $HOME/.gradle
