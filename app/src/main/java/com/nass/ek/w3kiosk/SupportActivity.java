@@ -9,14 +9,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class SupportActivity extends AppCompatActivity {
 
@@ -68,28 +62,6 @@ public class SupportActivity extends AppCompatActivity {
         finish();
     }
 
-    public String getIP()
-    {
-        String ethAddr = execCommand(getString(R.string.commands_to_get_ip_on_eth0));
-        String wifiAddr = execCommand(getString(R.string.commands_to_get_ip_on_wlan0));
-        if (!ethAddr.isEmpty())
-        {
-            return ethAddr;
-        }
-        if (!wifiAddr.isEmpty())
-        {
-            return wifiAddr;
-        }
-        return "000.000.000.000";
-    }
-
-    public void setAdbPort(View view) {
-        String tcpPort = execCommand(getString(R.string.commands_to_get_tcp_port_of_prop));
-        execCommandsAsSU(new String[]{getString(R.string.commands_to_set_tcp_port_of_prop, tcpPort)});
-        execCommandsAsSU(getResources().getStringArray(R.array.commands_to_enable_tcp_forward));
-        Toast.makeText(this, "ADB active at: " + getIP() + ":" + tcpPort, Toast.LENGTH_LONG).show();
-    }
-
     public void appClick(String uri) {
 
         Intent t;
@@ -115,52 +87,4 @@ public class SupportActivity extends AppCompatActivity {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static String execCommand(String command) {
-        try {
-            Process process = Runtime.getRuntime().exec(command);
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            int read;
-            char[] buffer = new char[4096];
-            StringBuilder output = new StringBuilder();
-            while ((read = reader.read(buffer)) > 0) {
-                output.append(buffer, 0, read);
-            }
-            reader.close();
-
-            process.waitFor();
-
-            return output.toString();
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void execCommandsAsSU(String[] commands) {
-        DataOutputStream os = null;
-        try {
-            Process process = Runtime.getRuntime().exec("su");
-            os = new DataOutputStream(process.getOutputStream());
-
-            for (String command : commands) {
-                os.writeBytes(command + "\n");
-                os.flush();
-            }
-
-            os.writeBytes("exit\n");
-            os.flush();
-
-            process.waitFor();
-        } catch (IOException | InterruptedException e) {
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-            } catch (IOException e) {
-                // Handle the exception or log it as needed
-            }
-        }
-
-    }
 }
