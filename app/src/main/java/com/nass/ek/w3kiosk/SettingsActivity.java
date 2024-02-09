@@ -30,7 +30,6 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -43,7 +42,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Random;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -143,6 +141,9 @@ public class SettingsActivity extends AppCompatActivity {
         b.setOnClickListener(view -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
+            s = findViewById(R.id.chromeToggle);
+            editor.putBoolean("useChrome", s.isChecked());
+
             s = findViewById(R.id.mobileToggle);
             editor.putBoolean("mobileMode", s.isChecked());
 
@@ -151,7 +152,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             r = findViewById(R.id.radioSlow);
             if (r.isChecked())
-            editor.putInt("marqueeSpeed", 10);
+                editor.putInt("marqueeSpeed", 10);
 
             r = findViewById(R.id.radioNormal);
             if (r.isChecked())
@@ -174,9 +175,6 @@ public class SettingsActivity extends AppCompatActivity {
 
             s = findViewById(R.id.autoLogin);
             editor.putBoolean("autoLogin", s.isChecked());
-
-            e = findViewById(R.id.apiEditText);
-            editor.putString("apiKey", e.getText().toString());
 
             e = findViewById(R.id.devIdEditText);
             editor.putString("devId", e.getText().toString());
@@ -205,6 +203,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         s = findViewById(R.id.mobileToggle);
         s.setChecked(sharedPreferences.getBoolean("mobileMode", false));
+
+        s = findViewById(R.id.chromeToggle);
+        s.setChecked(sharedPreferences.getBoolean("useChrome", false));
 
         s = findViewById(R.id.updateToggle);
         s.setChecked(sharedPreferences.getBoolean("autoUpdate", false));
@@ -284,9 +285,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         e = findViewById(R.id.loginEditText);
         e.setText(sharedPreferences.getString("loginName", ""));
-
-        e = findViewById(R.id.apiEditText);
-        e.setText(sharedPreferences.getString("apiKey", BuildConfig.API_KEY));
 
         e = findViewById(R.id.devIdEditText);
         e.setText(sharedPreferences.getString("devId", ChecksAndConfigs.randomId()));

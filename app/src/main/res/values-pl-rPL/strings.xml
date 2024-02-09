@@ -79,4 +79,5 @@
     <string name="fast">szybko</string>
     <string name="marqueeHint">np. www.w3coach.de (maks. 35 znaków)</string>
     <string name="deviceId">Device-Id:</string>
+    <string name="useChrome">Użyj Chrome</string>
 </resources>

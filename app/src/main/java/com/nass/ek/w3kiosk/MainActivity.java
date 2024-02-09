@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int toggleKey;
     public int zoom;
     public String nextUrl;
-    public String apiKey;
     public Handler handler;
     public Runnable runnable;
     public Handler marqueeHandler;
@@ -129,16 +128,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         marquee = sharedPreferences.getBoolean("marquee", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
-        apiKey = sharedPreferences.getString("apiKey", "");
-//        marqueeText = sharedPreferences.getString("marqueeText", "");
-//        if (!marqueeText.isEmpty()) {
             File marqueeFile = new File("/storage/emulated/0/Pictures/marquee.png");
             if (marqueeFile.exists()) {
                 marqueeText="<img src=\"file:///storage/emulated/0/Pictures/marquee.png\"/>";
             } else {
                 marqueeText="<img src=\"file:///android_res/drawable/logo_splash_web.png\"/>";
             }
-//        }
         marqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
         marqueeBgColor = getResources().getColor(R.color.colorMarquee);
         marqueeTxColor = getResources().getColor(R.color.colorDarkGray);
@@ -233,18 +228,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
 
         setupSettings();
-
-        if (!apiKey.isEmpty() && !clientUrl1.isEmpty()) {
-            String connType = ChecksAndConfigs.connectionType(context);
-            String clientUrl = sharedPreferences.getString("clientUrl1", "w3c");
-            String deviceId = sharedPreferences.getString("devId", ChecksAndConfigs.randomId());
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("devId", deviceId);
-            editor.commit();
-//            StatusSender.sendData(deviceId, clientUrl, connType);
-//            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-//            scheduler.scheduleAtFixedRate(() -> {StatusSender.sendData(deviceId, clientUrl, connType);}, 0, 1, TimeUnit.HOURS);
-        }
 
         if (ChecksAndConfigs.isScanner()) {
             Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);

@@ -97,4 +97,5 @@
     <string name="marqueeHint">eg. www.w3coach.de (max. 35 characters)</string>
     <string name="apiKey" translatable="false">Api-Key:</string>
     <string name="deviceId">Device-Id:</string>
+    <string name="useChrome">Use Chrome</string>
 </resources>

@@ -33,10 +33,6 @@ public class AboutActivity extends AppCompatActivity {
     WindowManager windowManager;
     DisplayMetrics displayMetrics;
     public String Rooted;
-    public String clientUrl;
-    public String passWord;
-    public String deviceId;
-    public String deviceName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,19 +56,11 @@ public class AboutActivity extends AppCompatActivity {
             Rooted = getString(R.string.No);
         }
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        passWord = sharedPreferences.getString("apiKey", BuildConfig.API_KEY);
-        clientUrl = sharedPreferences.getString("clientUrl1", "");
-        deviceName = SettingsActivity.readConfigFileContents();
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
         @SuppressLint("StringFormatMatches") String appinfo = (String.format(getString(R.string.appInfo), getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), connectionType(this), Rooted));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
         findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
-        deviceId = sharedPreferences.getString("devId", "");
-        if (deviceId.isEmpty()) {
-            deviceId = deviceName;
-        }
-        //StatusSender.sendData(deviceId, clientUrl, connectionType(this));
         checkUpdate();
     }
 

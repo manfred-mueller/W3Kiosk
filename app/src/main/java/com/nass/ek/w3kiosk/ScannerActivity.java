@@ -1,6 +1,7 @@
 package com.nass.ek.w3kiosk;
 
 
+import static android.text.TextUtils.isEmpty;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW1;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW3;
@@ -74,6 +75,7 @@ public class ScannerActivity extends AppCompatActivity {
     public String clientUrl2;
     public String nextUrl;
     public int appsCount;
+    public boolean useChrome;
     public boolean autoUpdate;
     Context context = this;
     public Intent intent;
@@ -164,75 +166,83 @@ public class ScannerActivity extends AppCompatActivity {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView(String web_url) {
-        Log.i( TAG, "*** Init WebView ***");
-
-        webView.setVisibility(View.VISIBLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkPermissions();
         }
-
-        if (BuildConfig.DEBUG) {
-            WebView.setWebContentsDebuggingEnabled(true);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        useChrome = sharedPreferences.getBoolean("useChrome", false);
+        if (useChrome) {
+            openInChrome(web_url);
         }
+        else {
+            Log.i(TAG, "*** Init WebView ***");
 
-        webView.setWebViewClient(new myWebClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setAllowFileAccess(true);
-        webView.getSettings().setAllowFileAccessFromFileURLs(true);
-        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-        webView.loadUrl(web_url);
+            webView.setVisibility(View.VISIBLE);
 
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
-
-        CookieManager.getInstance().setAcceptCookie(true);
-        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-        webView.setWebChromeClient(new WebChromeClient() {
-
-
-            @Override
-            public void onPermissionRequest(PermissionRequest request) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    request.grant(request.getResources());
-                }
+            if (BuildConfig.DEBUG) {
+                WebView.setWebContentsDebuggingEnabled(true);
             }
-            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
-                if (mFilePathCallback != null) {
-                    mFilePathCallback.onReceiveValue(null);
-                }
-                mFilePathCallback = filePath;
 
-                Intent takePictureIntent;
+            webView.setWebViewClient(new myWebClient());
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setAllowFileAccess(true);
+            webView.getSettings().setAllowFileAccessFromFileURLs(true);
+            webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+            webView.loadUrl(web_url);
 
-                takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                        takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
-                    } catch (IOException ex) {
-                        Log.e("TAG", "Unable to create Image File", ex);
-                    }
-                    if (photoFile != null) {
-                        Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", photoFile);
+            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-                        mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                        takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            CookieManager.getInstance().setAcceptCookie(true);
+            webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+
+            webView.setWebChromeClient(new WebChromeClient() {
+
+
+                @Override
+                public void onPermissionRequest(PermissionRequest request) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        request.grant(request.getResources());
                     }
                 }
-                startActivityForResult(takePictureIntent, INPUT_FILE_REQUEST_CODE);
-                return true;
-            }
-        });
 
-        webView.setWebViewClient( new WebViewClient() {
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                Log.i(TAG, "WebView load page " + url);
-            }
-        });
+                public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePath, FileChooserParams fileChooserParams) {
+                    if (mFilePathCallback != null) {
+                        mFilePathCallback.onReceiveValue(null);
+                    }
+                    mFilePathCallback = filePath;
+
+                    Intent takePictureIntent;
+
+                    takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                        File photoFile = null;
+                        try {
+                            photoFile = createImageFile();
+                            takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
+                        } catch (IOException ex) {
+                            Log.e("TAG", "Unable to create Image File", ex);
+                        }
+                        if (photoFile != null) {
+                            Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider", photoFile);
+
+                            mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                            takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                    }
+                    startActivityForResult(takePictureIntent, INPUT_FILE_REQUEST_CODE);
+                    return true;
+                }
+            });
+
+            webView.setWebViewClient(new WebViewClient() {
+                public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    Log.i(TAG, "WebView load page " + url);
+                }
+            });
+        }
     }
 
     private File createImageFile() throws IOException {
@@ -538,6 +548,17 @@ public class ScannerActivity extends AppCompatActivity {
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(t);
         } catch (PackageManager.NameNotFoundException ignored) {
+        }
+    }
+    public void openInChrome(String UriString) {
+        if (!isEmpty(UriString)) {
+            Uri W3LagerUri = Uri.parse(UriString);
+            Intent i = new Intent(Intent.ACTION_VIEW, W3LagerUri);
+            i.setPackage("com.android.chrome");
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            startActivity(i);
         }
     }
 }

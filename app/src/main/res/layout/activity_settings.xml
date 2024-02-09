@@ -59,28 +59,21 @@
                         tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                     <TextView
-                        android:id="@+id/apiKey"
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
+                        android:layout_toEndOf="@id/mobileToggle"
                         android:focusable="auto"
                         android:gravity="center"
-                        android:text="Api-Key:"
+                        android:text="@string/useChrome"
                         android:textSize="15sp" />
 
-                    <EditText
-                        android:id="@+id/apiEditText"
+                    <Switch
+                        android:id="@+id/chromeToggle"
                         android:layout_width="wrap_content"
-                        android:layout_height="50dp"
-                        android:layout_toEndOf="@id/apiKey"
-                        android:cursorVisible="true"
-                        android:ellipsize="end"
-                        android:gravity="bottom"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:textCursorDrawable="@color/colorPrimary"
-                        android:enabled="false"
-                        android:textSize="15sp" />
+                        android:layout_height="60dp"
+                        android:background="@android:color/transparent"
+                        tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+
 
                     <TextView
                         android:id="@+id/devId"
@@ -109,7 +102,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
-                        android:layout_toEndOf="@id/apiEditText"
+                        android:layout_toEndOf="@id/chromeToggle"
                         android:focusable="auto"
                         android:gravity="center"
                         android:text="@string/check_update"
