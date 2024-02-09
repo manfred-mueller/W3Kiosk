@@ -62,6 +62,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.CustomTabsService;
+
+
 public class ScannerActivity extends AppCompatActivity {
     static String TAG = ScannerActivity .class.getSimpleName();
 
@@ -552,13 +556,14 @@ public class ScannerActivity extends AppCompatActivity {
     }
     public void openInChrome(String UriString) {
         if (!isEmpty(UriString)) {
-            Uri W3LagerUri = Uri.parse(UriString);
-            Intent i = new Intent(Intent.ACTION_VIEW, W3LagerUri);
-            i.setPackage("com.android.chrome");
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            startActivity(i);
+            Uri uri = Uri.parse(UriString);
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            builder.setShowTitle(false); // Set to false if you don't want to show the page title
+            builder.setShareState(CustomTabsIntent.SHARE_STATE_OFF); // Set to false if you don't want to show the page title
+            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary)); // Set your desired toolbar color
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.intent.setPackage("com.android.chrome");
+            customTabsIntent.launchUrl(this, uri);
         }
     }
 }
