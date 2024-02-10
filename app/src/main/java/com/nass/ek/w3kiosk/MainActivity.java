@@ -1,5 +1,6 @@
 package com.nass.ek.w3kiosk;
 
+import static android.text.TextUtils.isEmpty;
 import static android.webkit.WebView.setWebContentsDebuggingEnabled;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW1;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
@@ -47,6 +48,8 @@ import android.widget.ImageButton;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
@@ -92,13 +95,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public Handler marqueeHandler;
     public Runnable marqueeRunnable;
 
+    public SharedPreferences sharedPreferences;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && intent.getAction().equals(ConnectivityManager
+            if (intent != null && Objects.equals(intent.getAction(), ConnectivityManager
                     .CONNECTIVITY_ACTION)) {
 
                 boolean isConnected = Objects.requireNonNull(ConnectivityManagerCompat.getNetworkInfoFromBroadcast
@@ -121,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
@@ -354,6 +358,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
+        marqueeBgColor = getResources().getColor(R.color.colorMarquee);
+        String reLoad = context.getString(R.string.reLoad);
+        String rawHTML = "<HTML>"+ "<body bgcolor=\"" + marqueeBgColor + "\"><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+        kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+
         kioskWeb.setWebViewClient(new WebViewClient()
         {
             public void onReceivedError(WebView webView, int errorCode, String description, String failingUrl) {
@@ -404,41 +413,45 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void commitURL(String url) {
-        kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
-        if (url.equals(urlPreset))
-        {
-            @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-            startActivity(startSettingsActivityIntent);
-        }
-        if (ChecksAndConfigs.isNetworkConnected(this)) {
-            if (!autoName.isEmpty() && !autoPassWord.isEmpty())
-            {
-                JavaString = "javascript:window.frames[\"Mainpage\"].document.getElementsByName('login')[0].value='" +
-                        autoName + "';" +
-                        "javascript:window.frames[\"Mainpage\"].document.getElementsByName('pwd')[0].value='" +
-                        autoPassWord + "';";
-                if (checkAutoLogin) {
-                    JavaString += "javascript:window.frames[\"Mainpage\"].document.getElementById('logon').click()";
-                }
-                kioskWeb.setWebViewClient(new WebViewClient() {
-                    public void onPageFinished(WebView view, String url) {
-                        CookieSyncManager.getInstance().sync();
-                        view.evaluateJavascript(JavaString, s -> {
-                        });
-                    }
-                });
-            }
-            setWebContentsDebuggingEnabled(true);
-            kioskWeb.loadUrl(url);
-        }
-        else
-        {
-            String noNet = context.getString(R.string.noNetwork);
-            String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+        if (sharedPreferences.getBoolean("useChrome", false)) {
+            String reLoad = context.getString(R.string.reLoad);
+            String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
             kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+            hideKeyboard(this);
+            findViewById(R.id.settingsButton).bringToFront();
+        } else {
+            kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
+            if (url.equals(urlPreset)) {
+                @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(startSettingsActivityIntent);
+            }
+            if (ChecksAndConfigs.isNetworkConnected(this)) {
+                if (!autoName.isEmpty() && !autoPassWord.isEmpty()) {
+                    JavaString = "javascript:window.frames[\"Mainpage\"].document.getElementsByName('login')[0].value='" +
+                            autoName + "';" +
+                            "javascript:window.frames[\"Mainpage\"].document.getElementsByName('pwd')[0].value='" +
+                            autoPassWord + "';";
+                    if (checkAutoLogin) {
+                        JavaString += "javascript:window.frames[\"Mainpage\"].document.getElementById('logon').click()";
+                    }
+                    kioskWeb.setWebViewClient(new WebViewClient() {
+                        public void onPageFinished(WebView view, String url) {
+                            CookieSyncManager.getInstance().sync();
+                            view.evaluateJavascript(JavaString, s -> {
+                            });
+                        }
+                    });
+                }
+                setWebContentsDebuggingEnabled(true);
+                kioskWeb.loadUrl(url);
+            } else {
+                String noNet = context.getString(R.string.noNetwork);
+                String rawHTML = "<HTML>" + "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet + "</h1></td><tr><td height=\"30%\"></td></table></body>" + "</HTML>";
+                kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+            }
+            hideKeyboard(this);
+            findViewById(R.id.settingsButton).bringToFront();
         }
-        hideKeyboard(this);
-        findViewById(R.id.settingsButton).bringToFront();
     }
 
     private void toggleUrl(){
@@ -507,10 +520,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         if (ChecksAndConfigs.isTv()) {
             toggleUrl();
         } else
-        kioskWeb.goBack();
+            kioskWeb.goBack();
     }
 
     @Override
@@ -708,5 +722,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void loadHtmlContent(String htmlContent) {
         kioskWeb.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
+    }
+    public void openInChrome(String UriString) {
+        if (!isEmpty(UriString)) {
+            Uri uri = Uri.parse(UriString);
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            builder.setShowTitle(false);
+            builder.setShareState(CustomTabsIntent.SHARE_STATE_OFF);
+            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.intent.setPackage("com.android.chrome");
+            customTabsIntent.launchUrl(this, uri);
+        }
     }
 }

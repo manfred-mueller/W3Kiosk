@@ -554,8 +554,9 @@ public class ScannerActivity extends AppCompatActivity {
     }
     public void openInChrome(String UriString) {
 
+        int marqueeBgColor = getResources().getColor(R.color.colorMarquee);
         String reLoad = context.getString(R.string.reLoad);
-        String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+        String rawHTML = "<HTML>"+ "<body bgcolor=\"" + marqueeBgColor + "\"><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
         webView.loadData(rawHTML, "text/HTML", "UTF-8");
         if (!isEmpty(UriString)) {
             Uri uri = Uri.parse(UriString);
