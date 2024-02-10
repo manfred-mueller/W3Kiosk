@@ -80,4 +80,5 @@
     <string name="marqueeHint">z.B. www.w3coach.de (maximal 35 Zeichen)</string>
     <string name="deviceId">Geräte-Id:</string>
     <string name="useChrome">Chrome benutzen</string>
+    <string name="reLoad">Zum Neuladen den Button unten rechts gedrückt halten.</string>
 </resources>

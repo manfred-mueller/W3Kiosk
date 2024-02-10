@@ -80,4 +80,5 @@
     <string name="marqueeHint">np. www.w3coach.de (maks. 35 znaków)</string>
     <string name="deviceId">Device-Id:</string>
     <string name="useChrome">Użyj Chrome</string>
+    <string name="reLoad">Aby ponownie załadować adres URL, przytrzymaj wciśnięty prawy przycisk.</string>
 </resources>

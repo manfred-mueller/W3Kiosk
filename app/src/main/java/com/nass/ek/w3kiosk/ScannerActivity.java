@@ -44,6 +44,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -61,9 +62,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.browser.customtabs.CustomTabsService;
 
 
 public class ScannerActivity extends AppCompatActivity {
@@ -440,10 +438,10 @@ public class ScannerActivity extends AppCompatActivity {
                     }
                 });
         checkPasswordDialog.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
-        if (appsCount > 0)
+        if (appsCount > 0 && !useChrome)
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
-        } else if (!clientUrl2.isEmpty()) {
+        } else if (!clientUrl2.isEmpty() && !useChrome) {
             checkPasswordDialog.setNeutralButton(R.string.toggleUrl, (dialog, id) -> toggleUrl());
         }
         else
@@ -555,12 +553,16 @@ public class ScannerActivity extends AppCompatActivity {
         }
     }
     public void openInChrome(String UriString) {
+
+        String reLoad = context.getString(R.string.reLoad);
+        String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+        webView.loadData(rawHTML, "text/HTML", "UTF-8");
         if (!isEmpty(UriString)) {
             Uri uri = Uri.parse(UriString);
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-            builder.setShowTitle(false); // Set to false if you don't want to show the page title
-            builder.setShareState(CustomTabsIntent.SHARE_STATE_OFF); // Set to false if you don't want to show the page title
-            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary)); // Set your desired toolbar color
+            builder.setShowTitle(false);
+            builder.setShareState(CustomTabsIntent.SHARE_STATE_OFF);
+            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.intent.setPackage("com.android.chrome");
             customTabsIntent.launchUrl(this, uri);
