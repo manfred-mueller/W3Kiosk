@@ -417,6 +417,9 @@ public class ScannerActivity extends AppCompatActivity {
                     else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
                     }
+                    else if (PwInput.equals("s")) {
+                        openStorageManager(this);
+                    }
                     else if (PwInput.equals("tv")) {
                         if (checkApps(tvUri))
                         {
@@ -568,5 +571,10 @@ public class ScannerActivity extends AppCompatActivity {
             customTabsIntent.intent.setPackage("com.android.chrome");
             customTabsIntent.launchUrl(this, uri);
         }
+    }
+    private void openStorageManager(Context context) {
+        Intent intent = new Intent();
+        intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+        context.startActivity(intent);
     }
 }

@@ -1,6 +1,5 @@
 package com.nass.ek.w3kiosk;
 
-import static android.text.TextUtils.isEmpty;
 import static android.webkit.WebView.setWebContentsDebuggingEnabled;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW1;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
@@ -11,8 +10,6 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,8 +45,6 @@ import android.widget.ImageButton;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.core.content.ContextCompat;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
@@ -58,9 +53,6 @@ import com.nass.ek.appupdate.services.TrustAllCertificates;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -288,6 +280,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                     else if (PwInput.equals("r")) {
                         startService(new Intent(this, ShutdownService.class));
+                    }
+                    else if (PwInput.equals("s")) {
+                        openStorageManager(this);
                     }
                     else if (PwInput.equals("tv")) {
                         if (checkApps(this, tvUri))
@@ -699,5 +694,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void loadHtmlContent(String htmlContent) {
         kioskWeb.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
+    }
+    private void openStorageManager(Context context) {
+        Intent intent = new Intent();
+        intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+        context.startActivity(intent);
     }
 }
