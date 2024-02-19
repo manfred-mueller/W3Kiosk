@@ -63,7 +63,7 @@ public class CheckUpdateTask extends Thread {
             connection = (HttpURLConnection) url.openConnection();
 
             if (mIsPost) {
-                StringBuilder mStringBuilder = new StringBuilder();
+                StringBuilder mStringBuilder = new StringBuilder("");
                 if (mPostParams != null) {
 
                     Set set = mPostParams.entrySet();

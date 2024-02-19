@@ -59,12 +59,14 @@
                         tools:ignore="UseSwitchCompatOrMaterialXml,DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                     <TextView
+                        android:id="@+id/chromeText"
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
                         android:layout_toEndOf="@id/mobileToggle"
                         android:focusable="auto"
                         android:gravity="center"
                         android:text="@string/useChrome"
+                        android:visibility="gone"
                         android:textSize="15sp" />
 
                     <Switch
@@ -72,6 +74,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
                         android:background="@android:color/transparent"
+                        android:visibility="gone"
                         tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
 
@@ -84,7 +87,8 @@
                         android:onClick="overwriteConfigFile"
                         android:gravity="center"
                         android:text="Device-Id:"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:visibility="gone" />
 
                     <EditText
                         android:id="@+id/devIdEditText"
@@ -97,7 +101,8 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textCursorDrawable="@color/colorPrimary"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -116,6 +121,7 @@
                         tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
                     <TextView
+                        android:id="@+id/appsText"
                         android:layout_width="wrap_content"
                         android:layout_height="60dp"
                         android:layout_alignParentStart="true"
@@ -126,7 +132,8 @@
                         android:gravity="center"
                         android:paddingRight="10dp"
                         android:text="@string/apps"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:visibility="gone" />
 
                     <Spinner
                         android:id="@+id/appsSpinner"
@@ -139,6 +146,7 @@
                         android:background="@android:drawable/btn_dropdown"
                         android:dropDownWidth="50dp"
                         android:spinnerMode="dropdown"
+                        android:visibility="gone"
                         tools:ignore="SpeakableTextPresentCheck" />
 
                     <TextView
@@ -294,18 +302,18 @@
 
             </LinearLayout>
 
-                <RelativeLayout
-                    android:id="@+id/marqueeLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:visibility="gone">
+            <RelativeLayout
+                android:id="@+id/marqueeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:visibility="gone">
 
 
                 <com.google.android.material.chip.ChipGroup
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                     <TextView
                         android:id="@+id/marqueeText"
@@ -317,83 +325,83 @@
                         android:textSize="15sp" />
 
                     <Switch
-                            android:id="@+id/marquee"
-                            android:layout_width="wrap_content"
+                        android:id="@+id/marquee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:background="@android:color/transparent"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                    <EditText
+                        android:id="@+id/marqueeEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:cursorVisible="true"
+                        android:gravity="bottom"
+                        android:inputType="text"
+                        android:enabled="false"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@color/colorPrimary"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/marqueeTimeoutText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:focusable="auto"
+                        android:gravity="center"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/marqueeTimeout"
+                        android:textSize="15sp" />
+
+                    <Spinner
+                        android:id="@+id/marqueeSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:background="@android:drawable/btn_dropdown"
+                        android:dropDownWidth="50dp"
+                        android:spinnerMode="dropdown"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                    <TextView
+                        android:id="@+id/marqueeSpeedText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:focusable="auto"
+                        android:gravity="center"
+                        android:paddingLeft="25dp"
+                        android:paddingRight="10dp"
+                        android:text="@string/marqueeSpeed"
+                        android:textSize="15sp" />
+
+                    <RadioGroup
+                        android:id="@+id/marqueeSpeedGroup"
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content" >
+
+                        <RadioButton
+                            android:id="@+id/radioSlow"
+                            android:layout_width="match_parent"
                             android:layout_height="60dp"
-                            android:background="@android:color/transparent"
-                            tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                        <EditText
-                            android:id="@+id/marqueeEditText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="50dp"
-                            android:cursorVisible="true"
-                            android:gravity="bottom"
-                            android:inputType="text"
-                            android:enabled="false"
-                            android:maxLines="1"
-                            android:ellipsize="end"
-                            android:singleLine="true"
-                            android:textCursorDrawable="@color/colorPrimary"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/marqueeTimeoutText"
-                            android:layout_width="wrap_content"
+                            android:text="@string/slow" />
+                        <RadioButton
+                            android:id="@+id/radioNormal"
+                            android:layout_width="match_parent"
                             android:layout_height="60dp"
-                            android:focusable="auto"
-                            android:gravity="center"
-                            android:paddingLeft="25dp"
-                            android:paddingRight="10dp"
-                            android:text="@string/marqueeTimeout"
-                            android:textSize="15sp" />
-
-                        <Spinner
-                            android:id="@+id/marqueeSpinner"
-                            android:layout_width="wrap_content"
+                            android:text="@string/normal" />
+                        <RadioButton
+                            android:id="@+id/radioFast"
+                            android:layout_width="match_parent"
                             android:layout_height="60dp"
-                            android:background="@android:drawable/btn_dropdown"
-                            android:dropDownWidth="50dp"
-                            android:spinnerMode="dropdown"
-                            tools:ignore="SpeakableTextPresentCheck" />
+                            android:text="@string/fast" />
+                    </RadioGroup>
 
-                        <TextView
-                            android:id="@+id/marqueeSpeedText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="60dp"
-                            android:focusable="auto"
-                            android:gravity="center"
-                            android:paddingLeft="25dp"
-                            android:paddingRight="10dp"
-                            android:text="@string/marqueeSpeed"
-                            android:textSize="15sp" />
+                </com.google.android.material.chip.ChipGroup>
 
-                        <RadioGroup
-                            android:id="@+id/marqueeSpeedGroup"
-                            android:layout_width="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_height="wrap_content" >
-
-                            <RadioButton
-                                android:id="@+id/radioSlow"
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp"
-                                android:text="@string/slow" />
-                            <RadioButton
-                                android:id="@+id/radioNormal"
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp"
-                                android:text="@string/normal" />
-                            <RadioButton
-                                android:id="@+id/radioFast"
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp"
-                                android:text="@string/fast" />
-                        </RadioGroup>
-
-                    </com.google.android.material.chip.ChipGroup>
-
-                </RelativeLayout>
+            </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/autologinLayout"
@@ -463,7 +471,7 @@
                         android:text="@string/login_password"
                         android:textSize="15sp" />
 
-                <EditText
+                    <EditText
                         android:id="@+id/pwEditText"
                         android:layout_width="400px"
                         android:layout_height="50dp"
@@ -485,7 +493,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -513,6 +521,7 @@
                             android:gravity="center_horizontal"
                             android:text="@string/permissions"
                             android:textSize="15sp"
+                            android:visibility="visible"
                             tools:ignore="UsingOnClickInXml,TouchTargetSizeCheck" />
 
                     </RelativeLayout>

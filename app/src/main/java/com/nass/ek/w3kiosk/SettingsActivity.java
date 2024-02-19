@@ -83,14 +83,21 @@ public class SettingsActivity extends AppCompatActivity {
         client1Text.setText(String.format(getString(R.string.website1), getString(R.string.url_preset)));
         client2Text.setText(getString(R.string.website2));
         client3Text.setText(getString(R.string.website3));
-        appsDropdown = findViewById(R.id.appsSpinner);
-        ArrayAdapter<String> appAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, allowedApps);
-        appAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        appsDropdown.setAdapter(appAdapter);
-        appsDropdown.setOnLongClickListener(v -> {
-            startActivity(new Intent(this, AppsActivity.class));
-            return true;
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            findViewById(R.id.permissionLayout).setVisibility(View.VISIBLE);
+            findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
+            findViewById(R.id.appsText).setVisibility(View.VISIBLE);
+            appsDropdown = findViewById(R.id.appsSpinner);
+            appsDropdown.setVisibility(View.VISIBLE);
+            ArrayAdapter<String> appAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, allowedApps);
+            appAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            appsDropdown.setAdapter(appAdapter);
+            appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
+            appsDropdown.setOnLongClickListener(v -> {
+                startActivity(new Intent(this, AppsActivity.class));
+                return true;
+            });
+        }
         marqueeDropdown = findViewById(R.id.marqueeSpinner);
         ArrayAdapter<String> mqtimeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marqueeTimeout);
         mqtimeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -115,7 +122,6 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> zoomAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, zoomFactor);
         zoomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         zoomDropdown.setAdapter(zoomAdapter);
-        findViewById(R.id.setLauncherButton).setVisibility(View.VISIBLE);
         if (ChecksAndConfigs.isTablet()){
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                 findViewById(R.id.marqueeLayout).setVisibility(View.VISIBLE);
@@ -126,6 +132,8 @@ public class SettingsActivity extends AppCompatActivity {
         if (ChecksAndConfigs.isScanner()){
             if (checkApp()){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
+                findViewById(R.id.chromeText).setVisibility(View.VISIBLE);
+                findViewById(R.id.chromeToggle).setVisibility(View.VISIBLE);
             }
             findViewById(R.id.timeoutText).setVisibility(View.GONE);
             findViewById(R.id.timeoutSpinner).setVisibility(View.GONE);
@@ -222,7 +230,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
         r.setChecked(true);
 
-        appsDropdown.setSelection(sharedPreferences.getInt("appsCount", 0));
         int urlSpinnerValue = sharedPreferences.getInt("urlTimeout",-1);
         if(urlSpinnerValue != -1)
             timeoutDropdown.setSelection(urlSpinnerValue);

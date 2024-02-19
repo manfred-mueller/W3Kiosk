@@ -132,12 +132,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         marquee = sharedPreferences.getBoolean("marquee", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
-            File marqueeFile = new File("/storage/emulated/0/Pictures/marquee.png");
-            if (marqueeFile.exists()) {
-                marqueeText="<img src=\"file:///storage/emulated/0/Pictures/marquee.png\"/>";
-            } else {
-                marqueeText="<img src=\"file:///android_res/drawable/logo_splash_web.png\"/>";
-            }
+        File marqueeFile = new File("/storage/emulated/0/Pictures/marquee.png");
+        if (marqueeFile.exists()) {
+            marqueeText="<img src=\"file:///storage/emulated/0/Pictures/marquee.png\"/>";
+        } else {
+            marqueeText="<img src=\"file:///android_res/drawable/logo_splash_web.png\"/>";
+        }
         marqueeSpeed = sharedPreferences.getInt("marqueeSpeed", 25);
         marqueeBgColor = getResources().getColor(R.color.colorMarquee);
         marqueeTxColor = getResources().getColor(R.color.colorDarkGray);
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 loadHtmlContent(htmlContent);
                 marqueeVisible = true;
             };
-                startmarqueeHandler();
+            startmarqueeHandler();
         }
 
         zoom = sharedPreferences.getInt("zoomFactor", 5);
@@ -223,13 +223,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-            final View decorView = getWindow().getDecorView();
-            decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
-                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                    decorView.setSystemUiVisibility(flags);
-                }
-            });
+        getWindow().getDecorView().setSystemUiVisibility(flags);
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
+            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                decorView.setSystemUiVisibility(flags);
+            }
+        });
 
         setupSettings();
 
@@ -366,21 +366,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.setWebViewClient(new WebViewClient()
         {
             public void onReceivedError(WebView webView, int errorCode, String description, String failingUrl) {
-            try {
-                webView.stopLoading();
-            } catch (Exception ignored) {
-            }
+                try {
+                    webView.stopLoading();
+                } catch (Exception ignored) {
+                }
                 String noNet = context.getString(R.string.noNetwork);
                 String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
                 kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle(getString(R.string.error));
-            alertDialog.setMessage(getString(R.string.check_internet));
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl1));
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle(getString(R.string.error));
+                alertDialog.setMessage(getString(R.string.check_internet));
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl1));
 
-            alertDialog.show();
-            super.onReceivedError(webView, errorCode, description, failingUrl);
-        }
+                alertDialog.show();
+                super.onReceivedError(webView, errorCode, description, failingUrl);
+            }
         });
 
         kioskWeb.clearCache(true);
@@ -413,14 +413,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void commitURL(String url) {
-        if (sharedPreferences.getBoolean("useChrome", false)) {
-            String reLoad = context.getString(R.string.reLoad);
-            String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
-            kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
-            hideKeyboard(this);
-            findViewById(R.id.settingsButton).bringToFront();
-        } else {
-            kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
+        kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
             if (url.equals(urlPreset)) {
                 @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                 startActivity(startSettingsActivityIntent);
@@ -451,7 +444,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
             hideKeyboard(this);
             findViewById(R.id.settingsButton).bringToFront();
-        }
     }
 
     private void toggleUrl(){
@@ -500,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
-         if (view == null) {
+        if (view == null) {
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -578,10 +570,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     public void toggleSettingsButton() {
         View buttonView = findViewById(R.id.settingsButton);
-            if(buttonView.getVisibility()==View.GONE)
-                buttonView.setVisibility(View.VISIBLE);
-            else if(buttonView.getVisibility()==View.VISIBLE)
-                buttonView.setVisibility(View.GONE);
+        if(buttonView.getVisibility()==View.GONE)
+            buttonView.setVisibility(View.VISIBLE);
+        else if(buttonView.getVisibility()==View.VISIBLE)
+            buttonView.setVisibility(View.GONE);
     }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -693,21 +685,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private String generateMarqueeHtml(String text, int speed, int bgColor) {
         String сolorString = String.format("%X", marqueeTxColor).substring(2);
 
-/*        return "<html><head><style>" +
-                "marquee {position: absolute; font-size: 20vh; white-space: nowrap; " +
-                "color: " + сolorString + ";}" +
-                "</style></head><body bgcolor=\"" + bgColor + "\">" +
-                "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + speed + "\">" + text + "</marquee>" +
-                "<script>" +
-                "var marquee = document.getElementById('marqueeText');" +
-                "marquee.style.top = generateRandomPosition();" +
-                "function generateRandomPosition() {" +
-                "    return (Math.random() * 80) + 'vh';" + // Adjust as needed
-                "}" +
-                "</script>" +
-                "</body></html>";
-
-*/
         return "<html><head><style>" +
                 "body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }" +
                 "marquee { font-size: 20vh; white-space: nowrap; " +
@@ -722,17 +699,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void loadHtmlContent(String htmlContent) {
         kioskWeb.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
-    }
-    public void openInChrome(String UriString) {
-        if (!isEmpty(UriString)) {
-            Uri uri = Uri.parse(UriString);
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-            builder.setShowTitle(false);
-            builder.setShareState(CustomTabsIntent.SHARE_STATE_OFF);
-            builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            CustomTabsIntent customTabsIntent = builder.build();
-            customTabsIntent.intent.setPackage("com.android.chrome");
-            customTabsIntent.launchUrl(this, uri);
-        }
     }
 }

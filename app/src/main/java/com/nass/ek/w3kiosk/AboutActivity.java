@@ -3,13 +3,8 @@ package com.nass.ek.w3kiosk;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.connectionType;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +12,6 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 
 import com.nass.ek.appupdate.UpdateWrapper;
 
@@ -49,13 +43,12 @@ public class AboutActivity extends AppCompatActivity {
         displayMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         setContentView(R.layout.activity_about);
-        String localVersion = BuildConfig.VERSION_NAME;
+        String localVersion = BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")";
         if (ChecksAndConfigs.isRooted()) {
             Rooted = getString(R.string.Yes);
         } else {
             Rooted = getString(R.string.No);
         }
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Date buildDate = new Date(Long.parseLong(BuildConfig.BUILD_TIME));
         @SuppressLint("StringFormatMatches") String appinfo = (String.format(getString(R.string.appInfo), getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), connectionType(this), Rooted));
         TextView appinfoText = findViewById(R.id.textView3);
