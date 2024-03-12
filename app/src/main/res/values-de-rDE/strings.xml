@@ -81,4 +81,5 @@
     <string name="deviceId">Geräte-Id:</string>
     <string name="useChrome">Chrome benutzen</string>
     <string name="reLoad">Zum Neuladen den Button unten rechts gedrueckt halten.</string>
+    <string name="dhl">DHL-App</string>
 </resources>

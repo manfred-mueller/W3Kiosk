@@ -1,6 +1,5 @@
 package com.nass.ek.w3kiosk;
 
-
 import static android.text.TextUtils.isEmpty;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW1;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
@@ -10,6 +9,7 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW4;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -31,7 +31,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
 import android.webkit.PermissionRequest;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -65,7 +67,7 @@ import java.util.Objects;
 
 
 public class ScannerActivity extends AppCompatActivity {
-    static String TAG = ScannerActivity .class.getSimpleName();
+    static String TAG = ScannerActivity.class.getSimpleName();
 
     private static final int INPUT_FILE_REQUEST_CODE = 1;
     private final int REQUEST_ID_MULTIPLE_PERMISSIONS = 100;
@@ -85,8 +87,16 @@ public class ScannerActivity extends AppCompatActivity {
     private boolean connected = false;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
+    public static String dhlUri = "com.dhl.ESPcapture";
 
-
+    // Declare BroadcastReceiver globally in your activity
+    BroadcastReceiver onComplete = new BroadcastReceiver() {
+        public void onReceive(Context ctxt, Intent intent) {
+            // Open the Download directory
+            Intent i = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
+            startActivity(i);
+        }
+    };
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -97,20 +107,20 @@ public class ScannerActivity extends AppCompatActivity {
                         ((ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE),
                                 intent)).isConnected();
 
-                if(connected == isConnected) {
+                if (connected == isConnected) {
                     return;
                 }
 
                 connected = isConnected;
 
                 if (isConnected) {
-                    Log.i( TAG, "*** Init WebView connectionReceiver ***");
+                    Log.i(TAG, "*** Init WebView connectionReceiver ***");
 
                     initWebView(urlPreset + clientUrl1);
                     nextUrl = clientUrl2;
                 } else {
                     String noNet = context.getString(R.string.noNetwork);
-                    String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+                    String rawHTML = "<HTML>" + "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet + "</h1></td><tr><td height=\"30%\"></td></table></body>" + "</HTML>";
                     webView.loadData(rawHTML, "text/HTML", "UTF-8");
                 }
             }
@@ -139,8 +149,10 @@ public class ScannerActivity extends AppCompatActivity {
 
         Log.i(TAG, "***************** create *************");
 
-        connected = ChecksAndConfigs.isNetworkConnected(this) ;
+        connected = ChecksAndConfigs.isNetworkConnected(this);
         setContentView(R.layout.activity_scanner);
+        // Register the BroadcastReceiver to listen for download completion
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnLongClickListener(v -> {
             recreate();
@@ -160,8 +172,7 @@ public class ScannerActivity extends AppCompatActivity {
         initWebView(urlPreset + clientUrl1);
         nextUrl = clientUrl2;
         findViewById(R.id.settingsButton).bringToFront();
-        if (getIntent().getBooleanExtra("EXIT", false))
-        {
+        if (getIntent().getBooleanExtra("EXIT", false)) {
             finish();
         }
     }
@@ -176,8 +187,7 @@ public class ScannerActivity extends AppCompatActivity {
         useChrome = sharedPreferences.getBoolean("useChrome", false);
         if (useChrome) {
             openInChrome(web_url);
-        }
-        else {
+        } else {
             Log.i(TAG, "*** Init WebView ***");
 
             webView.setVisibility(View.VISIBLE);
@@ -194,7 +204,6 @@ public class ScannerActivity extends AppCompatActivity {
             webView.loadUrl(web_url);
 
             webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
-
 
             CookieManager.getInstance().setAcceptCookie(true);
             webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
@@ -243,6 +252,26 @@ public class ScannerActivity extends AppCompatActivity {
                 public void onPageStarted(WebView view, String url, Bitmap favicon) {
                     Log.i(TAG, "WebView load page " + url);
                 }
+            });
+
+            // Add DownloadListener for downloading APK files
+            webView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+                if (url.endsWith(".apk")) {
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                    request.setMimeType(mimetype);
+                    String cookies = CookieManager.getInstance().getCookie(url);
+                    request.addRequestHeader("cookie", cookies);
+                    request.addRequestHeader("User-Agent", userAgent);
+                    request.setDescription("Downloading file...");
+                    request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype));
+                    request.allowScanningByMediaScanner();
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype));
+
+                    DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                    downloadManager.enqueue(request);
+                }
+
             });
         }
     }
@@ -410,6 +439,12 @@ public class ScannerActivity extends AppCompatActivity {
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + adUri));
                             startActivity(intent);
                         }                    }
+                    else if (PwInput.equals("dhl")) {
+                        if (checkApps(dhlUri))
+                        {
+                            appClick(dhlUri);
+                        } else {
+                            initWebView("https://nass-ek.de/android/ESP_Capture_2.5.121.apk");                        }                    }
                     else if (PwInput.equals("b")) {
                         Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                         startActivity(intent);
@@ -444,7 +479,10 @@ public class ScannerActivity extends AppCompatActivity {
         if (appsCount > 0 && !useChrome)
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
-        } else if (!clientUrl2.isEmpty() && !useChrome) {
+        } else if (clientUrl1.startsWith("brc") && checkApps(dhlUri)) {
+            checkPasswordDialog.setNeutralButton(R.string.dhl, (dialog, id) -> appClick(dhlUri));
+        }
+        else if (!clientUrl2.isEmpty() && !useChrome) {
             checkPasswordDialog.setNeutralButton(R.string.toggleUrl, (dialog, id) -> toggleUrl());
         }
         else
@@ -464,7 +502,7 @@ public class ScannerActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, filter);
-
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         webView.onResume();
     }
 
@@ -576,5 +614,11 @@ public class ScannerActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
         context.startActivity(intent);
+    }
+    // Unregister BroadcastReceiver in your activity's onDestroy method
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(onComplete);
     }
 }

@@ -81,4 +81,5 @@
     <string name="deviceId">Device-Id:</string>
     <string name="useChrome">Użyj Chrome</string>
     <string name="reLoad">Aby ponownie załadować adres URL, przytrzymaj wciśnięty prawy przycisk.</string>
+    <string name="dhl">DHL-App</string>
 </resources>

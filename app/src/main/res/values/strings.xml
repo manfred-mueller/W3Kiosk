@@ -99,4 +99,6 @@
     <string name="deviceId">Device-Id:</string>
     <string name="useChrome">Use Chrome</string>
     <string name="reLoad">To reload the url, hold the down right button pressed.</string>
+    <string name="device_admin_description" translatable="false">W3KioskDeviceAdminReceiver</string>
+    <string name="dhl">DHL-App</string>
 </resources>

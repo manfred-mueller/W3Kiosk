@@ -10,7 +10,10 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.admin.DeviceAdminReceiver;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
@@ -41,6 +45,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -51,7 +56,10 @@ import androidx.preference.PreferenceManager;
 import com.nass.ek.appupdate.UpdateWrapper;
 import com.nass.ek.appupdate.services.TrustAllCertificates;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -90,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public SharedPreferences sharedPreferences;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
+
+    private DevicePolicyManager mDevicePolicyManager;
+    private ComponentName mComponentName;
+
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
@@ -387,7 +399,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
         registerForContextMenu(kioskWeb);
-    }
+
+        String externalUrl = "";
+/*
+        try {
+            File externalFolder = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            File fl = new File(externalFolder, "url.xml");
+            externalUrl = FileUtils.readTextFromFile(fl).trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            onAlertDialog(this, "URL can't be loaded. \nError: " + e.getMessage(), "Try again!");
+        }
+*/    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     public void setMobileMode(final boolean enabled) {
@@ -699,5 +722,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Intent intent = new Intent();
         intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
         context.startActivity(intent);
+    }
+    private void onAlertDialog(Context context, String message, String toastMsg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Warning!");
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle OK button click
+            }
+        });
+        builder.show();
     }
 }
