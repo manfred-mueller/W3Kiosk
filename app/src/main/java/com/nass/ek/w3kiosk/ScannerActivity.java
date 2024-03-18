@@ -475,7 +475,7 @@ public class ScannerActivity extends AppCompatActivity {
         if (appsCount > 0 && !useChrome)
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
-        } else if (clientUrl1.startsWith("ber") && checkApps(dhlUri)) {
+        } else if (checkApps(dhlUri)) {
             checkPasswordDialog.setNeutralButton(R.string.dhl, (dialog, id) -> appClick(dhlUri));
         }
         else if (!clientUrl2.isEmpty() && !useChrome) {
