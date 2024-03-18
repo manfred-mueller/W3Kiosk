@@ -399,18 +399,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
         registerForContextMenu(kioskWeb);
-
-        String externalUrl = "";
-/*
-        try {
-            File externalFolder = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-            File fl = new File(externalFolder, "url.xml");
-            externalUrl = FileUtils.readTextFromFile(fl).trim();
-        } catch (Exception e) {
-            e.printStackTrace();
-            onAlertDialog(this, "URL can't be loaded. \nError: " + e.getMessage(), "Try again!");
-        }
-*/    }
+    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     public void setMobileMode(final boolean enabled) {

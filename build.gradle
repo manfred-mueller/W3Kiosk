@@ -9,7 +9,7 @@ buildscript {
 }
 
 ext {
-    verCode = 37
+    verCode = 38
     verName = "2.6.0"
     releaseDir = file("${projectDir}/app/release")
 }

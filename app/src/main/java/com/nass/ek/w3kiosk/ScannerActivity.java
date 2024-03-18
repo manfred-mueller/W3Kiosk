@@ -31,7 +31,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
 import android.webkit.PermissionRequest;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
@@ -92,7 +91,6 @@ public class ScannerActivity extends AppCompatActivity {
     // Declare BroadcastReceiver globally in your activity
     BroadcastReceiver onComplete = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {
-            // Open the Download directory
             Intent i = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
             startActivity(i);
         }
@@ -151,7 +149,6 @@ public class ScannerActivity extends AppCompatActivity {
 
         connected = ChecksAndConfigs.isNetworkConnected(this);
         setContentView(R.layout.activity_scanner);
-        // Register the BroadcastReceiver to listen for download completion
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnLongClickListener(v -> {
@@ -254,7 +251,6 @@ public class ScannerActivity extends AppCompatActivity {
                 }
             });
 
-            // Add DownloadListener for downloading APK files
             webView.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
                 if (url.endsWith(".apk")) {
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
@@ -479,7 +475,7 @@ public class ScannerActivity extends AppCompatActivity {
         if (appsCount > 0 && !useChrome)
         {
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
-        } else if (clientUrl1.startsWith("brc") && checkApps(dhlUri)) {
+        } else if (clientUrl1.startsWith("ber") && checkApps(dhlUri)) {
             checkPasswordDialog.setNeutralButton(R.string.dhl, (dialog, id) -> appClick(dhlUri));
         }
         else if (!clientUrl2.isEmpty() && !useChrome) {
@@ -615,7 +611,6 @@ public class ScannerActivity extends AppCompatActivity {
         intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
         context.startActivity(intent);
     }
-    // Unregister BroadcastReceiver in your activity's onDestroy method
     @Override
     protected void onDestroy() {
         super.onDestroy();
