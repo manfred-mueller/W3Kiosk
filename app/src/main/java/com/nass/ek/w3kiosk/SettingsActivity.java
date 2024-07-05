@@ -65,6 +65,11 @@ public class SettingsActivity extends AppCompatActivity {
     public EditText marqueeEditText;
     private GestureDetector gestureDetector;
 
+    public String chwUri = "com.rscja.scanner";
+    public String zebUri = "com.zebra.scanner";
+    public boolean chwCheck = false;
+    public boolean zebCheck = false;
+    public Intent keyboardEmulator;
     public static File configDirectory;
 
 
@@ -73,6 +78,8 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        zebCheck = ChecksAndConfigs.checkApps(this, zebUri);
+        chwCheck = ChecksAndConfigs.checkApps(this, chwUri);
         setContentView(R.layout.activity_settings);
         toggleLogin(findViewById(R.id.autologinLayout));
         toggleMarquee(findViewById(R.id.marqueeLayout));
@@ -130,7 +137,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if (ChecksAndConfigs.isScanner()){
-            if (checkApp()){
+            if (chwCheck || zebCheck){
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
                 findViewById(R.id.chromeText).setVisibility(View.VISIBLE);
                 findViewById(R.id.chromeToggle).setVisibility(View.VISIBLE);
@@ -553,15 +560,15 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void configureScanner(View v){
-        Intent keyboardEmulator;
         PackageManager manager = getPackageManager();
-        try {
-            keyboardEmulator = manager.getLaunchIntentForPackage("com.rscja.scanner");
-            if (keyboardEmulator == null)
-                throw new PackageManager.NameNotFoundException();
+        if (chwCheck) {
+            keyboardEmulator = manager.getLaunchIntentForPackage(chwUri);
             keyboardEmulator.addCategory(Intent.CATEGORY_LAUNCHER);
             startActivity(keyboardEmulator);
-        } catch (PackageManager.NameNotFoundException ignored) {
+        } else if (zebCheck) {
+            keyboardEmulator = manager.getLaunchIntentForPackage(zebUri);
+            keyboardEmulator.addCategory(Intent.CATEGORY_LAUNCHER);
+            startActivity(keyboardEmulator);
         }
     }
 
@@ -574,17 +581,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return false;
     }
-
-    private boolean checkApp() {
-        PackageInfo pkgInfo;
-        try {
-            pkgInfo = getPackageManager().getPackageInfo("com.rscja.scanner", 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-        return pkgInfo != null;
-    }
-
     @RequiresApi(api = O)
     @Override
     protected void onResume() {
