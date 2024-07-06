@@ -101,7 +101,7 @@ jobs:
        id: find_apk
      - name: Find APK_PATH
        run: |
-            apkPath=$(find apk/ -name "*.apk" -type f)
+            apkPath=$(find . -name "*.apk" -type f)
             export APK_PATH=$apkPath
             echo "APK_PATH=$apkPath" >> $GITHUB_ENV
        id: find_apk_path
