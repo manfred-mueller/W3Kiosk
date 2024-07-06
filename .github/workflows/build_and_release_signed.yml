@@ -113,5 +113,5 @@ jobs:
         asset_name: ${{ env.APP_NAME }}-${{ env.VERSION_NAME }}-release.apk
         tag: v${{ env.VERSION_NAME }}
         overwrite: true
-        body: "Automatic github release"
+        body: ${{ github.sha }}
         
