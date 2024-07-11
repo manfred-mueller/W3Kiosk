@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -129,15 +130,15 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> zoomAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, zoomFactor);
         zoomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         zoomDropdown.setAdapter(zoomAdapter);
-        if (ChecksAndConfigs.isTablet()){
+        if (ChecksAndConfigs.isTablet()) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                 findViewById(R.id.marqueeLayout).setVisibility(View.VISIBLE);
                 findViewById(R.id.autologinLayout).setVisibility(View.VISIBLE);
             }
         }
 
-        if (ChecksAndConfigs.isScanner()){
-            if (chwCheck || zebCheck){
+        if (ChecksAndConfigs.isScanner()) {
+            if (chwCheck || zebCheck) {
                 findViewById(R.id.scannerButton).setVisibility(View.VISIBLE);
                 findViewById(R.id.chromeText).setVisibility(View.VISIBLE);
                 findViewById(R.id.chromeToggle).setVisibility(View.VISIBLE);
@@ -228,22 +229,20 @@ public class SettingsActivity extends AppCompatActivity {
         int i = sharedPreferences.getInt("marqueeSpeed", 25);
         if (i < 25) {
             r = findViewById(R.id.radioSlow);
-        }
-        else if (i == 25) {
+        } else if (i == 25) {
             r = findViewById(R.id.radioNormal);
-        }
-        else {
+        } else {
             r = findViewById(R.id.radioFast);
         }
         r.setChecked(true);
 
-        int urlSpinnerValue = sharedPreferences.getInt("urlTimeout",-1);
-        if(urlSpinnerValue != -1)
+        int urlSpinnerValue = sharedPreferences.getInt("urlTimeout", -1);
+        if (urlSpinnerValue != -1)
             timeoutDropdown.setSelection(urlSpinnerValue);
-        int marqueeSpinnerValue = sharedPreferences.getInt("marqueeTimeout",-1);
-        if(marqueeSpinnerValue != -1)
+        int marqueeSpinnerValue = sharedPreferences.getInt("marqueeTimeout", -1);
+        if (marqueeSpinnerValue != -1)
             marqueeDropdown.setSelection(marqueeSpinnerValue);
-        int zoomValue = sharedPreferences.getInt("zoomFactor",5);
+        int zoomValue = sharedPreferences.getInt("zoomFactor", 5);
         zoomDropdown.setSelection(zoomValue);
 
         s = findViewById(R.id.marquee);
@@ -325,13 +324,11 @@ public class SettingsActivity extends AppCompatActivity {
                 if (Environment.isExternalStorageManager()) {
                     c.setChecked(true);
                     c.setEnabled(false);
-                } else
-                {
+                } else {
                     c.setChecked(false);
                     c.setEnabled(true);
                 }
-            } else
-            {
+            } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                 c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
             }
@@ -404,7 +401,7 @@ public class SettingsActivity extends AppCompatActivity {
         findViewById(R.id.pwEditText).setVisibility(checkAutoLogin ? View.VISIBLE : View.GONE);
         findViewById(R.id.loginPw).setVisibility(checkAutoLogin ? View.VISIBLE : View.GONE);
     }
-
+/*
     private boolean isMyAppLauncherDefault() {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
@@ -412,17 +409,18 @@ public class SettingsActivity extends AppCompatActivity {
         ComponentName myAppLauncher = new ComponentName(this, MainActivity.class);
         return defaultLauncher != null && defaultLauncher.equals(myAppLauncher);
     }
-
+*/
     private void showSetDefaultLauncherDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.setAsStartApp);
         builder.setMessage(R.string.setAsStartAppText);
         builder.setPositiveButton(R.string.Yes, (dialog, which) -> {
-            Intent intent = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Intent intent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
+            } else {
                 intent = new Intent(Settings.ACTION_HOME_SETTINGS);
             }
-            assert intent != null;
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
@@ -438,14 +436,16 @@ public class SettingsActivity extends AppCompatActivity {
         builder.setTitle(R.string.NoStartApp);
         builder.setMessage(R.string.NoStartAppRationale);
         builder.setPositiveButton(R.string.imSure, (dialog, which) -> {
+            // User confirmed they don't want to set as default launcher
         });
         builder.setNegativeButton(R.string.setAsStartApp, (dialog, which) -> {
             // Handle user's decision to set as default launcher
-            Intent intent = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Intent intent;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                intent = new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS);
+            } else {
                 intent = new Intent(Settings.ACTION_HOME_SETTINGS);
             }
-            assert intent != null;
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
@@ -458,12 +458,25 @@ public class SettingsActivity extends AppCompatActivity {
             builder.setTitle(R.string.changeStartApp);
             builder.setMessage(R.string.alreadyStartApp);
             builder.setPositiveButton("Ok", (dialog, which) -> {
+                // User acknowledged the message
             });
             builder.show();
         } else {
             showSetDefaultLauncherDialog();
         }
     }
+
+    private boolean isMyAppLauncherDefault() {
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        final ResolveInfo resolveInfo = getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (resolveInfo != null) {
+            String currentHomePackage = resolveInfo.activityInfo.packageName;
+            return currentHomePackage.equals(getPackageName());
+        }
+        return false;
+    }
+
 
     public void overwriteConfigFile(View v) {
         e = findViewById(R.id.devIdEditText);

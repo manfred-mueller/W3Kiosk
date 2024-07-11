@@ -64,7 +64,7 @@ public class ChecksAndConfigs extends AppCompatActivity {
     }
 
     public static boolean isScanner() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61") || android.os.Build.MODEL.toUpperCase().startsWith("RD");
+        return android.os.Build.MODEL.toUpperCase().startsWith("C4050") || android.os.Build.MODEL.toUpperCase().startsWith("C66") || android.os.Build.MODEL.toUpperCase().startsWith("C72") || android.os.Build.MODEL.toUpperCase().startsWith("C61")|| android.os.Build.MODEL.toUpperCase().startsWith("MC33")|| android.os.Build.MODEL.toUpperCase().startsWith("RD");
     }
 
     public static boolean isTablet() {

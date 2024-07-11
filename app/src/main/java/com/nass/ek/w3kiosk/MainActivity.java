@@ -563,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (ChecksAndConfigs.isTv()) {
+        if (!ChecksAndConfigs.isScanner() || !ChecksAndConfigs.isTablet()) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
