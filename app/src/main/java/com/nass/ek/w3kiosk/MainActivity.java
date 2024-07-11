@@ -398,7 +398,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
-        registerForContextMenu(kioskWeb);
+        if (ChecksAndConfigs.isTv()) {
+            registerForContextMenu(kioskWeb);
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -563,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!ChecksAndConfigs.isScanner() || !ChecksAndConfigs.isTablet()) {
+        if (ChecksAndConfigs.isTv()) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;

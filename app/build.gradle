@@ -67,6 +67,9 @@ android {
         abortOnError false
         warningsAsErrors false
     }
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 dependencies {
