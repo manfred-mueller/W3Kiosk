@@ -6,16 +6,12 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW3;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW4;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.checkApps;
-import static com.nass.ek.w3kiosk.ChecksAndConfigs.isScanner;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTv;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.admin.DeviceAdminReceiver;
-import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +24,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
@@ -47,7 +42,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -58,10 +52,7 @@ import androidx.preference.PreferenceManager;
 import com.nass.ek.appupdate.UpdateWrapper;
 import com.nass.ek.appupdate.services.TrustAllCertificates;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -100,9 +91,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public SharedPreferences sharedPreferences;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
-
-    private DevicePolicyManager mDevicePolicyManager;
-    private ComponentName mComponentName;
 
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
@@ -173,9 +161,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (isTv() && urlTimeout > 0) {
             urlHandler = new Handler();
-            urlRunnable = () -> {
-                toggleUrl();
-            };
+            urlRunnable = this::toggleUrl;
             startUrlHandler();
         }
 
@@ -193,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (savedInstanceState != null)
             ((WebView)findViewById(R.id.kioskView)).restoreState(savedInstanceState);
         urlHandler = new Handler();
-        urlRunnable = () -> toggleUrl();
+        urlRunnable = this::toggleUrl;
 
         if (autoUpdate) {
             checkUpdate();
@@ -361,9 +347,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(PermissionRequest request) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    request.grant(request.getResources());
-                }
+                request.grant(request.getResources());
             }
         });
 
@@ -521,10 +505,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (isTv()) {
-            toggleUrl();
-        } else
+        if (!isTv()) {
             kioskWeb.goBack();
+        }
     }
 
     @Override
@@ -574,8 +557,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
-            } else if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 23){
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 23 || event.getKeyCode() == 23)){
                 recreate();
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 82 || event.getKeyCode() == 4)){
+                toggleUrl();
                 return true;
             }
         }
@@ -633,13 +619,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         urlHandler.postDelayed(urlRunnable, urlTimeout);
     }
 
-    private void stopUrlHandler() {
-        marqueeHandler.removeCallbacks(urlRunnable);
-    }
+    private void stopUrlHandler() { urlHandler.removeCallbacks(urlRunnable); }
 
-    private void startMarqueeHandler() {
-        marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout);
-    }
+    private void startMarqueeHandler() { marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout); }
 
     private void stopMarqueeHandler() {
         marqueeHandler.removeCallbacks(marqueeRunnable);
@@ -719,17 +701,5 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Intent intent = new Intent();
         intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
         context.startActivity(intent);
-    }
-    private void onAlertDialog(Context context, String message, String toastMsg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Warning!");
-        builder.setMessage(message);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Handle OK button click
-            }
-        });
-        builder.show();
     }
 }
