@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             startMarqueeHandler();
         }
 
-        if (!isTv() && urlTimeout > 0) {
+        if (isTv() && urlTimeout > 0) {
             urlHandler = new Handler();
             urlRunnable = () -> {
                 toggleUrl();
@@ -491,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             commitURL(urlPreset + clientUrl1);
             nextUrl = clientUrl2;
         }
-        if (!isTv() && urlTimeout > 0) {
+        if (isTv() && urlTimeout > 0) {
             stopUrlHandler();
             startUrlHandler();
         }
@@ -547,7 +547,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             startMarqueeHandler();
         }
-        if (!isTv() && urlTimeout > 0) {
+        if (isTv() && urlTimeout > 0) {
             startUrlHandler();
         }
     }
