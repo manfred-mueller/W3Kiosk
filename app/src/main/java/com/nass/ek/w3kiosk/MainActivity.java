@@ -6,7 +6,9 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW2;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW3;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.PW4;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.checkApps;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.isScanner;
 import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTablet;
+import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTv;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int appsCount;
     public int toSetting;
     public int mqtoSetting;
-    public int handlerTimeout;
+    public int urlTimeout;
     public int marqueeTimeout;
     private int marqueeBgColor;
     private int marqueeTxColor;
@@ -90,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public int toggleKey;
     public int zoom;
     public String nextUrl;
-    public Handler handler;
-    public Runnable runnable;
+    public Handler urlHandler;
+    public Runnable urlRunnable;
     public Handler marqueeHandler;
     public Runnable marqueeRunnable;
 
@@ -154,9 +156,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         if (toSetting > 0) {
-            handlerTimeout = toSetting * 30000;
+            urlTimeout = toSetting * 30000;
         } else {
-            handlerTimeout = toSetting;
+            urlTimeout = toSetting;
         }
 
         if (isTablet() && marquee && marqueeTimeout > 0) {
@@ -166,7 +168,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 loadHtmlContent(htmlContent);
                 marqueeVisible = true;
             };
-            startmarqueeHandler();
+            startMarqueeHandler();
+        }
+
+        if (!isTv() && urlTimeout > 0) {
+            urlHandler = new Handler();
+            urlRunnable = () -> {
+                toggleUrl();
+            };
+            startUrlHandler();
         }
 
         zoom = sharedPreferences.getInt("zoomFactor", 5);
@@ -182,22 +192,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb = findViewById(R.id.kioskView);
         if (savedInstanceState != null)
             ((WebView)findViewById(R.id.kioskView)).restoreState(savedInstanceState);
-        handler = new Handler();
-        runnable = () -> {
-            commitURL(urlPreset + clientUrl1);
-            if (!clientUrl2.equals("")) {
-                nextUrl = clientUrl2;
-            } else
-            {
-                nextUrl = clientUrl1;
-            }
-        };
+        urlHandler = new Handler();
+        urlRunnable = () -> toggleUrl();
 
         if (autoUpdate) {
             checkUpdate();
         }
 
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             new CountDownTimer(60000, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }.start();
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26 && !ChecksAndConfigs.isTv()) {
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv()) {
             Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
             dialogIntent.setData(Uri.parse("package:none"));
             if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
@@ -343,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void setupSettings() {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             settingsButton.setOnLongClickListener(v -> {
                 toggleUrl();
                 return true;
@@ -398,7 +400,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             registerForContextMenu(kioskWeb);
         }
     }
@@ -463,9 +465,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
                 }
                 commitURL(clientUrl3);
-                if (handlerTimeout > 0) {
-                    startHandler();
-                }
             } else {
                 commitURL(urlPreset + clientUrl3);
             }
@@ -478,9 +477,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
                 }
                 commitURL(clientUrl2);
-                if (handlerTimeout > 0) {
-                    startHandler();
-                }
             } else {
                 commitURL(urlPreset + clientUrl2);
             }
@@ -494,7 +490,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         else if (nextUrl.equals(clientUrl1)){
             commitURL(urlPreset + clientUrl1);
             nextUrl = clientUrl2;
-            stopHandler();
+        }
+        if (!isTv() && urlTimeout > 0) {
+            stopUrlHandler();
+            startUrlHandler();
         }
     }
 
@@ -522,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             toggleUrl();
         } else
             kioskWeb.goBack();
@@ -546,7 +545,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, filter);
         if (isTablet() && marquee && marqueeTimeout > 0) {
-            startmarqueeHandler();
+            startMarqueeHandler();
+        }
+        if (!isTv() && urlTimeout > 0) {
+            startUrlHandler();
         }
     }
 
@@ -559,13 +561,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             e.printStackTrace();
         }
         if (isTablet() && marquee && marqueeTimeout > 0) {
-            stopmarqueeHandler();
+            stopMarqueeHandler();
+        }
+        if (isTv() && urlTimeout > 0) {
+            stopUrlHandler();
         }
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (ChecksAndConfigs.isTv()) {
+        if (isTv()) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
                 return true;
@@ -616,26 +621,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 kioskWeb.goBack();
                 marqueeVisible = false;
             }
-            stopmarqueeHandler();
-            startmarqueeHandler();
+            stopMarqueeHandler();
+            startMarqueeHandler();
         }
-        if (nextUrl.equals(clientUrl1) && handlerTimeout > 0) {
-            stopHandler();
-            startHandler();
+        if (nextUrl.equals(clientUrl1) && urlTimeout > 0) {
+            stopUrlHandler();
+            startUrlHandler();
         }
     }
-    public void stopHandler() {
-        handler.removeCallbacks(runnable);
-    }
-    public void startHandler() {
-        handler.postDelayed(runnable, handlerTimeout);
+    public void startUrlHandler() {
+        urlHandler.postDelayed(urlRunnable, urlTimeout);
     }
 
-    private void startmarqueeHandler() {
+    private void stopUrlHandler() {
+        marqueeHandler.removeCallbacks(urlRunnable);
+    }
+
+    private void startMarqueeHandler() {
         marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout);
     }
 
-    private void stopmarqueeHandler() {
+    private void stopMarqueeHandler() {
         marqueeHandler.removeCallbacks(marqueeRunnable);
     }
 
