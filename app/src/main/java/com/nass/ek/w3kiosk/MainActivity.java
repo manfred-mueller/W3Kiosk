@@ -11,7 +11,9 @@ import static com.nass.ek.w3kiosk.ChecksAndConfigs.isTv;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,9 +23,11 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
@@ -42,17 +46,26 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.net.ConnectivityManagerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.nass.ek.appupdate.UpdateWrapper;
 import com.nass.ek.appupdate.services.TrustAllCertificates;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -91,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public SharedPreferences sharedPreferences;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
+
+    private DevicePolicyManager mDevicePolicyManager;
+    private ComponentName mComponentName;
 
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
@@ -284,14 +300,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     else if (PwInput.equals("s")) {
                         openStorageManager(this);
                     }
+                    else if (PwInput.equals("sk")) {
+                        Update("https://nass-ek.de/android/simple-keyboard-w3c.apk", null);
+                    }
                     else if (PwInput.equals("tv")) {
-                        if (checkApps(this, tvUri))
-                        {
+                        if (checkApps(this, tvUri)) {
                             appClick(tvUri);
                         } else {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
-                            startActivity(intent);
-                        }                    }
+                            if (isTv()) {
+                                // Install teamviewer-quicksupport.apk and tvaddon_TV.apk for TV
+                                Update("https://nass-ek.de/android/Teamviewer/teamviewer-quicksupport.apk",
+                                        "https://nass-ek.de/android/Teamviewer/tvaddon_TV.apk");
+                            } else if (isTablet()) {
+                                // Install teamviewer-quicksupport.apk and tvaddon_Tablet.apk for Tablet
+                                Update("https://nass-ek.de/android/Teamviewer/teamviewer-quicksupport.apk",
+                                        "https://nass-ek.de/android/Teamviewer/tvaddon_Tablet.apk");
+                            } else {
+                                // Open the Play Store link
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
+                                startActivity(intent);
+                            }
+                        }
+                    }
                     else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
                         @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
                         startActivity(startSettingsActivityIntent);
@@ -627,6 +657,75 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         marqueeHandler.removeCallbacks(marqueeRunnable);
     }
 
+    public void Update(final String apkUrl1, @Nullable final String apkUrl2) {
+        new AsyncTask<Void, String, String>() {
+            String result = "";
+
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    // Download and install the first APK
+                    downloadAndInstallAPK(apkUrl1);
+
+                    // Download and install the second APK if provided
+                    if (apkUrl2 != null) {
+                        downloadAndInstallAPK(apkUrl2);
+                    }
+
+                } catch (IOException e) {
+                    result = "Update error! " + e.getMessage();
+                    e.printStackTrace();
+                }
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                if (!result.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
+
+    // Helper method to download and install APK
+    private void downloadAndInstallAPK(String apkUrl) throws IOException {
+        URL url = new URL(apkUrl);
+        HttpURLConnection c = (HttpURLConnection) url.openConnection();
+        c.setRequestMethod("GET");
+        c.connect();
+
+        String PATH = Environment.getExternalStorageDirectory() + "/download/";
+        File file = new File(PATH);
+        file.mkdirs();
+        File outputFile = new File(file, apkUrl.substring(apkUrl.lastIndexOf('/') + 1)); // Get the file name from the URL
+        FileOutputStream fos = new FileOutputStream(outputFile);
+
+        InputStream is = c.getInputStream();
+        byte[] buffer = new byte[1024];
+        int len1;
+        while ((len1 = is.read(buffer)) != -1) {
+            fos.write(buffer, 0, len1);
+        }
+        fos.close();
+        is.close();
+
+        Intent intent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri apkUri = FileProvider.getUriForFile(getApplicationContext(),
+                    getApplicationContext().getPackageName() + ".provider", outputFile);
+            intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+            intent.setData(apkUri);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        startActivity(intent);
+    }
+
     public void checkUpdate() {
 
         String updateFound=(String.format(getString(R.string.UpdateAvailable), getString(R.string.app_name)));
@@ -701,5 +800,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Intent intent = new Intent();
         intent.setAction(android.provider.Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
         context.startActivity(intent);
+    }
+    private void onAlertDialog(Context context, String message, String toastMsg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Warning!");
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Handle OK button click
+            }
+        });
+        builder.show();
     }
 }
