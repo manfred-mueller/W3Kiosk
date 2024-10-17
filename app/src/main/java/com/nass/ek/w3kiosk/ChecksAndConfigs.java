@@ -7,7 +7,9 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.text.format.Formatter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +17,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class ChecksAndConfigs extends AppCompatActivity {
@@ -161,5 +167,49 @@ public class ChecksAndConfigs extends AppCompatActivity {
         Random random = new Random();
         int randomNumber = random.nextInt(1000000); // Change this range as needed
         return String.valueOf(randomNumber);
+    }
+    public static String getIPAddress(Context context) {
+        // Check if connected to Wi-Fi
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                // Get IP address when connected to Wi-Fi
+                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+                return Formatter.formatIpAddress(ipAddress);
+            } else {
+                // Get IP address when connected to cellular or other network types
+                return getIPAddressFromNetworkInterface();
+            }
+        }
+        return "";
+    }
+
+    // This method retrieves the device's IP address from network interfaces (for cellular networks or other connections)
+    private static String getIPAddressFromNetworkInterface() {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface networkInterface : interfaces) {
+                List<InetAddress> addresses = Collections.list(networkInterface.getInetAddresses());
+                for (InetAddress address : addresses) {
+                    if (!address.isLoopbackAddress() && address instanceof InetAddress) {
+                        String ipAddress = address.getHostAddress();
+                        if (isIPv4Address(ipAddress)) {
+                            return ipAddress;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    // Helper method to check if the IP address is IPv4 (ignore IPv6 for most common cases)
+    private static boolean isIPv4Address(String ipAddress) {
+        return ipAddress.indexOf(':') < 0;  // IPv6 addresses contain ':'
     }
 }

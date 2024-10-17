@@ -22,6 +22,10 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -30,6 +34,10 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.Layout;
+import android.text.SpannableString;
+import android.text.style.AlignmentSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -65,6 +73,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.URL;
 import java.util.Objects;
 
@@ -82,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public boolean marquee;
     private String marqueeText;
     private boolean marqueeVisible;
+    public String localIp;
     public String clientUrl1;
     public String clientUrl2;
     public String clientUrl3;
@@ -139,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
         autoUpdate = sharedPreferences.getBoolean("autoUpdate", false);
+        localIp = getLocalIpAddress(this);
         marquee = sharedPreferences.getBoolean("marquee", false);
         appsCount = sharedPreferences.getInt("appsCount", 0);
         toSetting = sharedPreferences.getInt("urlTimeout", 0);
@@ -613,6 +626,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         menu.add(0, 2, 0, R.string.deactivateMenubutton);
         menu.add(0, 3, 0, R.string.settings);
         menu.add(0, 4, 0, R.string.showHelp);
+
+        // Create the 5th item with centered and smaller text
+        String ipText = String.format("IP: %s", localIp);
+        SpannableString smallerCenteredText = new SpannableString(ipText);
+        // Center the text
+        smallerCenteredText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, ipText.length(), 0);
+        // Make the text half the size
+        smallerCenteredText.setSpan(new RelativeSizeSpan(0.5f), 0, ipText.length(), 0);
+
+        menu.add(0, 5, 0, smallerCenteredText);
     }
 
     @Override
@@ -657,6 +680,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         marqueeHandler.removeCallbacks(marqueeRunnable);
     }
 
+    @SuppressLint("StaticFieldLeak")
     public void Update(final String apkUrl1, @Nullable final String apkUrl2) {
         new AsyncTask<Void, String, String>() {
             String result = "";
@@ -812,5 +836,32 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
         builder.show();
+    }
+    public static String getLocalIpAddress(Context context) {
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager != null) {
+                Network[] allNetworks = connectivityManager.getAllNetworks();
+                for (Network network : allNetworks) {
+                    NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+                    if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                        LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                        if (linkProperties != null) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // Android 7 (Nougat) or higher
+                                for (LinkAddress linkAddress : linkProperties.getLinkAddresses()) {
+                                    InetAddress address = linkAddress.getAddress();
+                                    // Check if it's a valid local IP address (IPv4 or IPv6)
+                                    if (!address.isLoopbackAddress() && (address instanceof Inet4Address)) {
+                                        return address.getHostAddress();
+                                    }
+                                }
+                            }                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if no IP address was found
     }
 }
