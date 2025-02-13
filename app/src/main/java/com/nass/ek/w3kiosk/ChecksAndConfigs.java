@@ -74,7 +74,7 @@ public class ChecksAndConfigs extends AppCompatActivity {
     }
 
     public static boolean isTablet() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("RK");
+        return android.os.Build.MODEL.toUpperCase().startsWith("RK") || android.os.Build.MODEL.toUpperCase().startsWith("PRIME");
     }
 
     public static boolean isTv() {

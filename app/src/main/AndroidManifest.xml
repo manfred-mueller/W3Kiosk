@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.STATUS_BAR" />
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
@@ -107,6 +108,10 @@
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <activity
             android:name=".SupportActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
+        <activity
+            android:name=".StatusBarActivity"
             android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation|fontScale|density|screenSize|keyboardHidden|uiMode" />
         <service

@@ -493,7 +493,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -540,13 +540,12 @@
                         android:layout_weight="1">
 
                         <CheckBox
-                            android:id="@+id/writeStorage"
+                            android:id="@+id/overlayPerm"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
                             android:clickable="false"
-                            android:onClick="checkStoragePermission"
-                            android:text="@string/storage_permission" />
+                            android:onClick="checkOverlayPermission"
+                            android:text="@string/overlay_permission" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -555,12 +554,13 @@
                         android:layout_weight="1">
 
                         <CheckBox
-                            android:id="@+id/overlayPerm"
+                            android:id="@+id/writeStorage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
                             android:clickable="false"
-                            android:onClick="checkOverlayPermission"
-                            android:text="@string/overlay_permission" />
+                            android:onClick="checkStoragePermission"
+                            android:text="@string/storage_permission" />
                     </RelativeLayout>
                 </LinearLayout>
 
@@ -569,6 +569,20 @@
                     android:layout_height="match_parent"
                     android:baselineAligned="false"
                     android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <CheckBox
+                            android:id="@+id/writeSystem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false"
+                            android:onClick="checkWritePermission"
+                            android:text="@string/write_system_settings" />
+                    </RelativeLayout>
 
                     <RelativeLayout
                         android:layout_width="0dp"
@@ -584,20 +598,6 @@
                             android:onClick="checkCameraPermission"
                             android:text="@string/camera_access" />
                     </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
-
-                        <CheckBox
-                            android:id="@+id/writeSystem"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clickable="false"
-                            android:onClick="checkWritePermission"
-                            android:text="@string/write_system_settings" />
-                    </RelativeLayout>
                 </LinearLayout>
 
                 <LinearLayout
@@ -612,13 +612,12 @@
                         android:layout_weight="1">
 
                         <CheckBox
-                            android:id="@+id/powerMenu"
+                            android:id="@+id/installApps"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
                             android:clickable="false"
-                            android:onClick="checkAccessibilityPermission"
-                            android:text="@string/powermenu" />
+                            android:onClick="checkInstallPermission"
+                            android:text="@string/apps_permission" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -627,12 +626,13 @@
                         android:layout_weight="1">
 
                         <CheckBox
-                            android:id="@+id/installApps"
+                            android:id="@+id/powerMenu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
                             android:clickable="false"
-                            android:onClick="checkInstallPermission"
-                            android:text="@string/apps_permission" />
+                            android:onClick="checkAccessibilityPermission"
+                            android:text="@string/powermenu" />
                     </RelativeLayout>
                 </LinearLayout>
 
