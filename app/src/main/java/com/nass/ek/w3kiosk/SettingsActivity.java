@@ -110,21 +110,6 @@ public class SettingsActivity extends AppCompatActivity {
         ArrayAdapter<String> mqtimeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marqueeTimeout);
         mqtimeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         marqueeDropdown.setAdapter(mqtimeoutAdapter);
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                toggleMarqueeEditText();
-                return true;
-            }
-        });
-
-        // Set OnTouchListener to detect gestures
-        marqueeDropdown.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
-        findViewById(R.id.marqueeText).setOnTouchListener((view, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return true;
-        });
-
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -379,10 +364,6 @@ public class SettingsActivity extends AppCompatActivity {
                 c.setVisibility(View.GONE);
             }
         }
-    }
-
-    public void toggleMarqueeEditText() {
-        marqueeEditText.setEnabled(!marqueeEditText.isEnabled());
     }
 
     public void toggleMarquee(View v) {
