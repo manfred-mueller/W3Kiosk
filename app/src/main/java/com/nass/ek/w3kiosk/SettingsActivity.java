@@ -118,10 +118,13 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        // Set OnTouchListener to detect gestures
+        marqueeDropdown.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
         findViewById(R.id.marqueeText).setOnTouchListener((view, event) -> {
             gestureDetector.onTouchEvent(event);
             return true;
         });
+
         timeoutDropdown = findViewById(R.id.timeoutSpinner);
         ArrayAdapter<String> timeoutAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urlTimeout);
         timeoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
