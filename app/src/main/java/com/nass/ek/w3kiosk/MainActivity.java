@@ -120,6 +120,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mComponentName;
 
+    private int upPressCount = 0;
+    private int rightPressCount = 0;
+    private long lastKeyPressTime = 0;
+    private static final long KEY_SEQUENCE_TIMEOUT = 2000; // 2 seconds timeout
+    private static final String TAG = "KeyEventDebug";
+
+
 
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
@@ -147,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         enableImmersiveMode();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
@@ -323,8 +332,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         }
                     }
                     else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
-                        @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-                        startActivity(startSettingsActivityIntent);
+                        openSettingsActivity();
                     }
                     else if (PwInput.equals("w")) {
                         Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
@@ -554,6 +562,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onResume() {
         super.onResume();
+        upPressCount = 0;
+        rightPressCount = 0;
         enableImmersiveMode();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -587,6 +597,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTv()) {
             if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
                 kioskWeb.showContextMenu();
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 19)){
+                upPressCount++;
+                if (upPressCount == 3) {
+                    rightPressCount = 0;
+                }
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 21 && upPressCount >= 3)){
+                rightPressCount++;
+                if (rightPressCount == 3) {
+                    openSettingsActivity();
+                    upPressCount = 0;
+                    rightPressCount = 0;
+                }
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 22 && upPressCount >= 3)){
+                rightPressCount++;
+                if (rightPressCount == 3) {
+                    openSettings();
+                    upPressCount = 0;
+                    rightPressCount = 0;
+                }
                 return true;
             } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 23 || event.getKeyCode() == 23)){
                 recreate();
@@ -866,5 +898,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 decorView.setSystemUiVisibility(flags);
             }
         });
+    }
+
+    private void openSettingsActivity() {
+        try {
+            @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(startSettingsActivityIntent);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to open settingsActivity", e);
+        }
+    }
+    private void openSettings() {
+        try {
+            Intent intent = new Intent(Settings.ACTION_SETTINGS);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to open settings", e);
+        }
     }
 }

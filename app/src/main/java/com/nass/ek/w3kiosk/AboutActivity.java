@@ -20,6 +20,8 @@ import com.nass.ek.appupdate.UpdateWrapper;
 import java.text.DateFormat;
 import java.util.Date;
 
+import android.view.KeyEvent;
+
 public class AboutActivity extends AppCompatActivity {
 
     public void closeClick(View view) {
@@ -28,6 +30,7 @@ public class AboutActivity extends AppCompatActivity {
 
     WindowManager windowManager;
     DisplayMetrics displayMetrics;
+    public String KeyCode = "";
     public String Rooted;
 
     @Override
@@ -55,6 +58,8 @@ public class AboutActivity extends AppCompatActivity {
         @SuppressLint("StringFormatMatches") String appinfo = (String.format(getString(R.string.appInfo), getString(R.string.app_name), localVersion, DateFormat.getDateInstance(DateFormat.MEDIUM).format(buildDate), String.format(connectionType(this) + " " + getIPAddress(getApplicationContext())), Rooted));
         TextView appinfoText = findViewById(R.id.textView3);
         appinfoText.setText(appinfo);
+        TextView keycodeText = findViewById(R.id.textView4);
+        keycodeText.setText(KeyCode);
         findViewById(R.id.logo_id).setOnClickListener(view -> checkUpdate());
         checkUpdate();
     }
@@ -78,5 +83,11 @@ public class AboutActivity extends AppCompatActivity {
                 })
                 .build();
         updateWrapper.start();
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        TextView keycodeText = findViewById(R.id.textView4);
+        keycodeText.setText("Keycode: " + keyCode);
+        return super.onKeyDown(keyCode, event);
     }
 }
