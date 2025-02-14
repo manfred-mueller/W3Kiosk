@@ -318,7 +318,7 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     // If not granted, enable checkbox to request permission
                     c.setChecked(false);
-                    c.setEnabled(true);
+                    c.setEnabled(false);
                 }
             } else {
                 // Android 10 and below: Check WRITE_EXTERNAL_STORAGE permission
@@ -334,7 +334,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.camAccess);
-            if (ChecksAndConfigs.isTv() || ChecksAndConfigs.isTablet()) {
+            if (ChecksAndConfigs.isTv()) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
