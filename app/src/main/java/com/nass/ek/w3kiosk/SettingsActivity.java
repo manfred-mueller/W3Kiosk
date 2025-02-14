@@ -320,9 +320,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.writeStorage);
-            if (ChecksAndConfigs.isTablet()) {
-                c.setVisibility(View.GONE);
-            } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     if (Environment.isExternalStorageManager()) {
                         c.setChecked(true);
@@ -335,7 +332,6 @@ public class SettingsActivity extends AppCompatActivity {
                     c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
                     c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
                 }
-            }
             String configFileContent = readConfigFileContents();
 
             if (configFileContent.isEmpty()) {
@@ -360,12 +356,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.powerMenu);
-            if (ChecksAndConfigs.isTablet()) {
-                c.setVisibility(View.GONE);
-            } else {
-                c.setChecked(isAccessibilitySettingsOn());
-                c.setEnabled(!isAccessibilitySettingsOn());
-            }
+            c.setChecked(isAccessibilitySettingsOn());
+            c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
             if (ChecksAndConfigs.isTv()) {
@@ -610,13 +602,9 @@ public class SettingsActivity extends AppCompatActivity {
             int zoomValue = sharedPreferences.getInt("zoomFactor",5);
             zoomDropdown.setSelection(zoomValue);
 
-                c = findViewById(R.id.writeStorage);
-            if (!ChecksAndConfigs.isTablet()) {
-                c.setVisibility(View.GONE);
-            } else {
-                c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
-            }
+            c = findViewById(R.id.writeStorage);
+            c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+            c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
             if (ChecksAndConfigs.isTv()) {
@@ -635,12 +623,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.powerMenu);
-            if (!ChecksAndConfigs.isTablet()) {
-                c.setVisibility(View.GONE);
-            } else {
-                c.setChecked(isAccessibilitySettingsOn());
-                c.setEnabled(!isAccessibilitySettingsOn());
-            }
+            c.setChecked(isAccessibilitySettingsOn());
+            c.setEnabled(!isAccessibilitySettingsOn());
 
             c = findViewById(R.id.writeSystem);
             if (ChecksAndConfigs.isTv()) {
