@@ -308,18 +308,24 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.writeStorage);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (Environment.isExternalStorageManager()) {
-                        c.setChecked(true);
-                        c.setEnabled(false);
-                    } else {
-                        c.setChecked(false);
-                        c.setEnabled(true);
-                    }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Android 11+ (API 30 and above, including Android 13)
+                if (Environment.isExternalStorageManager()) {
+                    // If MANAGE_EXTERNAL_STORAGE permission is granted, disable the checkbox
+                    c.setChecked(true);
+                    c.setEnabled(false);
                 } else {
-                    c.setChecked(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                    c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
+                    // If not granted, enable checkbox to request permission
+                    c.setChecked(false);
+                    c.setEnabled(true);
                 }
+            } else {
+                // Android 10 and below: Check WRITE_EXTERNAL_STORAGE permission
+                boolean hasWritePermission = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                c.setChecked(hasWritePermission);
+                c.setEnabled(!hasWritePermission);
+            }
             String configFileContent = readConfigFileContents();
 
             if (configFileContent.isEmpty()) {
@@ -512,20 +518,43 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    public void checkStoragePermission(View v){
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (! Environment.isExternalStorageManager()) {
+    public void checkStoragePermission(View v) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ (API 33): Request permissions for media access
+            if (!Environment.isExternalStorageManager()) {
+                // Request MANAGE_EXTERNAL_STORAGE permission if not granted
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
                 Uri uri = Uri.fromParts("package", getPackageName(), null);
                 intent.setData(uri);
-                context.startActivity(intent);
+                startActivityForResult(intent, 4710); // Start activity to manage permission
+            } else {
+                // If MANAGE_EXTERNAL_STORAGE is already granted, request media access permissions
+                ActivityCompat.requestPermissions(SettingsActivity.this, new String[]{
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO
+                }, 4710);
+            }
+        } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+ (API 30): Request MANAGE_EXTERNAL_STORAGE permission
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivityForResult(intent, 4710); // Start activity to manage permission
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // If MANAGE_EXTERNAL_STORAGE is granted, no need for further permissions
             }
         } else {
-            ActivityCompat.requestPermissions(SettingsActivity.this,new String[]{
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4710);
+            // Android 10 and below: Request WRITE_EXTERNAL_STORAGE permission
+            ActivityCompat.requestPermissions(SettingsActivity.this, new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, 4710);
         }
     }
-
     public void checkWritePermission(View v){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (! Settings.System.canWrite(this))

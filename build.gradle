@@ -17,7 +17,7 @@ configurations.configureEach {
 }
 
 ext {
-    verCode = 52
+    verCode = 53
     verName = "2.6.3"
     releaseDir = file("${projectDir}/app/release")
 }
