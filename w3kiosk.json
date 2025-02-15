@@ -1,7 +1,7 @@
 {
     "versionCode":55,
-    "versionName":"2.6.3",
+    "versionName":"2.6.5",
     "contentText":"Neue W3Kiosk-Version",
     "minSupport":1,
-    "url":"https://github.com/manfred-mueller/W3Kiosk/releases/download/v2.6.3/w3kiosk-2.6.3-release.apk"
+    "url":"https://github.com/manfred-mueller/W3Kiosk/releases/latest/download/w3kiosk.apk"
 }
