@@ -308,23 +308,26 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.writeStorage);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Android 11+ (API 30 and above, including Android 13)
-                if (Environment.isExternalStorageManager()) {
-                    // If MANAGE_EXTERNAL_STORAGE permission is granted, disable the checkbox
-                    c.setChecked(true);
-                    c.setEnabled(false);
-                } else {
-                    // If not granted, enable checkbox to request permission
-                    c.setChecked(false);
-                    c.setEnabled(false);
-                }
+            if (android.os.Build.MODEL.toUpperCase().startsWith("PRIME")) {
+                c.setVisibility(View.GONE);
             } else {
-                // Android 10 and below: Check WRITE_EXTERNAL_STORAGE permission
-                boolean hasWritePermission = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-                c.setChecked(hasWritePermission);
-                c.setEnabled(!hasWritePermission);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    // Android 11+ (API 30 and above, including Android 13)
+                    if (Environment.isExternalStorageManager()) {
+                        // If MANAGE_EXTERNAL_STORAGE permission is granted, disable the checkbox
+                        c.setChecked(true);
+                        c.setEnabled(false);
+                    } else {
+                        // If not granted, enable checkbox to request permission
+                        c.setChecked(false);
+                        c.setEnabled(false);
+                    }
+                } else {
+                    // Android 10 and below: Check WRITE_EXTERNAL_STORAGE permission
+                    boolean hasWritePermission = context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                    c.setChecked(hasWritePermission);
+                    c.setEnabled(!hasWritePermission);
+                }
             }
             String configFileContent = readConfigFileContents();
 
@@ -334,7 +337,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.camAccess);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv() || android.os.Build.MODEL.toUpperCase().startsWith("PRIME")) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);

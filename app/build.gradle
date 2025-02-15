@@ -32,7 +32,7 @@ android {
         versionCode rootProject.ext.verCode
         versionName rootProject.ext.verName
 
-        setProperty("archivesBaseName", "w3kiosk-$versionName")
+        setProperty("archivesBaseName", "w3kiosk")
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
