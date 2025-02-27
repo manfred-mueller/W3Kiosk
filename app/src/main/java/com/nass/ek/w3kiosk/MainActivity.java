@@ -578,6 +578,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, filter);
         if (isTablet() && marquee && marqueeTimeout > 0) {
+            savePreviousContent(); // Store the last page before restarting the marquee
             startMarqueeHandler();
         }
         if (isTv() && urlTimeout > 0) {
@@ -726,8 +727,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void stopUrlHandler() { urlHandler.removeCallbacks(urlRunnable); }
 
-    private void startMarqueeHandler() { marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout); }
-
+    private void startMarqueeHandler() {
+        marqueeRunnable = () -> {
+            savePreviousContent(); // Store the current WebView page before marquee
+            String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeBgColor);
+            loadHtmlContent(htmlContent);
+            marqueeVisible = true;
+        };
+        marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout);
+    }
     private void stopMarqueeHandler() {
         marqueeHandler.removeCallbacks(marqueeRunnable);
     }
