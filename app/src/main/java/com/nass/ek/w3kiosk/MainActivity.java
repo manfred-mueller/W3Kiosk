@@ -683,18 +683,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onUserInteraction() {
         super.onUserInteraction();
+
         if (isTablet() && marquee && marqueeTimeout > 0) {
-            if (marqueeVisible) {
+            if (isMarqueeRunning()) {
+                stopMarqueeHandler();
                 kioskWeb.goBack();
                 marqueeVisible = false;
             }
-            stopMarqueeHandler();
-            startMarqueeHandler();
         }
+
         if (nextUrl.equals(clientUrl1) && urlTimeout > 0) {
             stopUrlHandler();
             startUrlHandler();
         }
+    }
+
+    /**
+     * Helper method to check if the marquee is currently running.
+     */
+    private boolean isMarqueeRunning() {
+        return marqueeVisible && kioskWeb.getUrl() != null && kioskWeb.getUrl().contains("marquee");
     }
     public void startUrlHandler() {
         urlHandler.postDelayed(urlRunnable, urlTimeout);
