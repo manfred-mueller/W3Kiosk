@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public SharedPreferences sharedPreferences;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
+    public String adbUri = "com.cgutman.androidremotedebugger";
 
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mComponentName;
@@ -308,6 +309,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                     else if (PwInput.equals("s")) {
                         openStorageManager(this);
+                    }
+                    else if (PwInput.equals("ra") && isTablet()) {
+                        if (checkApps(this, adbUri))
+                        {
+                            appClick(adbUri);
+                        } else {
+                            Update("https://nass-ek.de/android/remote-adb-shell.apk", null);                        }
                     }
                     else if (PwInput.equals("sk")) {
                         Update("https://nass-ek.de/android/simple-keyboard-w3c.apk", null);
