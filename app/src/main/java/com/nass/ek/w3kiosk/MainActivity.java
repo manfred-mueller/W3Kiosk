@@ -455,6 +455,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void commitURL(String url) {
+        previousUrl=url;
         kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
             if (url.equals(urlPreset)) {
                 @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
@@ -578,7 +579,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(connectionReceiver, filter);
         if (isTablet() && marquee && marqueeTimeout > 0) {
-            savePreviousContent(); // Store the last page before restarting the marquee
             startMarqueeHandler();
         }
         if (isTv() && urlTimeout > 0) {
@@ -689,8 +689,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             if (isMarqueeRunning()) {
                 stopMarqueeHandler();
-                restorePreviousContent(); // Restore the previous page
                 marqueeVisible = false;
+                kioskWeb.loadUrl(previousUrl);
             }
         }
 
@@ -708,20 +708,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     /**
-     * Saves the current WebView URL before showing the marquee.
-     */
-    private void savePreviousContent() {
-        previousUrl = kioskWeb.getUrl();
-    }
-
-    /**
      * Restores the WebView to the content it had before the marquee started.
      */
     private void restorePreviousContent() {
         if (previousUrl != null && !previousUrl.isEmpty()) {
             kioskWeb.loadUrl(previousUrl);
         }
-    }    public void startUrlHandler() {
+    }
+
+    public void startUrlHandler() {
         urlHandler.postDelayed(urlRunnable, urlTimeout);
     }
 
@@ -729,7 +724,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void startMarqueeHandler() {
         marqueeRunnable = () -> {
-            savePreviousContent(); // Store the current WebView page before marquee
             String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeBgColor);
             loadHtmlContent(htmlContent);
             marqueeVisible = true;
