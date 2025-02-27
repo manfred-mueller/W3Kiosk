@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private int marqueeSpeed;
     public int toggleKey;
     public int zoom;
+    private String previousUrl;
     public String nextUrl;
     public Handler urlHandler;
     public Runnable urlRunnable;
@@ -687,7 +688,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             if (isMarqueeRunning()) {
                 stopMarqueeHandler();
-                kioskWeb.goBack();
+                restorePreviousContent(); // Restore the previous page
                 marqueeVisible = false;
             }
         }
@@ -702,9 +703,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Helper method to check if the marquee is currently running.
      */
     private boolean isMarqueeRunning() {
-        return marqueeVisible && kioskWeb.getUrl() != null && kioskWeb.getUrl().contains("marquee");
+        return marqueeVisible;
     }
-    public void startUrlHandler() {
+
+    /**
+     * Saves the current WebView URL before showing the marquee.
+     */
+    private void savePreviousContent() {
+        previousUrl = kioskWeb.getUrl();
+    }
+
+    /**
+     * Restores the WebView to the content it had before the marquee started.
+     */
+    private void restorePreviousContent() {
+        if (previousUrl != null && !previousUrl.isEmpty()) {
+            kioskWeb.loadUrl(previousUrl);
+        }
+    }    public void startUrlHandler() {
         urlHandler.postDelayed(urlRunnable, urlTimeout);
     }
 
