@@ -691,6 +691,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 stopMarqueeHandler();
                 marqueeVisible = false;
                 kioskWeb.loadUrl(previousUrl);
+                startMarqueeHandler();
             }
         }
 
