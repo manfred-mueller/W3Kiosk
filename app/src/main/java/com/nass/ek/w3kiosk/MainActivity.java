@@ -614,6 +614,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     rightPressCount = 0;
                 }
                 return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 20 && upPressCount >= 3)){
+                rightPressCount++;
+                if (rightPressCount == 3) {
+                    appClick(tvUri);
+                    upPressCount = 0;
+                    rightPressCount = 0;
+                }
+                return true;
             } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 21 && upPressCount >= 3)){
                 rightPressCount++;
                 if (rightPressCount == 3) {
