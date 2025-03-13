@@ -139,6 +139,11 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.client3EditText).setVisibility(View.GONE);
         }
 
+        if (ChecksAndConfigs.isTv()) {
+            findViewById(R.id.appsText).setVisibility(View.GONE);
+            findViewById(R.id.appsSpinner).setVisibility(View.GONE);
+        }
+
         devId = sharedPreferences.getString("devId", ChecksAndConfigs.randomId());
 
         b = findViewById(R.id.updateCloseButton);
