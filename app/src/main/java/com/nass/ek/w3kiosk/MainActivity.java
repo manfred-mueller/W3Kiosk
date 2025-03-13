@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         } else {
                             if (isTv()) {
                                 // Install teamviewer-quicksupport.apk and tvaddon_TV.apk for TV
-                                Update("https://nass-ek.de/android/Teamviewer/teamviewer-quicksupport.apk",
+                                Update("https://download.teamviewer.com/download/TeamViewerQS.apk",
                                         "https://nass-ek.de/android/Teamviewer/tvaddon_TV.apk");
                             } else if (isTablet()) {
                                 // Install teamviewer-quicksupport.apk and tvaddon_Tablet.apk for Tablet
