@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.8.0'
+        classpath 'com.android.tools.build:gradle:8.13.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -17,8 +17,8 @@ configurations.configureEach {
 }
 
 ext {
-    verCode = 67
-    verName = "2.8.1"
+    verCode = 68
+    verName = "2.8.2"
     releaseDir = file("${projectDir}/app/release")
 }
 

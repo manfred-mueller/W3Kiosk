@@ -358,8 +358,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.powerMenu);
-            c.setChecked(isAccessibilitySettingsOn());
-            c.setEnabled(!isAccessibilitySettingsOn());
+            c.setVisibility(android.view.View.GONE); // Accessibility Service nicht benoetigt
 
             c = findViewById(R.id.writeSystem);
             if (ChecksAndConfigs.isTv()) {
@@ -606,13 +605,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public boolean isAccessibilitySettingsOn() {
-        AccessibilityManager am = (AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
         ContentResolver cr = getApplicationContext().getContentResolver();
-        if (am.isEnabled()) {
-            String settingValue = Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            return settingValue != null && settingValue.contains("com.nass.ek.w3kiosk/com.nass.ek.w3kiosk.ShutdownService");
-        }
-        return false;
+        String settingValue = Settings.Secure.getString(cr, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (settingValue == null) return false;
+        // Beide Schreibweisen pruefen (kurz und lang)
+        return settingValue.contains("com.nass.ek.w3kiosk/com.nass.ek.w3kiosk.ShutdownService")
+            || settingValue.contains("com.nass.ek.w3kiosk/.ShutdownService");
     }
     @RequiresApi(api = O)
     @Override
@@ -644,8 +642,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.powerMenu);
-            c.setChecked(isAccessibilitySettingsOn());
-            c.setEnabled(!isAccessibilitySettingsOn());
+            c.setVisibility(android.view.View.GONE); // Accessibility Service nicht benoetigt
 
             c = findViewById(R.id.writeSystem);
             if (ChecksAndConfigs.isTv()) {

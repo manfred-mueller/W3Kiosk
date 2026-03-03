@@ -14,6 +14,7 @@ import android.text.format.Formatter;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,6 +80,31 @@ public class ChecksAndConfigs extends AppCompatActivity {
 
     public static boolean isTv() {
         return android.os.Build.MODEL.toUpperCase().startsWith("TV") || android.os.Build.MODEL.toUpperCase().startsWith("X8");
+    }
+    public static boolean isWirelessAdbEnabled() {
+        try {
+            // Request root shell
+            Process su = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(su.getOutputStream());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(su.getInputStream()));
+
+            // Execute command
+            os.writeBytes("getprop service.adb.tcp.port\n");
+            os.writeBytes("exit\n");
+            os.flush();
+
+            // Read result
+            String output = reader.readLine();
+            su.waitFor();
+
+            if (output != null) {
+                output = output.trim();
+                return !output.equals("-1") && !output.isEmpty();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     public static boolean checkApps(Context context, String uri) {
         PackageInfo pkgInfo;

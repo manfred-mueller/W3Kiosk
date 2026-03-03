@@ -27,7 +27,7 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
-import android.os.AsyncTask;
+// AsyncTask entfernt - ersetzt durch ExecutorService
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -114,6 +114,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public Handler marqueeHandler;
     public Runnable marqueeRunnable;
 
+    // NEUE FELDER: Flag und Handler für automatisches Wiederstarten nach Benutzer-Pause
+    private boolean marqueeUserPaused = false;
+    private Handler marqueeResumeHandler;
+
     public SharedPreferences sharedPreferences;
     public static String tvUri = "com.teamviewer.quicksupport.market";
     public static String adUri = "com.anydesk.anydeskandroid";
@@ -121,6 +125,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private DevicePolicyManager mDevicePolicyManager;
     private ComponentName mComponentName;
+
+    private void initKioskMode() {
+        mDevicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        mComponentName = new ComponentName(this, KioskAdminReceiver.class);
+        if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+            mDevicePolicyManager.setLockTaskPackages(
+                mComponentName, new String[]{ getPackageName(), "com.android.settings" }
+            );
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                mDevicePolicyManager.setLockTaskFeatures(
+                    mComponentName, DevicePolicyManager.LOCK_TASK_FEATURE_NONE
+                );
+            }
+            startLockTask();
+        }
+    }
 
     private int upPressCount = 0;
     private int rightPressCount = 0;
@@ -133,31 +153,67 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && Objects.equals(intent.getAction(), ConnectivityManager
-                    .CONNECTIVITY_ACTION)) {
+            if (intent != null && Objects.equals(intent.getAction(), ConnectivityManager.CONNECTIVITY_ACTION)) {
 
-                boolean isConnected = Objects.requireNonNull(ConnectivityManagerCompat.getNetworkInfoFromBroadcast
-                        ((ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE),
-                                intent)).isConnected();
+                // Sicherer Zugriff auf NetworkInfo (vermeidet NPE)
+                android.net.NetworkInfo networkInfo = ConnectivityManagerCompat.getNetworkInfoFromBroadcast(
+                        (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE),
+                        intent);
+                boolean isConnected = networkInfo != null && networkInfo.isConnected();
 
                 if (isConnected) {
                     commitURL(urlPreset + clientUrl1);
                 } else {
                     String noNet = context.getString(R.string.noNetwork);
                     String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
-                    kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+                    if (kioskWeb != null) kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
                 }
             }
         }
     };
+
+    // Android 11+: NetworkCallback
+    private android.net.ConnectivityManager.NetworkCallback networkCallback;
+
+    private void registerNetworkCallback() {
+        android.net.ConnectivityManager cm =
+                (android.net.ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        networkCallback = new android.net.ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(android.net.Network network) {
+                runOnUiThread(() -> commitURL(urlPreset + clientUrl1));
+            }
+            @Override
+            public void onLost(android.net.Network network) {
+                runOnUiThread(() -> {
+                    String noNet = getString(R.string.noNetwork);
+                    String rawHTML = "<HTML><body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet + "</h1></td></table></body></HTML>";
+                    if (kioskWeb != null) kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+                });
+            }
+        };
+        android.net.NetworkRequest request = new android.net.NetworkRequest.Builder()
+                .addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+        cm.registerNetworkCallback(request, networkCallback);
+    }
+
+    private void unregisterNetworkCallback() {
+        if (networkCallback != null) {
+            android.net.ConnectivityManager cm =
+                    (android.net.ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            cm.unregisterNetworkCallback(networkCallback);
+            networkCallback = null;
+        }
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint({"ApplySharedPref", "HardwareIds"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // setContentView und FLAG_KEEP_SCREEN_ON wurden an eine zentrale Stelle verschoben,
+        // um doppelte Initialisierung zu vermeiden
         enableImmersiveMode();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
@@ -214,13 +270,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         toggleKey = sharedPreferences.getInt("toggleKey", 82);
         autoPassWord = sharedPreferences.getString("loginPassword", "");
         urlPreset = getString(R.string.url_preset);
+
+        // zentrale einmalige setContentView / View-Init
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         kioskWeb = findViewById(R.id.kioskView);
         if (savedInstanceState != null)
             ((WebView)findViewById(R.id.kioskView)).restoreState(savedInstanceState);
-        urlHandler = new Handler();
-        urlRunnable = this::toggleUrl;
+        // urlHandler/urlRunnable bereits oben gesetzt für TV/Timeout-Fall
 
         if (autoUpdate) {
             checkUpdate();
@@ -251,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
 
         setupSettings();
+        initKioskMode();
 
         if (ChecksAndConfigs.isScanner()) {
             Intent startScannerActivityIntent = new Intent(getApplicationContext(), ScannerActivity.class);
@@ -306,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         startActivity(intent);
                     }
                     else if (PwInput.equals("r")) {
-                        startService(new Intent(this, ShutdownService.class));
+                        ShutdownService.rebootDevice(this);
                     }
                     else if (PwInput.equals("s")) {
                         openStorageManager(this);
@@ -364,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
         } else
         {
-            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
+            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> ShutdownService.rebootDevice(this));
         }
         AlertDialog dialog = checkPasswordDialog.create();
         dialog.show();
@@ -434,6 +492,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTv()) {
             registerForContextMenu(kioskWeb);
         }
+
+        // Neuer Touch-Listener: bei Tippen auf die WebView während der Marquee sichtbar ist,
+        // Marquee stoppen, vorherigen Inhalt wiederherstellen und das Touch-Event konsumieren.
+        kioskWeb.setOnTouchListener((v, event) -> {
+            if (isTablet() && marquee && marqueeTimeout > 0 && marqueeVisible) {
+                // Marquee durch Benutzer gestoppt -> pausieren und automatischen Restart planen
+                stopMarqueeHandler();
+                marqueeVisible = false;
+                marqueeUserPaused = true;
+                restorePreviousContent();
+                scheduleMarqueeResume();
+                // Event konsumieren, damit Tippen nicht zusätzlich Aktionen im Marquee/Seite auslöst
+                return true;
+            }
+            return false;
+        });
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -541,7 +615,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onDestroy() {
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
-        Runtime.getRuntime().exit(0);
+        if (mDevicePolicyManager != null && mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+            stopLockTask();
+        }
+        stopMarqueeResumeHandler(); // Aufräumen
+        if (kioskWeb != null) {
+            try {
+                kioskWeb.stopLoading();
+                kioskWeb.clearHistory();
+                kioskWeb.removeAllViews();
+                kioskWeb.destroy();
+            } catch (Exception ignored) {}
+            kioskWeb = null;
+        }
         super.onDestroy();
     }
 
@@ -552,9 +638,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (!isTv()) {
+        // Wenn WebView zurückspringen kann, zuerst WebView verwenden
+        if (!isTv() && kioskWeb != null && kioskWeb.canGoBack()) {
             kioskWeb.goBack();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -562,10 +650,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            enableImmersiveMode();
         }
     }
 
@@ -575,9 +660,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         upPressCount = 0;
         rightPressCount = 0;
         enableImmersiveMode();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(connectionReceiver, filter);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            registerNetworkCallback();
+        } else {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            registerReceiver(connectionReceiver, filter);
+        }
         if (isTablet() && marquee && marqueeTimeout > 0) {
             startMarqueeHandler();
         }
@@ -590,12 +679,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onPause() {
         super.onPause();
         try {
-            unregisterReceiver(connectionReceiver);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                unregisterNetworkCallback();
+            } else {
+                unregisterReceiver(connectionReceiver);
+            }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
         if (isTablet() && marquee && marqueeTimeout > 0) {
             stopMarqueeHandler();
+            stopMarqueeResumeHandler(); // Aufräumen
         }
         if (isTv() && urlTimeout > 0) {
             stopUrlHandler();
@@ -638,7 +732,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     rightPressCount = 0;
                 }
                 return true;
-            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 23 || event.getKeyCode() == 23)){
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 23){
+                // Einzelne Prüfung (vorher doppelt)
                 recreate();
                 return true;
             } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 82 || event.getKeyCode() == 4)){
@@ -696,10 +791,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         if (isTablet() && marquee && marqueeTimeout > 0) {
             if (isMarqueeRunning()) {
+                // Stoppe Marquee bei Benutzerinteraktion und stelle vorherigen Inhalt wieder her.
+                // Marquee wird nicht dauerhaft deaktiviert, sondern pausiert und dann automatisch neu gestartet.
                 stopMarqueeHandler();
                 marqueeVisible = false;
-                kioskWeb.loadUrl(previousUrl);
-                startMarqueeHandler();
+                marqueeUserPaused = true;
+                restorePreviousContent();
+                scheduleMarqueeResume();
             }
         }
 
@@ -726,53 +824,77 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public void startUrlHandler() {
-        urlHandler.postDelayed(urlRunnable, urlTimeout);
+        if (urlHandler != null && urlRunnable != null && urlTimeout > 0) {
+            urlHandler.postDelayed(urlRunnable, urlTimeout);
+        }
     }
 
-    private void stopUrlHandler() { urlHandler.removeCallbacks(urlRunnable); }
+    private void stopUrlHandler() {
+        if (urlHandler != null && urlRunnable != null) {
+            urlHandler.removeCallbacks(urlRunnable);
+        }
+    }
 
     private void startMarqueeHandler() {
-        marqueeRunnable = () -> {
-            String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeBgColor);
-            loadHtmlContent(htmlContent);
-            marqueeVisible = true;
-        };
-        marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout);
+        // Wenn der Benutzer das Marquee pausiert hat, nicht sofort neu starten
+        if (marqueeUserPaused) return;
+
+        if (marqueeHandler == null) marqueeHandler = new Handler();
+        if (marqueeRunnable == null) {
+            marqueeRunnable = () -> {
+                String htmlContent = generateMarqueeHtml(marqueeText, marqueeSpeed, marqueeBgColor);
+                loadHtmlContent(htmlContent);
+                marqueeVisible = true;
+            };
+        }
+        if (marqueeTimeout > 0) marqueeHandler.postDelayed(marqueeRunnable, marqueeTimeout);
     }
     private void stopMarqueeHandler() {
-        marqueeHandler.removeCallbacks(marqueeRunnable);
+        if (marqueeHandler != null && marqueeRunnable != null) {
+            marqueeHandler.removeCallbacks(marqueeRunnable);
+        }
     }
 
-    @SuppressLint("StaticFieldLeak")
+    // NEUE METHODEN: Resume-Planung und Aufräumen
+    private void scheduleMarqueeResume() {
+        if (marqueeTimeout <= 0) return;
+        if (marqueeResumeHandler == null) marqueeResumeHandler = new Handler();
+        // Entferne vorherige Resume-Aufrufe und plane einen neuen Restart nach marqueeTimeout
+        marqueeResumeHandler.removeCallbacksAndMessages(null);
+        marqueeResumeHandler.postDelayed(() -> {
+            marqueeUserPaused = false;
+            startMarqueeHandler();
+        }, marqueeTimeout);
+    }
+
+    private void stopMarqueeResumeHandler() {
+        if (marqueeResumeHandler != null) {
+            marqueeResumeHandler.removeCallbacksAndMessages(null);
+        }
+    }
+
     public void Update(final String apkUrl1, @Nullable final String apkUrl2) {
-        new AsyncTask<Void, String, String>() {
+        java.util.concurrent.ExecutorService executor =
+                java.util.concurrent.Executors.newSingleThreadExecutor();
+        android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
+        executor.execute(() -> {
             String result = "";
-
-            @Override
-            protected String doInBackground(Void... params) {
-                try {
-                    // Download and install the first APK
-                    downloadAndInstallAPK(apkUrl1);
-
-                    // Download and install the second APK if provided
-                    if (apkUrl2 != null) {
-                        downloadAndInstallAPK(apkUrl2);
-                    }
-
-                } catch (IOException e) {
-                    result = "Update error! " + e.getMessage();
-                    e.printStackTrace();
+            try {
+                downloadAndInstallAPK(apkUrl1);
+                if (apkUrl2 != null) {
+                    downloadAndInstallAPK(apkUrl2);
                 }
-                return result;
+            } catch (IOException e) {
+                result = "Update error! " + e.getMessage();
+                e.printStackTrace();
             }
-
-            @Override
-            protected void onPostExecute(String result) {
-                if (!result.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
+            final String finalResult = result;
+            handler.post(() -> {
+                if (!finalResult.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), finalResult, Toast.LENGTH_LONG).show();
                 }
-            }
-        }.execute();
+            });
+        });
     }
 
     // Helper method to download and install APK
@@ -803,14 +925,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     getApplicationContext().getPackageName() + ".provider", outputFile);
             intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             intent.setData(apkUri);
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
         } else {
             intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
 
-        startActivity(intent);
+        // Start Intent auf UI-Thread, weil Download im Hintergrund läuft
+        runOnUiThread(() -> {
+            try {
+                startActivity(intent);
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Install failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     public void checkUpdate() {
@@ -866,17 +995,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private String generateMarqueeHtml(String text, int speed, int bgColor) {
-        String сolorString = String.format("%X", marqueeTxColor).substring(2);
+        // Korrekte Benennung und Formatierung der Farben als Hex
+        String colorString = String.format("#%06X", (0xFFFFFF & marqueeTxColor));
+        String bgString = String.format("#%06X", (0xFFFFFF & bgColor));
 
         return "<html><head><style>" +
-                "body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }" +
-                "marquee { font-size: 20vh; white-space: nowrap; " +
-                "color: " + сolorString + ";}" +
-                "</style></head><body bgcolor=\"" + bgColor + "\">" +
+                "body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background:" + bgString + "; }" +
+                "marquee { font-size: 20vh; white-space: nowrap; color: " + colorString + ";}" +
+                "</style></head><body>" +
                 "<marquee id='marqueeText' behavior=\"scroll\" direction=\"left\" scrollamount=\"" + speed + "\">" + text + "</marquee>" +
-                "<script>" +
-                "var marquee = document.getElementById('marqueeText');" +
-                "</script>" +
                 "</body></html>";
     }
 
@@ -927,22 +1054,33 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         return null; // Return null if no IP address was found
     }
+    @SuppressWarnings("deprecation")
     private void enableImmersiveMode() {
-        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        getWindow().getDecorView().setSystemUiVisibility(flags);
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
-            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                decorView.setSystemUiVisibility(flags);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            getWindow().setDecorFitsSystemWindows(false);
+            android.view.WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(android.view.WindowInsets.Type.statusBars()
+                        | android.view.WindowInsets.Type.navigationBars());
+                controller.setSystemBarsBehavior(
+                        android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
-        });
+        } else {
+            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            final View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(flags);
+            decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(flags);
+                }
+            });
+        }
     }
-
     private void openSettingsActivity() {
         try {
             @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);

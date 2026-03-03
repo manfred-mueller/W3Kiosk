@@ -341,9 +341,7 @@ public class ScannerActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(ScannerActivity.this)) {
             runIntent("Manage_Overlay");
         }
-        if (!isAccessibilitySettingsOn()) {
-            runIntent("Power_Menu");
-        }
+        // Accessibility Service nicht benoetigt
     }
 
     @Override
@@ -446,7 +444,7 @@ public class ScannerActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                     else if (PwInput.equals("r")) {
-                        startService(new Intent(this, ShutdownService.class));
+                        ShutdownService.rebootDevice(this);
                     }
                     else if (PwInput.equals("s")) {
                         openStorageManager(this);
@@ -483,7 +481,7 @@ public class ScannerActivity extends AppCompatActivity {
         }
         else
         {
-            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> startService(new Intent(this, ShutdownService.class)));
+            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> ShutdownService.rebootDevice(this));
         }
         AlertDialog dialog = checkPasswordDialog.create();
         dialog.show();
