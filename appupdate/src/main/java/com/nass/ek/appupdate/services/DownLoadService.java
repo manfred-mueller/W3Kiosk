@@ -49,7 +49,8 @@ public class DownLoadService extends Service {
                 mNotificationManager.cancel(NOTIFICATION_ID);
                 if (isBackground) {
                     //download finish . start to install app
-                    startActivity(FileUtils.openApkFile(getApplicationContext(), new File(filePath)));
+                    // Silent Install - kein Dialog, kein LockTask-Problem
+                    FileUtils.silentInstallApk(getApplicationContext(), new File(filePath));
                 } else {
                     if (mProgressListener != null) {
                         mProgressListener.done();

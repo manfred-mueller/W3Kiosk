@@ -89,7 +89,8 @@ public class DownloadDialog extends DialogFragment implements View.OnClickListen
                     break;
                 case DONE:
                     if (getActivity() != null) {
-                        getActivity().startActivity(FileUtils.openApkFile(getActivity(), new File(FileUtils.getApkFilePath(getActivity(), mDownloadUrl))));
+                        // Silent Install - kein Dialog, kein LockTask-Problem
+                        FileUtils.silentInstallApk(getActivity(), new File(FileUtils.getApkFilePath(getActivity(), mDownloadUrl)));
                         getActivity().finish();
                         ToastUtils.show(getActivity(), R.string.update_lib_download_finish);
                     }

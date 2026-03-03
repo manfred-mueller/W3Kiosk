@@ -897,21 +897,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         });
     }
 
-    // Helper method to download and install APK
+    // APK herunterladen und silent installieren (kein Dialog, kein LockTask-Problem)
     private void downloadAndInstallAPK(String apkUrl) throws IOException {
         URL url = new URL(apkUrl);
         HttpURLConnection c = (HttpURLConnection) url.openConnection();
         c.setRequestMethod("GET");
+        c.setInstanceFollowRedirects(true);
+        c.setRequestProperty("User-Agent", "Mozilla/5.0");
         c.connect();
 
-        String PATH = Environment.getExternalStorageDirectory() + "/download/";
-        File file = new File(PATH);
-        file.mkdirs();
-        File outputFile = new File(file, apkUrl.substring(apkUrl.lastIndexOf('/') + 1)); // Get the file name from the URL
+        File outputFile = new File(getExternalFilesDir(null),
+                apkUrl.substring(apkUrl.lastIndexOf('/') + 1));
         FileOutputStream fos = new FileOutputStream(outputFile);
-
         InputStream is = c.getInputStream();
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         int len1;
         while ((len1 = is.read(buffer)) != -1) {
             fos.write(buffer, 0, len1);
@@ -919,27 +918,52 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         fos.close();
         is.close();
 
-        Intent intent;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Uri apkUri = FileProvider.getUriForFile(getApplicationContext(),
-                    getApplicationContext().getPackageName() + ".provider", outputFile);
-            intent = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-            intent.setData(apkUri);
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-        } else {
-            intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromFile(outputFile), "application/vnd.android.package-archive");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
+        silentInstallApk(outputFile);
+    }
 
-        // Start Intent auf UI-Thread, weil Download im Hintergrund läuft
-        runOnUiThread(() -> {
-            try {
-                startActivity(intent);
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Install failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+    // Silent Install via PackageInstaller - kein Dialog, funktioniert im LockTask-Modus
+    private void silentInstallApk(File apkFile) {
+        android.content.pm.PackageInstaller packageInstaller =
+                getPackageManager().getPackageInstaller();
+        android.content.pm.PackageInstaller.SessionParams params =
+                new android.content.pm.PackageInstaller.SessionParams(
+                        android.content.pm.PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+        try {
+            int sessionId = packageInstaller.createSession(params);
+            android.content.pm.PackageInstaller.Session session =
+                    packageInstaller.openSession(sessionId);
+
+            try (InputStream in = new java.io.FileInputStream(apkFile);
+                 java.io.OutputStream out = session.openWrite("package", 0, apkFile.length())) {
+                byte[] buffer = new byte[4096];
+                int len;
+                while ((len = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, len);
+                }
+                session.fsync(out);
             }
-        });
+
+            android.app.PendingIntent intent = android.app.PendingIntent.getBroadcast(
+                    this, sessionId,
+                    new Intent("com.nass.ek.w3kiosk.INSTALL_COMPLETE"),
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT |
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+                            android.app.PendingIntent.FLAG_MUTABLE : 0)
+            );
+            session.commit(intent.getIntentSender());
+            session.close();
+
+            runOnUiThread(() ->
+                Toast.makeText(getApplicationContext(),
+                        "Update wird installiert...", Toast.LENGTH_SHORT).show()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(() ->
+                Toast.makeText(getApplicationContext(),
+                        "Install failed: " + e.getMessage(), Toast.LENGTH_LONG).show()
+            );
+        }
     }
 
     public void checkUpdate() {
