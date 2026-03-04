@@ -131,7 +131,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mComponentName = new ComponentName(this, KioskAdminReceiver.class);
         if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
             mDevicePolicyManager.setLockTaskPackages(
-                mComponentName, new String[]{ getPackageName(), "com.android.settings" }
+                mComponentName, new String[]{
+                    getPackageName(),
+                    "com.android.settings",
+                    "com.teamviewer.quicksupport.market",
+                    "com.teamviewer.quicksupport.addon.universal"
+                }
             );
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                 mDevicePolicyManager.setLockTaskFeatures(
