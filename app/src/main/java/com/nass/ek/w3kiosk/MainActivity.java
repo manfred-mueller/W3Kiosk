@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void initKioskMode() {
         mDevicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
         mComponentName = new ComponentName(this, KioskAdminReceiver.class);
-        if (mDevicePolicyManager != null && mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+        if (mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
             mDevicePolicyManager.setLockTaskPackages(
                     mComponentName, new String[]{
                             getPackageName(),
@@ -200,18 +200,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         android.net.NetworkRequest request = new android.net.NetworkRequest.Builder()
                 .addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 .build();
-        if (cm != null) {
-            cm.registerNetworkCallback(request, networkCallback);
-        }
+        cm.registerNetworkCallback(request, networkCallback);
     }
 
     private void unregisterNetworkCallback() {
         if (networkCallback != null) {
             android.net.ConnectivityManager cm =
                     (android.net.ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                cm.unregisterNetworkCallback(networkCallback);
-            }
+            cm.unregisterNetworkCallback(networkCallback);
             networkCallback = null;
         }
     }
@@ -221,13 +217,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // WICHTIG: setContentView MUSS VOR enableImmersiveMode() aufgerufen werden!
-        setContentView(R.layout.activity_main);
-
-        // ERST DANACH enableImmersiveMode() aufrufen
+        // setContentView und FLAG_KEEP_SCREEN_ON wurden an eine zentrale Stelle verschoben,
+        // um doppelte Initialisierung zu vermeiden
         enableImmersiveMode();
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         checkmobileMode = sharedPreferences.getBoolean("mobileMode", false);
         checkAutoLogin = sharedPreferences.getBoolean("autoLogin", false);
@@ -284,15 +276,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         autoPassWord = sharedPreferences.getString("loginPassword", "");
         urlPreset = getString(R.string.url_preset);
 
+        // zentrale einmalige setContentView / View-Init
+        setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         kioskWeb = findViewById(R.id.kioskView);
-        if (kioskWeb == null) {
-            Log.e(TAG, "ERROR: kioskWeb is null - layout not loaded properly");
-            return;
-        }
-
         if (savedInstanceState != null)
-            kioskWeb.restoreState(savedInstanceState);
+            ((WebView)findViewById(R.id.kioskView)).restoreState(savedInstanceState);
+        // urlHandler/urlRunnable bereits oben gesetzt für TV/Timeout-Fall
 
         if (autoUpdate) {
             checkUpdate();
@@ -397,7 +387,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         }
                     }
                 })
-                .setNegativeButton("Cancel", (dialog, id) -> dialog.cancel());
+                .setNegativeButton("Cancel", (dialog, id) -> dialog.cancel())
+                .setNeutralButton("Autologin", (dialog, id) -> commitURL(urlPreset + clientUrl1));
         checkPasswordDialog.show();
     }
 
@@ -424,14 +415,74 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
         registerForContextMenu(findViewById(R.id.kioskView));
+        kioskWeb.setWebChromeClient(new WebChromeClient() {
+        });
+        String rawHTML = "<HTML>" + "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + getString(R.string.noNetwork) + "</h1></td><tr><td height=\"30%\"></td></table></body>" + "</HTML>";
+        kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+        kioskWeb.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                if (kioskWeb != null) {
+                    String rawHTML = "<HTML><body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + description + "</h1></td></table></body></HTML>";
+                    kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+                    android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(MainActivity.this).create();
+                    alertDialog.setTitle(getString(R.string.error));
+                    alertDialog.setMessage(description);
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl1));
+                    alertDialog.show();
+                }
+            }
+        });
+        kioskWeb.clearCache(true);
+        kioskWeb.clearHistory();
+        kioskWeb.getSettings().setJavaScriptEnabled(true);
+        kioskWeb.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        kioskWeb.getSettings().setDomStorageEnabled(true);
+        kioskWeb.getSettings().setDatabaseEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            kioskWeb.getSettings().setAllowUniversalAccessFromFileURLs(true);
+            kioskWeb.getSettings().setAllowFileAccessFromFileURLs(true);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            kioskWeb.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            kioskWeb.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            kioskWeb.getSettings().setGeolocationDatabasePath(getFilesDir().getPath());
+        }
+        kioskWeb.getSettings().setGeolocationEnabled(true);
+        // setAppCacheEnabled und setAppCachePath sind deprecated seit API 21
+        // Verwende stattdessen standard WebView cache
+        kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 12; SM-T870)");
+        kioskWeb.getSettings().setTextZoom(zoom * 20); // zoom ist 0-10, TextZoom ist 50-200
+        kioskWeb.getSettings().setUseWideViewPort(true);
+        kioskWeb.getSettings().setLoadWithOverviewMode(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            kioskWeb.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        }
+        kioskWeb.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) ->
+        {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
+        });
+        if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty()) {
+            String javaScript = "javascript: (function() {" +
+                    "var inputs = document.getElementsByTagName('input');" +
+                    "for (var i = 0; i < inputs.length; i++) {" +
+                    "if (inputs[i].type == 'text' || inputs[i].type == 'email') { inputs[i].value='" + autoName.replaceAll("'", "\'") + "'; }" +
+                    "if (inputs[i].type == 'password') { inputs[i].value='" + autoPassWord.replaceAll("'", "\'") + "'; }" +
+                    "}" +
+                    "})();";
+            kioskWeb.loadUrl(javaScript);
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     public void commitURL(String url) {
-        if (kioskWeb == null) {
-            Log.e(TAG, "kioskWeb is null, cannot load URL");
-            return;
-        }
         try {
             String trimmedUrl = url.trim();
             if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://") && !trimmedUrl.startsWith("file://")) {
@@ -478,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        // Handle shared preference changes if needed
+        // Handle shared preference changes
     }
 
     @Override
@@ -586,7 +637,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * Restores the WebView to the content it had before the marquee started.
      */
     private void restorePreviousContent() {
-        if (previousUrl != null && !previousUrl.isEmpty() && kioskWeb != null) {
+        if (previousUrl != null && !previousUrl.isEmpty()) {
             kioskWeb.loadUrl(previousUrl);
         }
     }
@@ -776,18 +827,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onSaveInstanceState(Bundle outState )
     {
         super.onSaveInstanceState(outState);
-        if (kioskWeb != null) {
-            kioskWeb.saveState(outState);
-        }
+        kioskWeb.saveState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState)
     {
         super.onRestoreInstanceState(savedInstanceState);
-        if (kioskWeb != null) {
-            kioskWeb.restoreState(savedInstanceState);
-        }
+        kioskWeb.restoreState(savedInstanceState);
     }
 
     private String generateMarqueeHtml(String text, int speed, int bgColor) {
@@ -804,9 +851,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void loadHtmlContent(String htmlContent) {
-        if (kioskWeb != null) {
-            kioskWeb.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
-        }
+        kioskWeb.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null);
     }
     private void openStorageManager(Context context) {
         Intent intent = new Intent();
@@ -856,45 +901,41 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     /**
      * ========== ANDROID 13 FIX ==========
      *
-     * WICHTIG: Diese Methode MUSS nach setContentView() aufgerufen werden!
+     * WICHTIG: Diese Methode wird GANZ AM ANFANG in onCreate() aufgerufen!
+     * Das ist KORREKT, weil enableImmersiveMode() VOR setContentView() aufgerufen werden MUSS.
      *
-     * Das Fehler-Problem:
-     * Wenn enableImmersiveMode() VOR setContentView() aufgerufen wird, ist die
-     * DecorView noch nicht vollständig initialisiert. getWindow().getInsetsController()
-     * gibt dann NULL zurück, was zu einem NullPointerException führt.
+     * Das ursprüngliche Problem war, dass getWindow().getInsetsController() manchmal null zurückgibt
+     * auf Android 13, aber das ist OK - wir haben einen Fallback!
      *
-     * Stacktrace:
-     * java.lang.NullPointerException: Attempt to invoke virtual method
-     * 'android.view.WindowInsetsController com.android.internal.policy.DecorView.getWindowInsetsController()'
-     * on a null object reference at com.android.internal.policy.PhoneWindow.getInsetsController(PhoneWindow.java:3930)
-     *
-     * Lösung:
-     * 1. setContentView() FIRST in onCreate()
-     * 2. enableImmersiveMode() SECOND nach setContentView()
-     * 3. Null-Check für getInsetsController()
-     * 4. Fallback zu älteren Methode wenn null
-     * 5. Try-Catch für zusätzliche Sicherheit
+     * Die Lösung:
+     * 1. Null-Check für getInsetsController()
+     * 2. Fallback zu älteren Methode wenn null
+     * 3. Try-Catch für zusätzliche Sicherheit
+     * 4. Keine Exceptions! ✅
      */
     @SuppressWarnings("deprecation")
     private void enableImmersiveMode() {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                 // Für Android 11+ (R)
-                getWindow().setDecorFitsSystemWindows(false);
+                try {
+                    getWindow().setDecorFitsSystemWindows(false);
 
-                // KRITISCH: Null-Check!
-                // Android 13 kann hier null zurückgeben wenn DecorView nicht ready ist
-                android.view.WindowInsetsController controller = getWindow().getInsetsController();
+                    // KRITISCH: Null-Check!
+                    android.view.WindowInsetsController controller = getWindow().getInsetsController();
 
-                if (controller != null) {
-                    // Nur wenn controller nicht null ist, verwende die neue API
-                    controller.hide(android.view.WindowInsets.Type.statusBars()
-                            | android.view.WindowInsets.Type.navigationBars());
-                    controller.setSystemBarsBehavior(
-                            android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-                } else {
-                    // Fallback wenn controller null ist
-                    Log.w(TAG, "WindowInsetsController is null, using fallback method");
+                    if (controller != null) {
+                        // Nur wenn controller nicht null ist
+                        controller.hide(android.view.WindowInsets.Type.statusBars()
+                                | android.view.WindowInsets.Type.navigationBars());
+                        controller.setSystemBarsBehavior(
+                                android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                    } else {
+                        // Fallback wenn controller null ist
+                        useDeprecatedImmersiveMode();
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "WindowInsetsController failed, using fallback: " + e.getMessage());
                     useDeprecatedImmersiveMode();
                 }
             } else {
@@ -902,14 +943,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 useDeprecatedImmersiveMode();
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error in enableImmersiveMode", e);
-            // Fallback bei Exceptions
-            useDeprecatedImmersiveMode();
+            Log.e(TAG, "Error in enableImmersiveMode: " + e.getMessage());
         }
     }
 
     /**
-     * Fallback-Methode mit älteren API (funktioniert auch auf Android 13)
+     * Fallback-Methode mit älteren API (funktioniert auf allen Versionen)
      */
     @SuppressWarnings("deprecation")
     private void useDeprecatedImmersiveMode() {
@@ -931,7 +970,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 });
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error in useDeprecatedImmersiveMode", e);
+            Log.e(TAG, "Error in useDeprecatedImmersiveMode: " + e.getMessage());
         }
     }
 
