@@ -368,208 +368,394 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
                         startActivity(intent);
                     }
-                    else if (PwInput.equals(PW1)) {
-                        openSettingsActivity();
+                    else if (PwInput.equals("r")) {
+                        ShutdownService.rebootDevice(this);
                     }
-                    else if (PwInput.equals(PW2)) {
-                        openSettings();
-                    }
-                    else if (PwInput.equals(PW3)) {
+                    else if (PwInput.equals("s")) {
                         openStorageManager(this);
                     }
-                    else if (PwInput.equals(PW4)) {
-                        if (checkApps(this, tvUri))
+                    else if (PwInput.equals("ra") && isTablet()) {
+                        if (checkApps(this, adbUri))
                         {
+                            appClick(adbUri);
+                        } else {
+                            Update("https://nass-ek.de/android/remote-adb-shell.apk", null);                        }
+                    }
+                    else if (PwInput.equals("sk")) {
+                        Update("https://nass-ek.de/android/simple-keyboard-w3c.apk", null);
+                    }
+                    else if (PwInput.equals("tv")) {
+                        if (checkApps(this, tvUri)) {
                             appClick(tvUri);
                         } else {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
-                            startActivity(intent);
+                            if (isTv()) {
+                                // Install teamviewer-quicksupport.apk and tvaddon_TV.apk for TV
+                                Update("https://download.teamviewer.com/download/TeamViewerQS.apk",
+                                        "https://nass-ek.de/android/Teamviewer/tvaddon_TV.apk");
+                            } else if (isTablet()) {
+                                // Install teamviewer-quicksupport.apk and tvaddon_Tablet.apk for Tablet
+                                Update("https://nass-ek.de/android/Teamviewer/teamviewer-quicksupport.apk",
+                                        "https://nass-ek.de/android/Teamviewer/tvaddon_Tablet.apk");
+                            } else {
+                                // Open the Play Store link
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + tvUri));
+                                startActivity(intent);
+                            }
                         }
                     }
-                })
-                .setNegativeButton("Cancel", (dialog, id) -> dialog.cancel())
-                .setNeutralButton("Autologin", (dialog, id) -> commitURL(urlPreset + clientUrl1));
-        checkPasswordDialog.show();
-    }
-
-    private void toggleUrl() {
-        if (previousUrl == null || previousUrl.isEmpty()) {
-            previousUrl = urlPreset + clientUrl1;
+                    else if (PwInput.equals(PW1) || PwInput.equals(PW2) || PwInput.equals(PW3) || PwInput.equals(PW4)) {
+                        openSettingsActivity();
+                    }
+                    else if (PwInput.equals("w")) {
+                        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                        startActivity(intent);
+                    }
+                    else {
+                        dialog.cancel();
+                    }
+                });
+        checkPasswordDialog.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
+        if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty() && clientUrl2.isEmpty())
+        {
+            checkPasswordDialog.setNeutralButton("Autologin", (dialog, id) -> commitURL(urlPreset + clientUrl1));
         }
-        String currentUrl = kioskWeb.getUrl();
-        commitURL(nextUrl.isEmpty() ? (urlPreset + clientUrl1) : nextUrl);
-        previousUrl = currentUrl;
-        nextUrl = clientUrl3.isEmpty() ? clientUrl1 : clientUrl3;
-    }
-
-    private void toggleSettingsButton() {
-        ImageButton settingsButton = findViewById(R.id.settingsButton);
-        if (settingsButton.getVisibility() == View.VISIBLE) {
-            settingsButton.setVisibility(View.GONE);
-        } else {
-            settingsButton.setVisibility(View.VISIBLE);
+        else if (!clientUrl2.isEmpty()) {
+            checkPasswordDialog.setNeutralButton(R.string.toggleUrl, (dialog, id) -> toggleUrl());
         }
+        else if (appsCount > 0)
+        {
+            checkPasswordDialog.setNeutralButton(R.string.apps, (dialog, id) -> startActivity(new Intent(this, AppsActivity.class)));
+        } else
+        {
+            checkPasswordDialog.setNeutralButton(R.string.reboot, (dialog, id) -> ShutdownService.rebootDevice(this));
+        }
+        AlertDialog dialog = checkPasswordDialog.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setAllCaps(false);
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAllCaps(false);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @SuppressLint("SetJavaScriptEnabled")
     private void setupSettings() {
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
+        if (isTv()) {
+            settingsButton.setOnLongClickListener(v -> {
+                toggleUrl();
+                return true;
+            });
+        } else {
+            settingsButton.setOnLongClickListener(v -> {
+                recreate();
+                return true;
+            });
+        }
         settingsButton.setOnClickListener(view -> checkPassword(getString(R.string.code_or_help)));
-        registerForContextMenu(findViewById(R.id.kioskView));
+
         kioskWeb.setWebChromeClient(new WebChromeClient() {
-        });
-        String rawHTML = "<HTML>" + "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + getString(R.string.noNetwork) + "</h1></td><tr><td height=\"30%\"></td></table></body>" + "</HTML>";
-        kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
-        kioskWeb.setWebViewClient(new WebViewClient() {
             @Override
-            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                if (kioskWeb != null) {
-                    String rawHTML = "<HTML><body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + description + "</h1></td></table></body></HTML>";
-                    kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
-                    android.app.AlertDialog alertDialog = new android.app.AlertDialog.Builder(MainActivity.this).create();
-                    alertDialog.setTitle(getString(R.string.error));
-                    alertDialog.setMessage(description);
-                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl1));
-                    alertDialog.show();
-                }
+            public void onPermissionRequest(PermissionRequest request) {
+                request.grant(request.getResources());
             }
         });
+
+        marqueeBgColor = getResources().getColor(R.color.colorMarquee);
+        String reLoad = context.getString(R.string.reLoad);
+        String rawHTML = "<HTML>"+ "<body bgcolor=\"" + marqueeBgColor + "\"><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + reLoad +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+        kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+
+        kioskWeb.setWebViewClient(new WebViewClient()
+        {
+            public void onReceivedError(WebView webView, int errorCode, String description, String failingUrl) {
+                try {
+                    webView.stopLoading();
+                } catch (Exception ignored) {
+                }
+                String noNet = context.getString(R.string.noNetwork);
+                String rawHTML = "<HTML>"+ "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet +"</h1></td><tr><td height=\"30%\"></td></table></body>"+ "</HTML>";
+                kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle(getString(R.string.error));
+                alertDialog.setMessage(getString(R.string.check_internet));
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, getString(R.string.try_again), (dialog, which) -> commitURL(urlPreset + clientUrl1));
+
+                alertDialog.show();
+                super.onReceivedError(webView, errorCode, description, failingUrl);
+            }
+        });
+
         kioskWeb.clearCache(true);
         kioskWeb.clearHistory();
         kioskWeb.getSettings().setJavaScriptEnabled(true);
         kioskWeb.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        kioskWeb.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
-        kioskWeb.getSettings().setDatabaseEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            kioskWeb.getSettings().setAllowUniversalAccessFromFileURLs(true);
-            kioskWeb.getSettings().setAllowFileAccessFromFileURLs(true);
+        setMobileMode(checkmobileMode);
+        if (isTv()) {
+            registerForContextMenu(kioskWeb);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            kioskWeb.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            kioskWeb.getSettings().setMediaPlaybackRequiresUserGesture(false);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            kioskWeb.getSettings().setGeolocationDatabasePath(getFilesDir().getPath());
-        }
-        kioskWeb.getSettings().setGeolocationEnabled(true);
-        // setAppCacheEnabled und setAppCachePath sind deprecated seit API 21
-        // Verwende stattdessen standard WebView cache
-        kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 12; SM-T870)");
-        kioskWeb.getSettings().setTextZoom(zoom * 20); // zoom ist 0-10, TextZoom ist 50-200
-        kioskWeb.getSettings().setUseWideViewPort(true);
-        kioskWeb.getSettings().setLoadWithOverviewMode(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            kioskWeb.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        }
-        kioskWeb.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) ->
-        {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            startActivity(intent);
+
+        // Neuer Touch-Listener: bei Tippen auf die WebView während der Marquee sichtbar ist,
+        // Marquee stoppen, vorherigen Inhalt wiederherstellen und das Touch-Event konsumieren.
+        kioskWeb.setOnTouchListener((v, event) -> {
+            if (isTablet() && marquee && marqueeTimeout > 0 && marqueeVisible) {
+                // Marquee durch Benutzer gestoppt -> pausieren und automatischen Restart planen
+                stopMarqueeHandler();
+                marqueeVisible = false;
+                marqueeUserPaused = true;
+                restorePreviousContent();
+                scheduleMarqueeResume();
+                // Event konsumieren, damit Tippen nicht zusätzlich Aktionen im Marquee/Seite auslöst
+                return true;
+            }
+            return false;
         });
-        if (checkAutoLogin && !autoName.isEmpty() && !autoPassWord.isEmpty()) {
-            String javaScript = "javascript: (function() {" +
-                    "var inputs = document.getElementsByTagName('input');" +
-                    "for (var i = 0; i < inputs.length; i++) {" +
-                    "if (inputs[i].type == 'text' || inputs[i].type == 'email') { inputs[i].value='" + autoName.replaceAll("'", "\'") + "'; }" +
-                    "if (inputs[i].type == 'password') { inputs[i].value='" + autoPassWord.replaceAll("'", "\'") + "'; }" +
-                    "}" +
-                    "})();";
-            kioskWeb.loadUrl(javaScript);
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    public void setMobileMode(final boolean enabled) {
+        final WebSettings webSettings = this.kioskWeb.getSettings();
+        final String newUserAgent;
+        if ((enabled) || ChecksAndConfigs.isScanner()) {
+            newUserAgent = webSettings.getUserAgentString().replace("Safari", "Mobile Safari");
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        else {
+            newUserAgent = webSettings.getUserAgentString().replace("Mobile Safari", "Safari");
+        }
+        webSettings.setUserAgentString(newUserAgent);
+        webSettings.setUseWideViewPort(enabled);
+        webSettings.setLoadWithOverviewMode(enabled);
+        webSettings.setSupportZoom(enabled);
+        webSettings.setBuiltInZoomControls(enabled);
+    }
+
+    private void commitURL(String url) {
+        previousUrl=url;
+        kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
+        if (url.equals(urlPreset)) {
+            @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(startSettingsActivityIntent);
+        }
+        if (ChecksAndConfigs.isNetworkConnected(this)) {
+            if (!autoName.isEmpty() && !autoPassWord.isEmpty()) {
+                JavaString = "javascript:window.frames[\"Mainpage\"].document.getElementsByName('login')[0].value='" +
+                        autoName + "';" +
+                        "javascript:window.frames[\"Mainpage\"].document.getElementsByName('pwd')[0].value='" +
+                        autoPassWord + "';";
+                if (checkAutoLogin) {
+                    JavaString += "javascript:window.frames[\"Mainpage\"].document.getElementById('logon').click()";
+                }
+                kioskWeb.setWebViewClient(new WebViewClient() {
+                    public void onPageFinished(WebView view, String url) {
+                        CookieSyncManager.getInstance().sync();
+                        view.evaluateJavascript(JavaString, s -> {
+                        });
+                    }
+                });
+            }
+            setWebContentsDebuggingEnabled(true);
+            kioskWeb.loadUrl(url);
+        } else {
+            String noNet = context.getString(R.string.noNetwork);
+            String rawHTML = "<HTML>" + "<body><table width=\"100%\" height=\"100%\"><td height=\"30%\"></td><tr><td height=\"40%\" align=\"center\" valign=\"middle\"><h1>" + noNet + "</h1></td><tr><td height=\"30%\"></td></table></body>" + "</HTML>";
+            kioskWeb.loadData(rawHTML, "text/HTML", "UTF-8");
+        }
+        hideKeyboard(this);
+        findViewById(R.id.settingsButton).bringToFront();
+    }
+
+    private void toggleUrl(){
+        if (nextUrl.equals(clientUrl3)){
+            if (clientUrl3.startsWith("http")) {
+                if (ChecksAndConfigs.isTablet()) {
+                    TrustAllCertificates.install();
+                    kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
+                }
+                commitURL(clientUrl3);
+            } else {
+                commitURL(urlPreset + clientUrl3);
+            }
+            nextUrl = clientUrl1;
+        }
+        else if (nextUrl.equals(clientUrl2)){
+            if (clientUrl2.startsWith("http")) {
+                if (ChecksAndConfigs.isTablet()) {
+                    TrustAllCertificates.install();
+                    kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
+                }
+                commitURL(clientUrl2);
+            } else {
+                commitURL(urlPreset + clientUrl2);
+            }
+            if (!clientUrl3.equals("")) {
+                nextUrl = clientUrl3;
+            } else
+            {
+                nextUrl = clientUrl1;
+            }
+        }
+        else if (nextUrl.equals(clientUrl1)){
+            commitURL(urlPreset + clientUrl1);
+            nextUrl = clientUrl2;
+        }
+        if (isTv() && urlTimeout > 0) {
+            stopUrlHandler();
+            startUrlHandler();
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    public void commitURL(String url) {
-        try {
-            String trimmedUrl = url.trim();
-            if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://") && !trimmedUrl.startsWith("file://")) {
-                trimmedUrl = "https://" + trimmedUrl;
-            }
-            previousUrl = kioskWeb.getUrl();
-            kioskWeb.loadUrl(trimmedUrl);
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading URL: " + url, e);
+    private void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+        if (mDevicePolicyManager != null && mDevicePolicyManager.isDeviceOwnerApp(getPackageName())) {
+            stopLockTask();
+        }
+        stopMarqueeResumeHandler(); // Aufräumen
+        if (kioskWeb != null) {
+            try {
+                kioskWeb.stopLoading();
+                kioskWeb.clearHistory();
+                kioskWeb.removeAllViews();
+                kioskWeb.destroy();
+            } catch (Exception ignored) {}
+            kioskWeb = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        recreate();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Wenn WebView zurückspringen kann, zuerst WebView verwenden
+        if (!isTv() && kioskWeb != null && kioskWeb.canGoBack()) {
+            kioskWeb.goBack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            enableImmersiveMode();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (kioskWeb != null) {
-            kioskWeb.onResume();
+        upPressCount = 0;
+        rightPressCount = 0;
+        enableImmersiveMode();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            registerNetworkCallback();
+        } else {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            registerReceiver(connectionReceiver, filter);
         }
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        registerNetworkCallback();
+        if (isTablet() && marquee && marqueeTimeout > 0) {
+            startMarqueeHandler();
+        }
+        if (isTv() && urlTimeout > 0) {
+            startUrlHandler();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (kioskWeb != null) {
-            kioskWeb.onPause();
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                unregisterNetworkCallback();
+            } else {
+                unregisterReceiver(connectionReceiver);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
         }
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        unregisterNetworkCallback();
-    }
-
-    @Override
-    protected void onDestroy() {
-        stopUrlHandler();
-        stopMarqueeHandler();
-        stopMarqueeResumeHandler();
-        unregisterNetworkCallback();
-        if (sharedPreferences != null) {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        if (isTablet() && marquee && marqueeTimeout > 0) {
+            stopMarqueeHandler();
+            stopMarqueeResumeHandler(); // Aufräumen
         }
-        super.onDestroy();
+        if (isTv() && urlTimeout > 0) {
+            stopUrlHandler();
+        }
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        // Handle shared preference changes
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                if (upPressCount == 0) {
-                    lastKeyPressTime = System.currentTimeMillis();
-                }
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (isTv()) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+                kioskWeb.showContextMenu();
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 19)){
                 upPressCount++;
-                if (upPressCount >= 3 && (System.currentTimeMillis() - lastKeyPressTime) < KEY_SEQUENCE_TIMEOUT) {
-                    resetKeyPressCounter();
-                    return true;
+                if (upPressCount == 3) {
+                    rightPressCount = 0;
                 }
-            }
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                if (rightPressCount == 0) {
-                    lastKeyPressTime = System.currentTimeMillis();
-                }
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 20 && upPressCount >= 3)){
                 rightPressCount++;
-                if (rightPressCount >= 3 && (System.currentTimeMillis() - lastKeyPressTime) < KEY_SEQUENCE_TIMEOUT) {
-                    resetKeyPressCounter();
-                    return true;
+                if (rightPressCount == 3) {
+                    appClick(tvUri);
+                    upPressCount = 0;
+                    rightPressCount = 0;
                 }
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 21 && upPressCount >= 3)){
+                rightPressCount++;
+                if (rightPressCount == 3) {
+                    openSettingsActivity();
+                    upPressCount = 0;
+                    rightPressCount = 0;
+                }
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 22 && upPressCount >= 3)){
+                rightPressCount++;
+                if (rightPressCount == 3) {
+                    openSettings();
+                    upPressCount = 0;
+                    rightPressCount = 0;
+                }
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == 23){
+                // Einzelne Prüfung (vorher doppelt)
+                recreate();
+                return true;
+            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 82 || event.getKeyCode() == 4)){
+                toggleUrl();
+                return true;
             }
-        } else if (keyCode == toggleKey) {
-            return true;
-        } else {
-            resetKeyPressCounter();
         }
-        return super.onKeyDown(keyCode, event);
+        return super.dispatchKeyEvent(event);
     }
 
-    private void resetKeyPressCounter() {
-        upPressCount = 0;
-        rightPressCount = 0;
-        lastKeyPressTime = 0;
+    public void toggleSettingsButton() {
+        View buttonView = findViewById(R.id.settingsButton);
+        if(buttonView.getVisibility()==View.GONE)
+            buttonView.setVisibility(View.VISIBLE);
+        else if(buttonView.getVisibility()==View.VISIBLE)
+            buttonView.setVisibility(View.GONE);
     }
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -897,22 +1083,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         return null; // Return null if no IP address was found
     }
-
-    /**
-     * ========== ANDROID 13 FIX ==========
-     *
-     * WICHTIG: Diese Methode wird GANZ AM ANFANG in onCreate() aufgerufen!
-     * Das ist KORREKT, weil enableImmersiveMode() VOR setContentView() aufgerufen werden MUSS.
-     *
-     * Das ursprüngliche Problem war, dass getWindow().getInsetsController() manchmal null zurückgibt
-     * auf Android 13, aber das ist OK - wir haben einen Fallback!
-     *
-     * Die Lösung:
-     * 1. Null-Check für getInsetsController()
-     * 2. Fallback zu älteren Methode wenn null
-     * 3. Try-Catch für zusätzliche Sicherheit
-     * 4. Keine Exceptions! ✅
-     */
     @SuppressWarnings("deprecation")
     private void enableImmersiveMode() {
         try {
@@ -921,21 +1091,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 try {
                     getWindow().setDecorFitsSystemWindows(false);
 
-                    // KRITISCH: Null-Check!
+                    // KRITISCH: Null-Check für Android 13+
+                    // getWindow().getInsetsController() kann null sein auf Android 13
                     android.view.WindowInsetsController controller = getWindow().getInsetsController();
 
                     if (controller != null) {
-                        // Nur wenn controller nicht null ist
                         controller.hide(android.view.WindowInsets.Type.statusBars()
                                 | android.view.WindowInsets.Type.navigationBars());
                         controller.setSystemBarsBehavior(
                                 android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
                     } else {
                         // Fallback wenn controller null ist
+                        Log.w(TAG, "WindowInsetsController is null, using fallback method");
                         useDeprecatedImmersiveMode();
                     }
                 } catch (Exception e) {
-                    Log.w(TAG, "WindowInsetsController failed, using fallback: " + e.getMessage());
+                    Log.w(TAG, "WindowInsetsController failed: " + e.getMessage());
                     useDeprecatedImmersiveMode();
                 }
             } else {
@@ -948,7 +1119,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     /**
-     * Fallback-Methode mit älteren API (funktioniert auf allen Versionen)
+     * Fallback-Methode für ältere Android-Versionen
      */
     @SuppressWarnings("deprecation")
     private void useDeprecatedImmersiveMode() {
@@ -973,7 +1144,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Log.e(TAG, "Error in useDeprecatedImmersiveMode: " + e.getMessage());
         }
     }
-
     private void openSettingsActivity() {
         try {
             @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
