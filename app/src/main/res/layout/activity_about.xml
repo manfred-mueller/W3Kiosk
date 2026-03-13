@@ -92,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="190dp"
-        android:text="Copyright ©W3Coach 2018-2025"
+        android:text="Copyright ©W3Coach 2018-2026"
         android:textColor="#FFFEFE"
         android:textSize="10dp"
         android:textStyle="bold|italic"
