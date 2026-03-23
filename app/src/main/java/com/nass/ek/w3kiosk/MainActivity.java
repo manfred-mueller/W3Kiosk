@@ -534,8 +534,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void commitURL(String url) {
+
         previousUrl=url;
         kioskWeb.getSettings().setTextZoom(75 + (zoom * 5));
+        String w3Agent = getString(R.string.app_name) + " " + BuildConfig.VERSION_CODE;
+        String baseUserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36";
+        kioskWeb.getSettings().setUserAgentString(baseUserAgent + " " + w3Agent);
         if (url.equals(urlPreset)) {
             @SuppressLint({"NewApi", "LocalSuppress"}) Intent startSettingsActivityIntent = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(startSettingsActivityIntent);
@@ -569,12 +573,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void toggleUrl(){
+        if (ChecksAndConfigs.isTablet()) {
+            TrustAllCertificates.install();
+        }
+
         if (nextUrl.equals(clientUrl3)){
             if (clientUrl3.startsWith("http")) {
-                if (ChecksAndConfigs.isTablet()) {
-                    TrustAllCertificates.install();
-                    kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
-                }
                 commitURL(clientUrl3);
             } else {
                 commitURL(urlPreset + clientUrl3);
@@ -583,10 +587,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
         else if (nextUrl.equals(clientUrl2)){
             if (clientUrl2.startsWith("http")) {
-                if (ChecksAndConfigs.isTablet()) {
-                    TrustAllCertificates.install();
-                    kioskWeb.getSettings().setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.66 Safari/537.36");
-                }
                 commitURL(clientUrl2);
             } else {
                 commitURL(urlPreset + clientUrl2);
