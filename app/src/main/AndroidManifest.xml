@@ -126,6 +126,7 @@
                 android:resource="@xml/accessibility_service" />
         </service>
 
+        <!-- Einziger FileProvider - doppelter Eintrag entfernt (führte zu Installationsfehler) -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -136,15 +137,16 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/install_provider_paths" />
-        </provider>
+        <!-- BootReceiver: startet die App automatisch nach dem Neustart -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".KioskAdminReceiver"

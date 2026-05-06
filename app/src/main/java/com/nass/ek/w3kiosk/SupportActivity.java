@@ -25,7 +25,7 @@ public class SupportActivity extends AppCompatActivity {
         boolean tvCheck = ChecksAndConfigs.checkApps(this, tvUri);
         boolean adCheck = ChecksAndConfigs.checkApps(this, adUri);
 
-        if (ChecksAndConfigs.isTv()) {
+        if (ChecksAndConfigs.isTv(this)) {
             TextView txtTv = findViewById(R.id.textView);
             txtTv.setText(getString(R.string.helpTextTv));
             ImageView imgView = findViewById(R.id.imageView);

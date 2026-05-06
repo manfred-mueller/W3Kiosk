@@ -20,3 +20,5 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep public class com.nass.ek.materialofficeaboutlib.Models.** { *; }
+-keep class com.nass.ek.w3kiosk.MainActivity { *; }
+-keep class com.nass.ek.w3kiosk.** { *; }
