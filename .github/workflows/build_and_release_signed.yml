@@ -23,8 +23,8 @@ jobs:
      - name: Setup JDK
        uses: actions/setup-java@v4
        with:
-         distribution: temurin
-         java-version: "17"
+         distribution: corretto
+         java-version: "24"
      - name: Copy Gradle Properties
        run: |
              mkdir -p $HOME/.gradle
