@@ -139,7 +139,7 @@ public class SettingsActivity extends AppCompatActivity {
             findViewById(R.id.client3EditText).setVisibility(View.GONE);
         }
 
-        if (ChecksAndConfigs.isTv()) {
+        if (ChecksAndConfigs.isTv(this)) {
             findViewById(R.id.appsText).setVisibility(View.GONE);
             findViewById(R.id.appsSpinner).setVisibility(View.GONE);
         }
@@ -308,7 +308,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             b = findViewById(R.id.keyboardButton);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 b.setVisibility(View.VISIBLE);
             }
 
@@ -342,7 +342,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.camAccess);
-            if (ChecksAndConfigs.isTv() || android.os.Build.MODEL.toUpperCase().startsWith("PRIME")) {
+            if (ChecksAndConfigs.isTv(this) || android.os.Build.MODEL.toUpperCase().startsWith("PRIME")) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -350,7 +350,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.overlayPerm);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
@@ -361,7 +361,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setVisibility(android.view.View.GONE); // Accessibility Service nicht benoetigt
 
             c = findViewById(R.id.writeSystem);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));
@@ -626,7 +626,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setEnabled(context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED);
 
             c = findViewById(R.id.camAccess);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
@@ -634,7 +634,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             c = findViewById(R.id.overlayPerm);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.canDrawOverlays(this));
@@ -645,7 +645,7 @@ public class SettingsActivity extends AppCompatActivity {
             c.setVisibility(android.view.View.GONE); // Accessibility Service nicht benoetigt
 
             c = findViewById(R.id.writeSystem);
-            if (ChecksAndConfigs.isTv()) {
+            if (ChecksAndConfigs.isTv(this)) {
                 c.setVisibility(View.GONE);
             } else {
                 c.setChecked(Settings.System.canWrite(this));

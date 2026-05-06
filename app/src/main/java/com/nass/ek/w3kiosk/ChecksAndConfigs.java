@@ -79,7 +79,17 @@ public class ChecksAndConfigs extends AppCompatActivity {
     }
 
     public static boolean isTv() {
-        return android.os.Build.MODEL.toUpperCase().startsWith("TV") || android.os.Build.MODEL.toUpperCase().startsWith("X8");
+        // Modellname-Fallback für bekannte TV-Geräte
+        String model = android.os.Build.MODEL.toUpperCase();
+        return model.startsWith("TV") || model.startsWith("X8") || model.startsWith("GOOGLE TV");
+    }
+
+    public static boolean isTv(Context context) {
+        // Feature-basierte Erkennung (zuverlässiger, erkennt auch Google TV Streamer)
+        android.content.pm.PackageManager pm = context.getPackageManager();
+        return pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)
+                || pm.hasSystemFeature("android.software.leanback_only")
+                || isTv();
     }
     public static boolean isWirelessAdbEnabled() {
         try {

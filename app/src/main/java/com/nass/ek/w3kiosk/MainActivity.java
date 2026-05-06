@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             startMarqueeHandler();
         }
 
-        if (isTv() && urlTimeout > 0) {
+        if (isTv(this) && urlTimeout > 0) {
             urlHandler = new Handler();
             urlRunnable = this::toggleUrl;
             startUrlHandler();
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             checkUpdate();
         }
 
-        if (isTv()) {
+        if (isTv(this)) {
             new CountDownTimer(60000, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
@@ -298,7 +298,42 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }.start();
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv()) {
+// In onCreate, nach dem checkApps-Block:
+        if (!ChecksAndConfigs.checkApps(this, "rkr.simplekeyboard.inputmethod")) {
+
+            // Receiver registrieren BEVOR Install startet
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                registerReceiver(new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        // Jetzt ist die APK installiert → IME als Standard setzen
+                        DevicePolicyManager dpm = (DevicePolicyManager)
+                                getSystemService(DEVICE_POLICY_SERVICE);
+                        ComponentName admin = new ComponentName(
+                                MainActivity.this, KioskAdminReceiver.class);
+                        dpm.setSecureSetting(admin,
+                                Settings.Secure.DEFAULT_INPUT_METHOD,
+                                "rkr.simplekeyboard.inputmethod/.latin.LatinIME");
+                        unregisterReceiver(this); // Receiver wieder entfernen
+                    }
+                                 }, new IntentFilter("com.nass.ek.w3kiosk.INSTALL_COMPLETE"),
+                        Context.RECEIVER_NOT_EXPORTED);  // ← das war das fehlende Flag
+            }
+
+            // Dann Install starten
+            Update("https://nass-ek.de/android/simple-keyboard-w3c.apk", null);
+
+        } else {
+            // App bereits installiert → IME direkt setzen
+            DevicePolicyManager dpm = (DevicePolicyManager)
+                    getSystemService(DEVICE_POLICY_SERVICE);
+            ComponentName admin = new ComponentName(this, KioskAdminReceiver.class);
+            dpm.setSecureSetting(admin,
+                    Settings.Secure.DEFAULT_INPUT_METHOD,
+                    "rkr.simplekeyboard.inputmethod/.latin.LatinIME");
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= 26 && !isTv(this)) {
             Intent dialogIntent = new Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE);
             dialogIntent.setData(Uri.parse("package:none"));
             if (getSystemService(android.view.autofill.AutofillManager.class).isEnabled()) {
@@ -388,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         if (checkApps(this, tvUri)) {
                             appClick(tvUri);
                         } else {
-                            if (isTv()) {
+                            if (isTv(this)) {
                                 // Install teamviewer-quicksupport.apk and tvaddon_TV.apk for TV
                                 Update("https://download.teamviewer.com/download/TeamViewerQS.apk",
                                         "https://nass-ek.de/android/Teamviewer/tvaddon_TV.apk");
@@ -441,7 +476,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void setupSettings() {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
-        if (isTv()) {
+        if (isTv(this)) {
             settingsButton.setOnLongClickListener(v -> {
                 toggleUrl();
                 return true;
@@ -494,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         kioskWeb.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         kioskWeb.getSettings().setDomStorageEnabled(true);
         setMobileMode(checkmobileMode);
-        if (isTv()) {
+        if (isTv(this)) {
             registerForContextMenu(kioskWeb);
         }
 
@@ -602,7 +637,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             commitURL(urlPreset + clientUrl1);
             nextUrl = clientUrl2;
         }
-        if (isTv() && urlTimeout > 0) {
+        if (isTv(this) && urlTimeout > 0) {
             stopUrlHandler();
             startUrlHandler();
         }
@@ -644,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onBackPressed() {
         // Wenn WebView zurückspringen kann, zuerst WebView verwenden
-        if (!isTv() && kioskWeb != null && kioskWeb.canGoBack()) {
+        if (!isTv(this) && kioskWeb != null && kioskWeb.canGoBack()) {
             kioskWeb.goBack();
         } else {
             super.onBackPressed();
@@ -675,7 +710,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (isTablet() && marquee && marqueeTimeout > 0) {
             startMarqueeHandler();
         }
-        if (isTv() && urlTimeout > 0) {
+        if (isTv(this) && urlTimeout > 0) {
             startUrlHandler();
         }
     }
@@ -696,15 +731,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             stopMarqueeHandler();
             stopMarqueeResumeHandler(); // Aufräumen
         }
-        if (isTv() && urlTimeout > 0) {
+        if (isTv(this) && urlTimeout > 0) {
             stopUrlHandler();
         }
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (isTv()) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
+        if (isTv(this)) {
+            if ((event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_MENU) ||
+                    (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN && (event.getScanCode() == 0x000c0077))){
                 kioskWeb.showContextMenu();
                 return true;
             } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 19)){
@@ -721,7 +757,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     rightPressCount = 0;
                 }
                 return true;
-            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 21 && upPressCount >= 3)){
+            } else if ((event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 21 && upPressCount >= 3)) ||
+                    (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN && (event.getScanCode() == 0x000c0078))){
                 rightPressCount++;
                 if (rightPressCount == 3) {
                     openSettingsActivity();
@@ -741,7 +778,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 // Einzelne Prüfung (vorher doppelt)
                 recreate();
                 return true;
-            } else if (event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 82 || event.getKeyCode() == 4)){
+            } else if ((event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == 82 || event.getKeyCode() == 4)) ||
+                    (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN && (event.getScanCode() == 0x000c0186))){
                 toggleUrl();
                 return true;
             }
