@@ -39,17 +39,11 @@ android {
     buildTypes {
         debug {
             buildConfigField "String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\""
-            buildConfigField 'String', "API_NAME", API_NAME
-            buildConfigField 'String', "API_KEY", API_KEY
-            buildConfigField 'String', "API_URL", API_URL
-            buildConfigField 'String', "UPDATE_URL", UPDATE_URL
+            buildConfigField 'String', "UPDATE_URL", W3KIOSK_UPDATE_URL
         }
         release {
             buildConfigField "String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\""
-            buildConfigField 'String', "API_NAME", API_NAME
-            buildConfigField 'String', "API_KEY", API_KEY
-            buildConfigField 'String', "API_URL", API_URL
-            buildConfigField 'String', "UPDATE_URL", UPDATE_URL
+            buildConfigField 'String', "UPDATE_URL", W3KIOSK_UPDATE_URL
 
             minifyEnabled false
             signingConfig signingConfigs.release
@@ -80,9 +74,10 @@ dependencies {
     implementation 'androidx.gridlayout:gridlayout:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'com.google.android.material:material:1.14.0'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
     implementation 'androidx.browser:browser:1.10.0'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.media:media:1.8.0'
     implementation project(':appupdate')
 }

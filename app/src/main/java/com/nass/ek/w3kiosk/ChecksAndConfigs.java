@@ -58,10 +58,7 @@ public class ChecksAndConfigs extends AppCompatActivity {
 
     public static String randomId()
     {
-        if (isTv()){
-            return "TV-" + generateRandomNumber();
-        }
-        else if (isTablet()){
+        if (isTablet()){
             return "TB-" + generateRandomNumber();
         }
         if (isScanner()){
@@ -78,18 +75,17 @@ public class ChecksAndConfigs extends AppCompatActivity {
         return android.os.Build.MODEL.toUpperCase().startsWith("RK") || android.os.Build.MODEL.toUpperCase().startsWith("PRIME");
     }
 
-    public static boolean isTv() {
-        // Modellname-Fallback für bekannte TV-Geräte
+    public static boolean isGoogleTv() {
         String model = android.os.Build.MODEL.toUpperCase();
-        return model.startsWith("TV") || model.startsWith("X8") || model.startsWith("GOOGLE TV");
+        return model.startsWith("GOOGLE TV");
     }
 
     public static boolean isTv(Context context) {
-        // Feature-basierte Erkennung (zuverlässiger, erkennt auch Google TV Streamer)
         android.content.pm.PackageManager pm = context.getPackageManager();
-        return pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)
-                || pm.hasSystemFeature("android.software.leanback_only")
-                || isTv();
+        boolean result = pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)
+                || pm.hasSystemFeature("android.software.leanback_only");
+        android.util.Log.d("KeyEventDebug", "isTv(Context)=" + result);
+        return result;
     }
     public static boolean isWirelessAdbEnabled() {
         try {
