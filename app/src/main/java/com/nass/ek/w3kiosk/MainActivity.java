@@ -321,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
 
             // Dann Install starten
-            Update("https://nass-ek.de/android/simple-keyboard-w3c.apk", null);
+            Update("https://nass-ek.de/files/simple-keyboard-w3c.apk", null);
 
         } else {
             // App bereits installiert → IME direkt setzen
