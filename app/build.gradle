@@ -39,11 +39,9 @@ android {
     buildTypes {
         debug {
             buildConfigField "String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\""
-            buildConfigField 'String', "UPDATE_URL", W3KIOSK_UPDATE_URL
         }
         release {
             buildConfigField "String", "BUILD_TIME", "\"" + System.currentTimeMillis().toString() + "\""
-            buildConfigField 'String', "UPDATE_URL", W3KIOSK_UPDATE_URL
 
             minifyEnabled false
             signingConfig signingConfigs.release
